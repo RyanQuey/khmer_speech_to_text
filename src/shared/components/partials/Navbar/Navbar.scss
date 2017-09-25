@@ -1,0 +1,14 @@
+@import 'theme/_helpers';
+
+.navbar {
+  width: 100%;
+  height: 50px;
+  z-index: 2;
+  color: $white;
+  background-color: $nav-bg; //unless it's overridden in the component
+  @include rems(14);
+  a {
+    color: $primary;
+  }
+}
+

@@ -1,0 +1,144 @@
+@import 'theme/_helpers';
+
+// Profile Banner
+.profileBannerCtn {
+  position: relative;
+
+  .editBannerPictureCtn {
+    > div {
+    }
+
+  }
+}
+
+// Profile Title
+.profileTitle {
+  bottom: 0;
+  left: 50%;
+  background-color: rgba(0, 0, 0, .4);
+  position: absolute;
+  transform: translateX(-50%);
+  width: 100%;
+
+  .profileTitleCtn {
+    left: 325px;
+    position: relative;
+    padding: 1rem 0;
+    input {
+      margin-left: 20px;
+      width: 300px;
+    }
+    h1 {
+      margin: 0;
+      font-weight: none;
+      @include rems(36);
+    }
+    label {
+      margin: 0;
+      @include rems(16);
+    }
+    input {
+      margin-left: 5px;
+      width: 300px;
+    }
+  }
+}
+
+// Profile Summary
+.profileSummaryCtn {
+
+}
+
+.editProfilePictureCtn {
+  position: absolute;
+  padding-left: 50px;
+  margin-top: -130px;
+  color: $white;
+  div {
+    border: 3px solid $white;
+    border-radius: 50%;
+    > div {
+      border: none;
+    }
+  }
+}
+
+.summaryText {
+  padding: 20px 0 20px 325px;
+  width: 100%;
+}
+.summaryStats {
+  @include cols(6);
+  text-align: center;
+  color: $text;
+  list-style: none;
+  li {
+    float: left;
+    display: inline-block;
+    padding: 0 25px 0 0;
+    &:last-of-type {
+      padding-right: 0;
+    }
+  }
+  span:first-of-type {
+    margin-right: 8px;
+    line-height: 1;
+    display: block;
+    @include rems(14);
+  }
+  span:nth-of-type(2) {
+    margin-top: -6px;
+    @include rems(28);
+  }
+}
+.chatButton {
+  @include cols(6);
+}
+.socialLinks {
+  @include cols(12);
+  margin: 20px 0;
+  input {
+    margin-left: 6px;
+  }
+}
+
+//Status Container
+.statusCtn {
+
+}
+
+//
+.portfolioCtn {
+  padding: 20px;
+  margin-bottom: 3rem;
+
+  label {
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 1rem 0 0 0;
+    color: $accent1;
+  }
+  h5 {
+    margin-bottom: 0;
+  }
+}
+
+.formField {
+  background: $white;
+  border: 1px solid $primary;
+  padding: 10px;
+  border-radius: 5px;
+  @include rems(16);
+}
+
+
+
+/* below is imported from the aborted v2
+.profile {
+  min-height: 100vh;
+  @include cols(9);
+  padding: 0;
+  width: calc(100% - 300px);
+}
+*/

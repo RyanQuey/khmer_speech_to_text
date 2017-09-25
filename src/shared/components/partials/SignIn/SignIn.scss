@@ -1,0 +1,10 @@
+@import 'theme/_helpers';
+
+.loginModal {
+  color: $black;
+}
+.loginInput {
+  label {
+    display: block;
+  }
+}

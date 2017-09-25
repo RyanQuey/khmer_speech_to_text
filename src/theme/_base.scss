@@ -1,0 +1,47 @@
+@import 'theme/_helpers';
+
+/*     Base styles     */
+html {
+  box-sizing: border-box;
+  height: 100%;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+body {
+  color: #fff;
+  background: #383f4a;
+  font: 100%/1.3 'Raleway';
+  margin: 0 auto;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+audio,
+canvas,
+img,
+video {
+  vertical-align: middle;
+}
+
+/* Fluid images */
+img, object {
+  height: auto;
+  max-width: 100%;
+  _width: 100%;
+}
+
+a {
+  color: $link;
+  text-decoration: none;
+  transition: all 0.3s ease-out;
+  &:visited {
+    color: $link-visited;
+  }
+  &:hover {
+    color: $link-hover;
+  }
+  &:active {
+    color: $link;
+  }
+}

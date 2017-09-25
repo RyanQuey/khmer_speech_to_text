@@ -1,0 +1,85 @@
+/*     Default spacing   */
+$columns: 12;
+$gutter: 40px;
+
+/*     Font defaults     */
+$font-size: 16; // Your base font-size in pixels
+$line: 24;
+$em: $font-size * 1em; // Shorthand for outputting ems, e.g. "12/$em"
+
+
+$navy: #1c3343;
+$white: #fff;
+$black: #000;
+$blue: #058fc4;
+$blue-bg: #157ba6;
+$blue-button: #176181;
+$blue-hover: #124a62;
+$blue-hover-alt: #1B7398;
+$gray: #9b9b9b;
+$gray-bg: #4a4a4a;
+$green-button: #40b655;
+$green-hover: #369646;
+$red-bg: #da513d;
+$red-dk: #c94b39;
+$red-dk-bg: #b34232;
+$red-button: #7d2e23;
+$red-hover: #5e231b;
+$ghost-blue: #058fc4;
+$ghost-red: #cb4e4e;
+$ghost-yellow: #ffbe00;
+$ghost-green: #41b655;
+$module_gray-1: #f4f4f4;
+$module_gray-2: #efefef;
+$module_gray-3: #ebebeb;
+$module_gray-4: #e5e5e5;
+$module_blue-1: #058fc4;
+$module_blue-2: #45b1db;
+$module_blue-3: #176181;
+$module_yellow: #F8CB33;
+$module_yellow-2: #C59923;
+$module_red: #e54242;
+$module_red-2: #c32525;
+$module_green: #42B655;
+$module_quote: #dedede;
+
+$text: #333;
+$msg: #A3A3A3;
+$sidebar: $gray-bg;
+$nav-bg: #595959;
+$header: $nav-bg;
+$footer: $navy;
+$clients-bg: $white;
+$features-bg: $blue-bg;
+$completion-bg: $blue;
+$delivery-bg: $white;
+$integrations-bg: $gray-bg;
+$get-started-bg: $white;
+$how-it-works-bg: $red-bg;
+$custom-assessment-bg: $red-dk-bg;
+$play-bg: #A79032;
+
+$primary: #17C3A9;
+$active: rgb(23, 195, 169);
+$secondary: rgb(0, 125, 125);
+$accent1: rgb(155, 155, 155);
+$accent2: rgb(250, 175, 0);
+$accent3: rgb(176, 69, 69);
+
+$nav-hover: #626262;
+$nav-border: #474747;
+
+$light-gray-bg: #FAFAFA;
+
+/*     Link colors     */
+$link: $blue;
+$link-hover: $blue-hover;
+$link-visited: $blue;
+$exec: #a75bd8;
+$creative: #0ee0bd;
+$dev: #17aee7;
+$psych: #ed4343;
+
+/*     Fonts     */
+$source-sans: 'source_sans_pro_reg', 'Helvetica Neue', Arial, sans-serif;
+$source-sans-semibold: 'source_sans_pro_semibold', 'Helvetica Neue', Arial, sans-serif;

@@ -1,0 +1,90 @@
+@import 'theme/index';
+
+.sidebar {
+  min-height: 100vh;
+  width: 300px;
+  background: $sidebar;
+  color: $white;
+  padding: 40px 20px;
+}
+
+.statusCtn {
+  height: 175px;
+  min-height: 175px;
+  label {
+    margin-top: 2rem;
+    display: block;
+  }
+  select {
+    color: $text;
+    display: block;
+    width: 100%;
+    height: 40px;
+
+  }
+  button {
+    margin-top: 20px;
+  }
+  .statusMsg {
+    color: $msg;
+    text-align: center;
+    @include rems(14);
+    span {
+      color: $primary;
+    }
+  }
+  .btnPrimary {
+    display: block;
+    width: 100%;
+    background: $primary;
+    color: $white;
+    border: 0;
+    padding: 7px 14px;
+    border-radius: 5px;
+  }
+}
+.nav {
+  margin-top: 20px;
+}
+.sidebarNav {
+  list-style: none;
+  margin: 0 -20px;
+  padding: 0;
+  background: $nav-bg;
+  li {
+  }
+  a, a:visited {
+    display: block;
+    padding: 10px 20px;
+    background: $nav-bg;
+    color: $white;
+    border: 1px solid $nav-border;
+    &:hover {
+      color: $primary;
+      background: $nav-hover;
+    }
+  }
+  a.navActive {
+    &:hover {
+      color: $white;
+    }
+  }
+  .profileEdit {
+    display: block;
+    color: $primary;
+    float: right;
+    margin-top: -3px;
+  }
+  .badge {
+    display: block;
+    background: $primary;
+    color: $white;
+    float: right;
+    min-width: 10px;
+    padding: 3px 10px;
+    border-radius: 5px;
+    margin-top: -3px;
+    font-weight: bold;
+  }
+}
+

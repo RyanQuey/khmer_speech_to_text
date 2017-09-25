@@ -1,0 +1,25 @@
+@import 'theme/_helpers';
+
+.fields {
+  @include cols(6);
+  padding: 0;
+  margin: 50px 0;
+
+  .form {
+    margin: 0 5%;
+  }
+}
+.onLampWrapper {
+  @include cols(6);
+  min-width: 400px;
+  height: 100%;
+  padding: 0;
+  margin: 50px 0;
+  //need to find a better way to create this gray thing that is reported
+  //border-left: $gray 2px solid;
+  .onLamp {
+    height: 100%;
+    width: 100%;
+    padding: 10%;
+  }
+}

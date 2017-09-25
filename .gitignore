@@ -1,0 +1,15 @@
+node_modules/
+.idea
+npm-debug.log
+package-lock.json
+public/user*.js
+public/admin*.js
+public/user*.map
+public/admin*.map
+public/user/index.html
+public/admin/index.html
+.DS_Store
+.happypack
+dist/
+**.swp
+**.swo

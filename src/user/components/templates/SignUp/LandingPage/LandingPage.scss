@@ -1,0 +1,68 @@
+@import 'theme/_helpers';
+.landingPageCtn {
+  h1 {
+
+    @include cols(12);
+  }
+  h2 {
+    display: inline-block;
+    padding: 0 5px;
+  }
+}
+.headerCtn {
+  width: 100%;
+  padding-top: 20px;
+  overflow: hidden;
+  .headerContentCtn {
+    width: 960px;
+    margin: 0 auto;
+    overflow: hidden;
+
+    img {
+      float: left;
+    }
+  }
+}
+.layerCtn {
+  width: 960px;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 20px 0;
+}
+.introCtn {
+
+}
+.middleCtn {
+  background-color: $light-gray-bg;
+}
+.leftCtn {
+  @include cols(6);
+}
+.rightCtn {
+  @include cols(6);
+  img {
+    float: right;
+  }
+}
+.imageCtn {
+  margin: 0 0 -320px 0;
+  text-align: center;
+  padding: 20px 0;
+  background-color: $light-gray-bg;
+
+  img {
+    margin: 0 40px;
+    max-width: 880px;
+    background-color: $white;
+    border: $white 3px solid;
+  }
+}
+.bottomCtn {
+  background-color: $primary;
+  p {
+    @include rems(24);
+  }
+  button {
+    margin: 0;
+  }
+}
