@@ -69,6 +69,7 @@ export default () => {
     },
 
     notifyOfAPIError: function (data, title) {
+      console.log(data);
       var err = "Unknown error.";
       if (data.responseText) {
         try {

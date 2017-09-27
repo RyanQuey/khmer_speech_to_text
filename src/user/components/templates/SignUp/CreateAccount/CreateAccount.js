@@ -6,7 +6,8 @@ import { withRouter } from 'react-router-dom'
 import { Button, Flexbox, Heading, Input } from 'shared/components/elements'
 import { Unauthenticated } from 'user/components/yields'
 import {
-  FIELDS,
+  USER_COLUMNS,
+  EMAIL,
   NEW_EMAIL,
   FACEBOOK,
   GITHUB,
@@ -21,31 +22,38 @@ class CreateAccount extends Component {
     this.state = {
       email: '',
       validEmail: false,
+      view: 'SIGN_UP'
     }
   }
-  updateEmail(e, errors) {
+  handleEmail(e, errors) {
     this.setState({
       email: e.target.value,
       validEmail: (errors.length === 0),
     })
   }
   signInWithEmail() {
-    userActions.signIn({
-      type: EMAIL,
-      data: {
+    let type
+    if (this.state.view === 'SIGN_UP') {
+      type = NEW_EMAIL
+    } else {
+      type = EMAIL
+    }
+    userActions.signIn(
+      type,
+      {
         email: this.state.email,
         history: this.props.history,
       },
-    })
+    )
   }
   providerSignIn(provider) {
-    userActions.signIn({
-      type: PROVIDER,
-      data: {
+    userActions.signIn(
+      PROVIDER,
+      {
         provider,
         history: this.props.history,
       },
-    })
+    )
   }
   render() {
     return (
@@ -56,8 +64,8 @@ class CreateAccount extends Component {
             <Heading level={3}>Email address:</Heading>
             <Input
               color="primary"
-              name={FIELDS.EMAIL}
-              onChange={(e, errors) => this.updateEmail(e, errors)}
+              name={USER_COLUMNS.EMAIL}
+              onChange={(e, errors) => this.handleEmail(e, errors)}
               placeholder="your-email@gmail.com"
               type="text"
               value={this.state.email}
@@ -65,7 +73,7 @@ class CreateAccount extends Component {
             />
             <Heading level={5}>We&apos;ll send you an email to set your password.</Heading>
             <Button
-              onClick={() => this.createUserWithEmail()}
+              onClick={() => this.signInWithEmail()}
               disabled={(!this.state.validEmail)}
             >
               Sign up

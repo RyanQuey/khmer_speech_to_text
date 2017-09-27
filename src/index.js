@@ -21,6 +21,10 @@ import adminCombiner from 'admin/reducers'
 import sharedCombiner from 'shared/reducers'
 import userCombiner from 'user/reducers'
 
+import _ from 'lodash'
+
+window._ = _
+
 window.React = React
 const combined = combineReducers({
   admin: adminCombiner,
