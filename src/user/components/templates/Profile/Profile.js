@@ -1,14 +1,26 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { setImage } from 'actions'
+import { setImage } from 'shared/actions'
 import { Button, Flexbox, Heading, Icon, Spinner } from 'shared/components/elements'
 import { DropImage } from 'shared/components/groups'
 import { FirebaseInput } from 'shared/components/partials'
 import { Authenticated } from 'shared/components/yields'
-import { FIELDS, SOCIAL, URL } from 'utils/constants'
+
+import schema from 'constants/schema'
+import {
+  EMAIL,
+  CREATE_WITH_EMAIL,
+  PROVIDER,
+} from 'constants/signIn'
+
+import {
+  FACEBOOK,
+  GITHUB,
+  GOOGLE,
+} from 'constants/providers'
 import avatar from 'images/avatar.png'
-import banner from 'images/profile/defaultBanner.jpg'
+import banner from 'images/profile/baby.jpg'
 
 import classes from './Profile.scss'
 
@@ -17,7 +29,7 @@ class Profile extends Component {
     super()
 
     this.state = {
-      activeSocial: SOCIAL.FACEBOOK,
+      activeSocial: FACEBOOK,
     }
   }
   setActiveIcon(e) {
@@ -40,9 +52,9 @@ class Profile extends Component {
             <div className={classes.editProfileBannerCtn}>
               <DropImage
                 defaultImage={banner}
-                imageURL={this.props[FIELDS.BANNER_URL]}
+                imageURL={this.props[schema.user.BANNER_URL.column_name]}
                 setImage={this.props.setImage}
-                imageName={FIELDS.BANNER_URL}
+                imageName={schema.user.BANNER_URL.column_name}
                 label="Drop cover photo here"
                 className={classes.editBannerPicture}
                 uid={this.props.uid}
@@ -54,15 +66,6 @@ class Profile extends Component {
             <Flexbox className={classes.profileTitle} direction="column" justify="center">
               <Heading align="center" color="white" level={1}>{this.props.displayName}</Heading>
 
-              <Flexbox className={classes.profileTitleCtn}>
-                <FirebaseInput
-                  label={`${FIELDS.SPECIALTY} in`}
-                  color="primary"
-                  name={FIELDS.LOCATION}
-                  placeholder="Enter city or specify Nomad"
-                  type="text"
-                />
-              </Flexbox>
             </Flexbox>
 
           </div>
@@ -72,9 +75,9 @@ class Profile extends Component {
             <div className={classes.editProfilePictureCtn}>
               <DropImage
                 defaultImage={avatar}
-                imageURL={this.props[FIELDS.AVATAR_URL]}
+                imageURL={this.props[schema.user.AVATAR_URL.column_name]}
                 uid={this.props.uid}
-                imageName={FIELDS.AVATAR_URL}
+                imageName={schema.user.AVATAR_URL.column_name}
                 setImage={this.props.setImage}
                 label="Drop profile photo here"
                 style={{
@@ -97,7 +100,7 @@ class Profile extends Component {
                 <Flexbox justify="flex-start" className={classes.socialLinks} >
                   <span className="fa-stack fa-lg">
                     <Icon
-                      border={this.state.activeSocial === SOCIAL.FACEBOOK}
+                      border={this.state.activeSocial === FACEBOOK}
                       className="fa-stack-2x"
                       color="primary"
                       name="circle"
@@ -105,14 +108,14 @@ class Profile extends Component {
                     <Icon
                       className="fa-stack-1x"
                       color="white"
-                      id={SOCIAL.FACEBOOK}
-                      name={SOCIAL.FACEBOOK}
+                      id={FACEBOOK}
+                      name={FACEBOOK}
                       onClick={e => this.setActiveIcon(e)}
                     />
                   </span>
                   <span className="fa-stack fa-lg">
                     <Icon
-                      border={this.state.activeSocial === SOCIAL.LINKEDIN}
+                      border={this.state.activeSocial === LINKEDIN}
                       className="fa-stack-2x"
                       color="primary"
                       name="circle"
@@ -120,14 +123,14 @@ class Profile extends Component {
                     <Icon
                       className="fa-stack-1x"
                       color="white"
-                      id={SOCIAL.LINKEDIN}
-                      name={SOCIAL.LINKEDIN}
+                      id={LINKEDIN}
+                      name={LINKEDIN}
                       onClick={e => this.setActiveIcon(e)}
                     />
                   </span>
                   <span className="fa-stack fa-lg">
                     <Icon
-                      border={this.state.activeSocial === SOCIAL.TWITTER}
+                      border={this.state.activeSocial === TWITTER}
                       className="fa-stack-2x"
                       color="primary"
                       name="circle"
@@ -135,15 +138,15 @@ class Profile extends Component {
                     <Icon
                       className="fa-stack-1x"
                       color="white"
-                      id={SOCIAL.TWITTER}
-                      name={SOCIAL.TWITTER}
+                      id={TWITTER}
+                      name={TWITTER}
                       onClick={e => this.setActiveIcon(e)}
                     />
                   </span>
 
                   <FirebaseInput
                     color="primary"
-                    name={`${this.state.activeSocial.toLowerCase()}${URL}`}
+                    name={`${this.state.activeSocial.toLowerCase()}URL`}
                     placeholder={`Add a ${this.state.activeSocial} Account`}
                     type="text"
                   />
@@ -152,55 +155,6 @@ class Profile extends Component {
             </div>
           </div>
 
-          <Flexbox className={classes.statusCtn} justify="space-around" background="white">
-            <Heading color="primary" level={3}>Your availability status appears here</Heading>
-            <Button disabled={true}>Send Collab Request</Button>
-          </Flexbox>
-
-          <Flexbox className={classes.portfolioCtn} justify="space-around">
-            <Flexbox direction="column" className={classes.skills}>
-              <Heading color="accent1" level={5}>Skills</Heading>
-
-              <FirebaseInput
-                color="primary"
-                name={FIELDS.SPECIALTY}
-                placeholder="Add a another skill"
-                type="text"
-                label="Specialty"
-                addFieldButton={addFieldButton}
-              />
-
-            </Flexbox>
-
-            <Flexbox direction="column" className={classes.portfolio}>
-              <Heading color="accent1" level={5}>Portfolio</Heading>
-
-              <FirebaseInput
-                color="primary"
-                name={FIELDS.PORTFOLIO}
-                placeholder="Add a link to your portfolio"
-                type="text"
-                label="Portfolio Link"
-              />
-
-              <FirebaseInput
-                color="primary"
-                name={FIELDS.BEHANCE_URL}
-                placeholder="Link up your Behance"
-                type="text"
-                label="Behance Stream"
-              />
-
-              <FirebaseInput
-                color="primary"
-                name={FIELDS.DRIBBBLE_URL}
-                placeholder="Link up your Dribbble"
-                type="text"
-                label="Dribbble Stream"
-              />
-            </Flexbox>
-
-          </Flexbox>
 
         </Flexbox>
       </AuthenticatedTemplate>
@@ -219,8 +173,8 @@ Profile.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    [FIELDS.AVATAR_URL]: state.user[FIELDS.AVATAR_URL],
-    [FIELDS.BANNER_URL]: state.user[FIELDS.BANNER_URL],
+    [schema.user.AVATAR_URL.column_name]: state.user[schema.user.AVATAR_URL.column_name],
+    [schema.user.BANNER_URL.column_name]: state.user[schema.user.BANNER_URL.column_name],
     displayName: state.user.displayName,
     uid: state.user.uid,
   }

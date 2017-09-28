@@ -1,27 +1,20 @@
 import firebase from 'refire/firebase'
 import generator from 'generate-password'
 
+import schema from 'constants/schema'
 import {
-  CREATE_USER,
   EMAIL,
+  CREATE_WITH_EMAIL,
+  PROVIDER,
+} from 'constants/signIn'
+
+import {
   FACEBOOK,
   GITHUB,
   GOOGLE,
-  NEW_EMAIL,
-  PROVIDER,
-  SUCCESS,
-  USER_COLUMNS,
-} from 'utils/constants'
-
-import { 
-  FETCH_USER, 
-  SIGN_OUT, 
-  SIGN_IN, 
-  SET_CURRENT_USER 
-} from 'actions/types'
+} from 'constants/providers'
 
 function _createUserWithEmail(data) {
-console.log(" digit now crating user");
   const password = generator.generate({
     length: 10,
     numbers: true,
@@ -33,7 +26,7 @@ console.log(" digit now crating user");
   // than the user data for an existing user so we have to pass obj
   firebase.auth().createUserWithEmailAndPassword(data.email, password)
   .then((user) => {
-console.log(user);
+    console.log(user);
     user.redirect = true
     user.history = data.history
 
@@ -44,7 +37,6 @@ console.log(user);
   })  
 }
 function _signInWithEmail(data) {
-console.log("nice-sounding in");
   firebase.auth().signInWithEmailAndPassword(data.email, data.password)
   .then(user => {
 
@@ -59,13 +51,13 @@ function _signInWithProvider(data) {
   let authProvider
 
   switch (data.provider) {
-    case FACEBOOK:
+    case providerConstants.FACEBOOK.name:
       authProvider = new firebase.auth.FacebookAuthProvider()
       break
-    case GITHUB:
+    case providerConstants.GITHUB.name:
       authProvider = new firebase.auth.GithubAuthProvider()
       break
-    case GOOGLE:
+    case providerConstants.GOOGLE.name:
       authProvider = new firebase.auth.GoogleAuthProvider()
       break
   }
@@ -87,7 +79,7 @@ console.log(user);
 
 //if the user cannot be found by the userData.uid, creates a new User newUserData
 export const findOrCreateUser = (userData, redirect) => {
-  const userColumns = _.values(USER_COLUMNS)
+  const userColumns = _.values(Object.keys(schema.tables.users))
   const ref = firebase.database().ref(`users/${userData.uid}`)
 
   ref.once('value')
@@ -107,13 +99,12 @@ export const findOrCreateUser = (userData, redirect) => {
     }
   })
   .then((persistedUser) => {
-    const u = Object.assign({}, persistentUser)
+    const u = Object.assign({}, persistedUser)
 
     store.dispatch({ 
-      type: FETCH_USER, 
+      type: actionTypes.FETCH_USER, 
       payload: {
         user: u,
-        result: SUCCESS
       }
     })
 
@@ -134,16 +125,16 @@ export const signIn = (type, data) => {
   let returnedUser
 
   switch (type) {
-    case CREATE_USER:
+    case signInConstants.CREATE_USER:
       returnedUser = _createUserWithEmail(data)
       break
-    case EMAIL:
+    case signInConstants.EMAIL:
       returnedUser = _signInWithEmail(data)
       break
-    case NEW_EMAIL:
+    case signInConstants.NEW_WITH_EMAIL:
       returnedUser = _createUserWithEmail(data)
       break
-    case PROVIDER:
+    case signInConstants.PROVIDER:
       returnedUser = _signInWithProvider(data)
       break
   }
@@ -154,11 +145,12 @@ export const signIn = (type, data) => {
       email: returnedUser.email,
       history: returnedUser.history || false,
       photoURL: returnedUser.photoURL ? returnedUser.photoURL : null,
-      redirect: returnedUser.redirect || false,
       uid: returnedUser.uid,
     }
+    const redirect = returnedUser.redirect || false 
 
     console.log('user auth data', userAuthData)
+    findOrCreateUser(userAuthData, redirect)
     //in case the user already has some data persisted in our database
   } else {
     //return an error
@@ -169,8 +161,8 @@ export const signIn = (type, data) => {
 //
 //I don't think we ever have to use this one
 export const setCurrentUser = user => (
-  { type: SET_CURRENT_USER, payload: user }
+  { type: actionTypes.SET_CURRENT_USER, payload: user }
 )
 export const signOut = isSignedOut => (
-  { type: SIGN_OUT, payload: isSignedOut }
+  { type: actionTypes.SIGN_OUT, payload: isSignedOut }
 )

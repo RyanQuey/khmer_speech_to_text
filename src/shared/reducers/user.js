@@ -1,13 +1,13 @@
 import {
-  INPUT_UPDATE_SUCCESSFUL,
+  UPDATE_FIREBASE,
   LOG_IN_WITH_PROVIDER,
   SET_CURRENT_USER,
   SET_IMAGE,
   SIGN_OUT,
-  USER_FETCH_SUCCEEDED,
-} from 'actions/types'
+  FETCH_USER,
+} from 'constants/actionTypes'
 
-const userReducer = (state = null, action) => {
+export default (state = null, action) => {
 
   switch (action.type) {
     case LOG_IN_WITH_PROVIDER:
@@ -19,13 +19,13 @@ const userReducer = (state = null, action) => {
     case SET_IMAGE:
       return Object.assign({}, state, { [action.data.name]: action.data.url })
 
-    case INPUT_UPDATE_SUCCESSFUL:
+    case UPDATE_FIREBASE:
       return Object.assign({}, state, { [action.inputData.name]: action.inputData.value })
 
     case SIGN_OUT:
       return action.isSignedOut ? state : null
 
-    case USER_FETCH_SUCCEEDED:
+    case FETCH_USER:
       console.log('Merged user auth and user data into store ===>', action.user)
       return Object.assign({}, state, action.user)
 
@@ -34,4 +34,3 @@ const userReducer = (state = null, action) => {
   }
 }
 
-export default userReducer

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { setInputVal } from 'actions'
+import { updateFirebase } from 'shared/actions'
 import { Input } from 'shared/components/elements'
 
 class FirebaseInput extends Component {
@@ -17,23 +17,32 @@ class FirebaseInput extends Component {
       this.setState({ value: nextProps[nextProps.name] })
     }
   }
-  updateVal(e, errors, index) {
-    const newInput = e.target.value.toString()
+  handleInput(e, errors, index) {
+    const v = e.target.value.toString()
+    const path = this.props.keys.replace(/\./g, "/")
     let value
+
+    // if this is really an array of inputs
+    // TODO: make a separate component if this is an array of inputs
     if (index) {
       value = this.state.value
-      value[index] = newInput
+      value[index] = v
     } else {
-      value = newInput
+      value = v
     }
+
     this.setState({ value })
 
     if (errors.length === 0) {
-      this.props.setInputVal({ name: this.props.name, value })
+      updateFirebase(value, path)
     }
   }
+
+  // if this is really an array of inputs
   addField(e) {
     const c = this
+    let path = this.props.keys.replace(/\./g, "/")
+
     let value
     if (Array.isArray(c.state.value)) {
       value = this.state.value
@@ -45,7 +54,10 @@ class FirebaseInput extends Component {
 
     value.push("")
     this.setState({ value })
-    this.props.setInputVal({ name: this.props.name, value })
+    //TODO: handle if need to set up an association here
+    //use firebase.push() instead
+
+    updateFirebase( path, value)
   }
 
   render() {
@@ -61,7 +73,7 @@ class FirebaseInput extends Component {
         value={value}
         checked={this.props.checked}
         onBlur={this.props.onBlur}
-        onChange={(e, errors, index) => this.updateVal(e, errors, index)}
+        onChange={(e, errors, index) => this.handleInput(e, errors, index)}
         index={index}
         label={label && this.props.label}
         labelAfter={this.props.labelAfter}
@@ -98,7 +110,6 @@ class FirebaseInput extends Component {
 
 FirebaseInput.propTypes = {
   uid: PropTypes.string,
-  setInputVal: PropTypes.func.isRequired,
   id: PropTypes.string,
   name: PropTypes.string.isRequired,
   className: PropTypes.string,
@@ -119,4 +130,4 @@ const mapStateToProps = (state, ownProps) => {
   return { [ownProps.name]: state.user[ownProps.name] }
 }
 
-export default connect(mapStateToProps, { setInputVal })(FirebaseInput)
+export default connect(mapStateToProps)(FirebaseInput)

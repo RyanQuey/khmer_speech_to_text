@@ -1,18 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { setInputVal } from 'actions'
 import { DropDown, Flexbox, MenuItem } from 'shared/components/elements'
-import {
-  NOT_WORKING,
-  REALLY_LIGHT,
-  KINDA_LIGHT,
-  NOT_THAT_BUSY,
-  KINDA_BUSY,
-  REALLY_BUSY,
-  SLAMMED,
-} from 'utils/constants'
 
+import { updateFirebase } from 'shared/actions'
 import classes from './Sidebar.scss'
 
 class Sidebar extends Component {
@@ -38,38 +29,11 @@ class Sidebar extends Component {
   handleSubmit() {
     console.log('submitting', this.state.status)
     this.setState({ dirty: false })
-    this.props.setInputVal({ name: 'status', value: this.state.status })
+    updateFirebase(`users/${this.props.user}/status`, this.state.status)
   }
   render() {
     return (
       <Flexbox className={classes.sidebar} direction="column" background="black">
-
-        <div className={classes.statusCtn}>
-          <DropDown
-            handleChange={this.handleChange}
-            handleSubmit={this.handleSubmit}
-            items={this.state.items}
-            name="profile-dropdown"
-            placeholder="How busy are you?"
-            value={this.state.status}
-            label="This week I am:"
-            submitButton={this.state.dirty ? {
-              classes: classes.btnPrimary,
-              text: 'Update Availability',
-            } : {}
-            }
-          />
-
-          {this.state.dirty ? false : (
-            <p className={classes.statusMsg}>
-              <span>You are up to date.</span>
-              <br />
-              Last Updated: Today
-              <br />
-              Expires in: 7 days
-            </p>
-          )}
-        </div>
 
         <div className={classes.nav}>
           <ul className={classes.sidebarNav}>
@@ -97,7 +61,8 @@ Sidebar.propTypes = {
 }
 
 const mapStateToProps = (state) => {
-  return { status: state.user.status }
+  return { 
+    user: state.user }
 }
 
-export default connect(mapStateToProps, { setInputVal })(Sidebar)
+export default connect(mapStateToProps)(Sidebar)

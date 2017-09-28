@@ -1,19 +1,23 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { userActions } from 'actions'
+import { userActions } from 'shared/actions'
 import { withRouter } from 'react-router-dom'
 import { Button, Flexbox, Heading, Input } from 'shared/components/elements'
 import { Unauthenticated } from 'user/components/yields'
+import schema from 'constants/schema'
 import {
-  USER_COLUMNS,
   EMAIL,
-  NEW_EMAIL,
+  CREATE_WITH_EMAIL,
+  PROVIDER,
+} from 'constants/signIn'
+
+import {
   FACEBOOK,
   GITHUB,
   GOOGLE,
-  PROVIDER,
-} from 'utils/constants'
+} from 'constants/providers'
+
 import classes from './CreateAccount.scss'
 
 class CreateAccount extends Component {
@@ -34,7 +38,7 @@ class CreateAccount extends Component {
   signInWithEmail() {
     let type
     if (this.state.view === 'SIGN_UP') {
-      type = NEW_EMAIL
+      type = CREATE_WITH_EMAIL
     } else {
       type = EMAIL
     }
@@ -64,7 +68,7 @@ class CreateAccount extends Component {
             <Heading level={3}>Email address:</Heading>
             <Input
               color="primary"
-              name={USER_COLUMNS.EMAIL}
+              path={schema.tables.users.email.path}
               onChange={(e, errors) => this.handleEmail(e, errors)}
               placeholder="your-email@gmail.com"
               type="text"

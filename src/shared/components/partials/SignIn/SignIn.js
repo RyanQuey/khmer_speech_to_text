@@ -3,14 +3,18 @@ import { Link } from 'react-router-dom'
 import { Button, Input } from 'shared/components/elements'
 import { connect } from 'react-redux'
 import Modal from 'react-modal'
-import { signInRequested } from 'actions'
+
+import { userActions } from 'shared/actions'
 import {
   EMAIL,
+  PROVIDER,
+} from 'constants/signIn'
+
+import {
   FACEBOOK,
   GITHUB,
   GOOGLE,
-  PROVIDER,
-} from 'utils/constants'
+} from 'constants/providers'
 import classes from './SignIn.scss'
 
 class SignIn extends Component {
@@ -35,26 +39,19 @@ class SignIn extends Component {
   closeLogInModal() {
     this.setState({ logInModalIsOpen: false })
   }
-  updateEmail(e, errors) {
+  handleEmail(e, errors) {
     this.setState({
       email: e.target.value,
       validEmail: (errors.length === 0),
     })
   }
-  updatePassword(e, errors) {
+  handlePassword(e, errors) {
     this.setState({
       password: e.target.value,
       validPassword: (errors.length === 0),
     })
   }
-  signIn(type, data) {
-    this.props.signInRequested({
-      type,
-      data: {
-        provider: data,
-      },
-    })
-  }
+
   render() {
     return (
       <div>
@@ -69,7 +66,7 @@ class SignIn extends Component {
           <h2>Login</h2>
           <Input
             type="email"
-            onChange={(e, errors) => this.updateEmail(e, errors)}
+            onChange={(e, errors) => this.handleEmail(e, errors)}
             value={this.state.email}
             validations={['required', 'email']}
             label='Email'
@@ -77,7 +74,7 @@ class SignIn extends Component {
           />
           <Input
             type="password"
-            onChange={(e, errors) => this.updatePassword(e, errors)}
+            onChange={(e, errors) => this.handlePassword(e, errors)}
             value={this.state.password}
             validations={['required']}
             label='Password'
@@ -154,4 +151,4 @@ const styles = {
 }
 
 
-export default connect(mapStateToProps, { signInRequested })(SignIn)
+export default connect(mapStateToProps)(SignIn)
