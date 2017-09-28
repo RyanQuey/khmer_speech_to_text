@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { DropDown, Flexbox, MenuItem } from 'shared/components/elements'
 
-import { updateFirebase } from 'shared/actions'
+import { firebaseActions } from 'shared/actions'
 import classes from './Sidebar.scss'
 
 class Sidebar extends Component {
@@ -29,7 +29,7 @@ class Sidebar extends Component {
   handleSubmit() {
     console.log('submitting', this.state.status)
     this.setState({ dirty: false })
-    updateFirebase(`users/${this.props.user}/status`, this.state.status)
+    firebaseActions(`users/${this.props.user}/status`, this.state.status)
   }
   render() {
     return (
@@ -62,7 +62,7 @@ Sidebar.propTypes = {
 
 const mapStateToProps = (state) => {
   return { 
-    user: state.user }
+    user: state.shared.user }
 }
 
 export default connect(mapStateToProps)(Sidebar)

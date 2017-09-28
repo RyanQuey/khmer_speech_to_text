@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { updateFirebase } from 'shared/actions'
+import { firebaseActions } from 'shared/actions'
 import { Input } from 'shared/components/elements'
 
 class FirebaseInput extends Component {
@@ -34,7 +34,7 @@ class FirebaseInput extends Component {
     this.setState({ value })
 
     if (errors.length === 0) {
-      updateFirebase(value, path)
+      firebaseActions(value, path)
     }
   }
 
@@ -57,7 +57,7 @@ class FirebaseInput extends Component {
     //TODO: handle if need to set up an association here
     //use firebase.push() instead
 
-    updateFirebase( path, value)
+    firebaseActions( path, value)
   }
 
   render() {
@@ -127,7 +127,7 @@ FirebaseInput.propTypes = {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  return { [ownProps.name]: state.user[ownProps.name] }
+  return { [ownProps.name]: state.shared.user[ownProps.name] }
 }
 
 export default connect(mapStateToProps)(FirebaseInput)

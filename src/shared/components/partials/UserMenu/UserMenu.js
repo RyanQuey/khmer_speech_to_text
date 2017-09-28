@@ -68,7 +68,7 @@ UserMenu.propTypes = {
 }
 
 const mapStateToProps = (state) => {
-  return { user: state.user }
+  return { user: state.shared.user }
 }
 
 export default connect(mapStateToProps)(UserMenu)

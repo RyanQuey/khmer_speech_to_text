@@ -2,6 +2,7 @@ import firebase from 'refire/firebase'
 import generator from 'generate-password'
 
 import schema from 'constants/schema'
+import * as actionTypes from 'constants/actionTypes'
 import {
   EMAIL,
   CREATE_WITH_EMAIL,
@@ -13,6 +14,9 @@ import {
   GITHUB,
   GOOGLE,
 } from 'constants/providers'
+import errorTypes from 'constants/errors'
+
+import { errorActions } from 'shared/actions'
 
 function _createUserWithEmail(data) {
   const password = generator.generate({
@@ -33,7 +37,20 @@ function _createUserWithEmail(data) {
     return user
   })
   .catch((err) => {
-    Helpers.notifyOfAPIError(err)
+    let toReturn = err
+    let options = {
+      alert: true
+    }
+    if (err.code === "auth/email-already-in-use") {
+      toReturn = {
+        title: "Email already in use",
+        message: "Please either login or try a different email",
+        errorType: errorTypes.RECORD_ALREADY_EXISTS.type,
+        errorLevel: errorTypes.RECORD_ALREADY_EXISTS.level,
+      }
+
+    }
+    errorActions.handleErrors("Login", "onSubmit", toReturn, options)
   })  
 }
 function _signInWithEmail(data) {
@@ -43,7 +60,7 @@ function _signInWithEmail(data) {
     return user
   })
   .catch((err) => {
-    Helpers.notifyOfAPIError(err)
+    errorActions.handleErrors(err)
   })
 }
 
@@ -72,7 +89,7 @@ console.log(user);
     return user
   })
   .catch((err) => {
-    Helpers.notifyOfAPIError(err)
+    errorActions.handleErrors(err)
     
   })
 }
@@ -116,7 +133,7 @@ export const findOrCreateUser = (userData, redirect) => {
   })
   .catch((err) => {
     console.log('user fetch failed')
-    Helpers.notifyOfAPIError(err)
+    errorActions.handleErrors(err)
   })
 }
 
@@ -125,16 +142,13 @@ export const signIn = (type, data) => {
   let returnedUser
 
   switch (type) {
-    case signInConstants.CREATE_USER:
+    case CREATE_WITH_EMAIL:
       returnedUser = _createUserWithEmail(data)
       break
-    case signInConstants.EMAIL:
+    case EMAIL:
       returnedUser = _signInWithEmail(data)
       break
-    case signInConstants.NEW_WITH_EMAIL:
-      returnedUser = _createUserWithEmail(data)
-      break
-    case signInConstants.PROVIDER:
+    case PROVIDER:
       returnedUser = _signInWithProvider(data)
       break
   }

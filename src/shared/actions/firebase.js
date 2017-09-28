@@ -16,7 +16,7 @@ const update = (path, data) => {
     store.dispatch({ type: UPDATE_FIREBASE, payload: inputData })
   })
   .catch((err) => {
-    Helpers.notifyOfAPIError(err)
+    errorActions.handleError(err)
   })
 }
 
@@ -93,7 +93,7 @@ const create = (path, data = {}) => {
 
     firebase.database().ref().update(updates)
     .catch((err) => {
-      Helpers.notifyOfAPIError(err)
+      errorActions.handleError(err)
     })
   }
 
@@ -127,7 +127,7 @@ const findOrCreate = (tableName, criteria, newResource) => {
     }
   })
   .catch((err) => {
-    Helpers.notifyOfAPIError(err)
+    errorActions.handleError(err)
   })
 }
 

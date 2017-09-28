@@ -2,6 +2,9 @@ import {
   CLEAR_ERRORS,
   HANDLE_ERRORS,
 } from 'constants/actionTypes'
+import {
+  newAlert
+} from 'shared/actions/alerts'
 
 export const clearErrors = (templateName, templatePart) => {
   // do not pass in templatePart to clear the errors for all of the template
@@ -9,7 +12,7 @@ export const clearErrors = (templateName, templatePart) => {
   const payload = {templateName, templatePart}
 
   store.dispatch({
-    type: actionTypes.CLEAR_ERRORS,
+    type: CLEAR_ERRORS,
     payload
   })
 }
@@ -33,9 +36,28 @@ export const handleErrors = (templateName, templatePart, errors, options = {})  
   if (options.method === "addToExisting") {
     errors = store.getState().errors[templateName].concat(errors)
   }
+  if (options.alert && errors.length > 0) {
+    if (options.combineAlerts) { 
+      newAlert({
+        title: options.combinedTitle || "Several errors occurred",
+        message: options.combinedMessage || "Please check the fields below and try again",
+        level: options.combinedLevel || "WARNING",
+        timer: options.timer || true,
+      })
+    } else {
+      errors.forEach((err) => {
+        newAlert({
+          title: err.title || "Unknown error",
+          message: err.message || "Please refresh your page and try again",
+          level: err.errorLevel || "WARNING",
+          timer: options.timer || true,
+        })
+      })
+    }
+  }
 
   store.dispatch({
-    type: actionTypes.HANDLE_ERRORS,
+    type: HANDLE_ERRORS,
     payload: {
       templateName,
       templatePart,

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { userActions } from 'shared/actions'
@@ -17,6 +17,7 @@ import {
   GITHUB,
   GOOGLE,
 } from 'constants/providers'
+import errorTypes from 'constants/errors'
 
 import classes from './CreateAccount.scss'
 
@@ -26,8 +27,28 @@ class CreateAccount extends Component {
     this.state = {
       email: '',
       validEmail: false,
-      view: 'SIGN_UP'
+      view: 'SIGN_UP',
+      loginPending: false
     }
+  }
+  componentWillReceiveProps (props) {
+    console.log("new props", props);
+    const user = props.user
+    const errors = Helpers.safeDataPath(props, 'errors.Login.onSubmit', false)
+
+    if (errors.length > 0 || user && Object.keys(user).length >0) {
+      this.setState({ signingIn: false });
+    }
+
+    if (user && Object.keys(user).length > 0) {
+      this.props.onSuccess();
+    }
+
+    errors && errors.forEach((err) => {
+      if (err.type === errorTypes.RECORD_ALREADY_EXISTS.type) {
+        
+      }
+    })
   }
   handleEmail(e, errors) {
     this.setState({
@@ -37,6 +58,7 @@ class CreateAccount extends Component {
   }
   signInWithEmail() {
     let type
+    this.setState({ loginPending: true });
     if (this.state.view === 'SIGN_UP') {
       type = CREATE_WITH_EMAIL
     } else {
@@ -51,6 +73,7 @@ class CreateAccount extends Component {
     )
   }
   providerSignIn(provider) {
+    this.setState({ loginPending: true });
     userActions.signIn(
       PROVIDER,
       {
@@ -78,7 +101,7 @@ class CreateAccount extends Component {
             <Heading level={5}>We&apos;ll send you an email to set your password.</Heading>
             <Button
               onClick={() => this.signInWithEmail()}
-              disabled={(!this.state.validEmail)}
+              disabled={(!this.state.validEmail || this.state.loginPending)}
             >
               Sign up
             </Button>
@@ -88,18 +111,21 @@ class CreateAccount extends Component {
             <Button
               background="facebook"
               onClick={() => this.providerSignIn(FACEBOOK)}
+              disabled={(this.state.loginPending)}
             >
               Create account with Facebook
             </Button>
             <Button
               background="github"
               onClick={() => this.providerSignIn(GITHUB)}
+              disabled={(this.state.loginPending)}
             >
             Create account with Github
             </Button>
             <Button
               background="google"
               onClick={() => this.providerSignIn(GOOGLE)}
+              disabled={(this.state.loginPending)}
             >
               Create account with Google
             </Button>
@@ -116,7 +142,10 @@ CreateAccount.propTypes = {
 }
 
 const mapStateToProps = (state) => {
-  return { user: state.user }
+  return { 
+    user: state.shared.user,
+    errors: state.shared.errors,
+  }
 }
 
 export default withRouter(connect(mapStateToProps)(CreateAccount))

@@ -21,7 +21,7 @@ export default function(ComposedComponent) {
   }
 
   function mapStateToProps(state) {
-    return { user: state.user }
+    return { user: state.shared.user }
   }
 
   return withRouter(connect(mapStateToProps)(Authentication))

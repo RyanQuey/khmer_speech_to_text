@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
@@ -26,6 +26,7 @@ import _ from 'lodash'
 window._ = _
 
 window.React = React
+
 const combined = combineReducers({
   admin: adminCombiner,
   user: userCombiner,

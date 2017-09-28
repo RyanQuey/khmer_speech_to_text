@@ -173,10 +173,10 @@ Profile.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    [schema.user.AVATAR_URL.column_name]: state.user[schema.user.AVATAR_URL.column_name],
-    [schema.user.BANNER_URL.column_name]: state.user[schema.user.BANNER_URL.column_name],
-    displayName: state.user.displayName,
-    uid: state.user.uid,
+    [schema.user.AVATAR_URL.column_name]: state.shared.user[schema.user.AVATAR_URL.column_name],
+    [schema.user.BANNER_URL.column_name]: state.shared.user[schema.user.BANNER_URL.column_name],
+    displayName: state.shared.user.displayName,
+    uid: state.shared.user.uid,
   }
 }
 

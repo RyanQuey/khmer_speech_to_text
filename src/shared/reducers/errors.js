@@ -2,9 +2,8 @@ import {
   CLEAR_ERRORS,
   HANDLE_ERRORS,
 } from 'constants/actionTypes'
-//place all errors in here
+
 //separate out by template the error was made in (even if it will be handled in a different template also)
-//
 
 export default (state = {}, action)=>{
   let templateName, templatePart, errors, newState
@@ -18,10 +17,10 @@ export default (state = {}, action)=>{
       templatePart = action.payload.templatePart
       // each entry in the array for this templatePart will be an error object with the following keys:
       // {
+      //   title: ,  (this will be header in the toaster. Pull these from the constants too)
       //   message: ,    (eg, "you are a bad programmer")
       //   statusCode: , (404, etc)
       //   errorType: ,  (eg, "REQUIRED_FIELDS" or "FAILED_VALIDATION")
-      //   title: ,  (this will be header in the toaster. Pull these from the constants too)
       //   errorLevel:   (one of "ALERT", "WARNING", "DANGER", "BUG") (don't know if we want this)
       // }
       //

@@ -5,6 +5,10 @@ export default {
     type: "FAILED_VALIDATION",
     level: "WARNING"
   },
+  RECORD_ALREADY_EXISTS: {
+    type: "RECORD_ALREADY_EXISTS",
+    level: "WARNING"
+  },
   REQUIRED_FIELDS: {
     type: "REQUIRED_FIELDS",
     level: "WARNING"
@@ -17,6 +21,10 @@ export default {
   FAILED_CREDENTIALS: {
     type: "FAILED_CREDENTIALS",
     level: "WARNING"
+  },
+  INVALID_ARGUMENTS: {
+    type: "INVALID_ARGUMENTS",
+    level: "BUG"
   },
 }
 

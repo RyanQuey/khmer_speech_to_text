@@ -1,4 +1,4 @@
-import React from 'react'
+//TODO just use the global _ variable
 import { extend } from 'underscore'
 import PropTypes from 'prop-types'
 import theme from 'theme'

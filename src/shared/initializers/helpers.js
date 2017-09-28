@@ -1,3 +1,5 @@
+import { errorActions } from 'shared/actions'
+
 export default () => {
 
   String.prototype.capitalize = function () {
@@ -66,29 +68,6 @@ export default () => {
       }
 
       return returnValue;
-    },
-
-    notifyOfAPIError: function (data, title) {
-      console.log(data);
-      var err = "Unknown error.";
-      if (data.responseText) {
-        try {
-          var stuff = JSON.parse(data.responseText);
-          err = stuff.error || stuff.message || err;
-          // test if waterline found a duplicate when data was supposed be unique
-          let re = /A record with that `(.*)` already exists/
-          let matchData = re.exec(stuff.message)
-          if (matchData) {
-            if (err === stuff.error) {
-              err = `${err}. A record with that ${matchData[1]} already exists`
-            }
-          }
-        } catch (e) {
-          // do nothin' ... my favorite!
-        }
-      }
-
-      console.log("ERROR:", err);
     },
 
     dayAbbreviations: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
