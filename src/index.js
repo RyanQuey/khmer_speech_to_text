@@ -20,10 +20,6 @@ import refire from './refire'
 import adminCombiner from 'admin/reducers'
 import sharedCombiner from 'shared/reducers'
 import userCombiner from 'user/reducers'
-//bootstrap
-import 'bootstrap';//-loader'
-import 'bootstrap/dist/css/bootstrap.css'
-
 
 import _ from 'lodash'
 

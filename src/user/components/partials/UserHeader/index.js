@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -7,7 +7,7 @@ import { SIGN_OUT } from 'constants/actionTypes'
 import { StyleSheet, css } from 'aphrodite'
 import theme from 'theme'
 import avatar from 'images/avatar.png'
-import classes from './UserMenu.scss'
+import classes from './style.scss'
 
 const styles = StyleSheet.create({
   menu: {
@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   },
 })
 
-class UserMenu extends Component {
+class UserHeader extends Component {
   constructor(props) {
     super(props)
 
@@ -43,7 +43,7 @@ class UserMenu extends Component {
           </li>
         </ul>
       )
-      : ''
+      : <ul></ul>
   }
   render() {
     const { user } = this.props
@@ -55,7 +55,7 @@ class UserMenu extends Component {
           margin="0 20px"
           padding="5px"
           size="50px"
-          src={user.photoURL || avatar}
+          src={user && user.photoURL || avatar}
         />
         {this.renderMenu()}
       </div>
@@ -63,7 +63,7 @@ class UserMenu extends Component {
   }
 }
 
-UserMenu.propTypes = {
+UserHeader.propTypes = {
   user: PropTypes.object,
 }
 
@@ -71,4 +71,5 @@ const mapStateToProps = (state) => {
   return { user: state.shared.user }
 }
 
-export default connect(mapStateToProps)(UserMenu)
+export default connect(mapStateToProps)(UserHeader)
+

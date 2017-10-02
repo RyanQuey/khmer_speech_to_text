@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { setImage } from 'shared/actions'
@@ -46,137 +46,111 @@ class Profile extends Component {
       />
     )
     return (
-      <AuthenticatedTemplate>
-        <Flexbox direction="column">
-          <div className={classes.profileBannerCtn}>
-            <div className={classes.editProfileBannerCtn}>
-              <DropImage
-                defaultImage={banner}
-                imageURL={this.props[schema.user.BANNER_URL.column_name]}
-                setImage={this.props.setImage}
-                imageName={schema.user.BANNER_URL.column_name}
-                label="Drop cover photo here"
-                className={classes.editBannerPicture}
-                uid={this.props.uid}
-                height="70vh"
-                width="100%"
-              />
-            </div>
-
-            <Flexbox className={classes.profileTitle} direction="column" justify="center">
-              <Heading align="center" color="white" level={1}>{this.props.displayName}</Heading>
-
-            </Flexbox>
-
+      <Flexbox direction="column">
+        <div className={classes.profileBannerCtn}>
+          <div className={classes.editProfileBannerCtn}>
+            <DropImage
+              defaultImage={banner}
+              imageURL={this.props.user.bannerURL}
+              setImage={this.props.setImage}
+              imageName="bannerURL"
+              label="Drop cover photo here"
+              className={classes.editBannerPicture}
+              uid={this.props.uid}
+              height="70vh"
+              width="100%"
+            />
           </div>
-
-          <div className={classes.profileSummaryCtn}>
-
-            <div className={classes.editProfilePictureCtn}>
-              <DropImage
-                defaultImage={avatar}
-                imageURL={this.props[schema.user.AVATAR_URL.column_name]}
-                uid={this.props.uid}
-                imageName={schema.user.AVATAR_URL.column_name}
-                setImage={this.props.setImage}
-                label="Drop profile photo here"
-                style={{
-                  borderRadius: '50%',
-                  color: 'white',
-                }}
-                height="250px"
-                width="250px"
-              />
-            </div>
-
-            <div className={classes.summaryText}>
-              <Flexbox justify="flex-start" flexWrap="wrap">
-
-                <div className={classes.summaryStats}>
-                </div>
-
-                <Button className="chatButton" disabled={true}>Open Chat</Button>
-
-                <Flexbox justify="flex-start" className={classes.socialLinks} >
-                  <span className="fa-stack fa-lg">
-                    <Icon
-                      border={this.state.activeSocial === FACEBOOK}
-                      className="fa-stack-2x"
-                      color="primary"
-                      name="circle"
-                    />
-                    <Icon
-                      className="fa-stack-1x"
-                      color="white"
-                      id={FACEBOOK}
-                      name={FACEBOOK}
-                      onClick={e => this.setActiveIcon(e)}
-                    />
-                  </span>
-                  <span className="fa-stack fa-lg">
-                    <Icon
-                      border={this.state.activeSocial === LINKEDIN}
-                      className="fa-stack-2x"
-                      color="primary"
-                      name="circle"
-                    />
-                    <Icon
-                      className="fa-stack-1x"
-                      color="white"
-                      id={LINKEDIN}
-                      name={LINKEDIN}
-                      onClick={e => this.setActiveIcon(e)}
-                    />
-                  </span>
-                  <span className="fa-stack fa-lg">
-                    <Icon
-                      border={this.state.activeSocial === TWITTER}
-                      className="fa-stack-2x"
-                      color="primary"
-                      name="circle"
-                    />
-                    <Icon
-                      className="fa-stack-1x"
-                      color="white"
-                      id={TWITTER}
-                      name={TWITTER}
-                      onClick={e => this.setActiveIcon(e)}
-                    />
-                  </span>
-
-                  <FirebaseInput
+          <Flexbox className={classes.profileTitle} direction="column" justify="center">
+            <Heading align="center" color="white" level={1}>{this.props.displayName}</Heading>
+          </Flexbox>
+        </div>
+        <div className={classes.profileSummaryCtn}>
+          <div className={classes.editProfilePictureCtn}>
+            <DropImage
+              defaultImage={avatar}
+              imageURL={this.props.user.avatarURL}
+              uid={this.props.uid}
+              imageName="avatarURL"
+              setImage={this.props.setImage}
+              label="Drop profile photo here"
+              style={{
+                borderRadius: '50%',
+                color: 'white',
+              }}
+              height="250px"
+              width="250px"
+            />
+          </div>
+          <div className={classes.summaryText}>
+            <Flexbox justify="flex-start" flexWrap="wrap">
+              <div className={classes.summaryStats}>
+              </div>
+              <Button className="chatButton" disabled={true}>Open Chat</Button>
+              <Flexbox justify="flex-start" className={classes.socialLinks} >
+                <span className="fa-stack fa-lg">
+                  <Icon
+                    border={this.state.activeSocial === FACEBOOK}
+                    className="fa-stack-2x"
                     color="primary"
-                    name={`${this.state.activeSocial.toLowerCase()}URL`}
-                    placeholder={`Add a ${this.state.activeSocial} Account`}
-                    type="text"
+                    name="circle"
                   />
-                </Flexbox>
+                  <Icon
+                    className="fa-stack-1x"
+                    color="white"
+                    id={FACEBOOK}
+                    name={FACEBOOK}
+                    onClick={e => this.setActiveIcon(e)}
+                  />
+                </span>
+                <span className="fa-stack fa-lg">
+                  <Icon
+                    border={this.state.activeSocial === LINKEDIN}
+                    className="fa-stack-2x"
+                    color="primary"
+                    name="circle"
+                  />
+                  <Icon
+                    className="fa-stack-1x"
+                    color="white"
+                    id={LINKEDIN}
+                    name={LINKEDIN}
+                    onClick={e => this.setActiveIcon(e)}
+                  />
+                </span>
+                <span className="fa-stack fa-lg">
+                  <Icon
+                    border={this.state.activeSocial === TWITTER}
+                    className="fa-stack-2x"
+                    color="primary"
+                    name="circle"
+                  />
+                  <Icon
+                    className="fa-stack-1x"
+                    color="white"
+                    id={TWITTER}
+                    name={TWITTER}
+                    onClick={e => this.setActiveIcon(e)}
+                  />
+                </span>
+                <FirebaseInput
+                  color="primary"
+                  name={`${this.state.activeSocial.toLowerCase()}URL`}
+                  placeholder={`Add a ${this.state.activeSocial} Account`}
+                  type="text"
+                />
               </Flexbox>
-            </div>
+            </Flexbox>
           </div>
-
-
-        </Flexbox>
-      </AuthenticatedTemplate>
+        </div>
+      </Flexbox>
     )
   }
 }
 
-Profile.propTypes = {
-  bannerURL: PropTypes.string,
-  displayName: PropTypes.string,
-  image: PropTypes.string,
-  uid: PropTypes.string,
-  user: PropTypes.object,
-  setImage: PropTypes.func.isRequired,
-}
-
 const mapStateToProps = (state) => {
   return {
-    [schema.user.AVATAR_URL.column_name]: state.shared.user[schema.user.AVATAR_URL.column_name],
-    [schema.user.BANNER_URL.column_name]: state.shared.user[schema.user.BANNER_URL.column_name],
-    displayName: state.shared.user.displayName,
-    uid: state.shared.user.uid,
+    user: state.shared.user,
   }
 }
 

@@ -1,29 +1,45 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
+import {
+  BrowserRouter,
+  Route,
+  Switch,
+} from 'react-router-dom'
+
 import PropTypes from 'prop-types'
-import { Flexbox } from 'shared/components/elements'
-import { Navbar, Sidebar, UserMenu } from 'shared/components/groups'
+import { connect } from 'react-redux'
+import { Home, Profile, SignUp } from 'user/components/templates'
+import { Flexbox, Alert } from 'shared/components/elements'
+import { Navbar, Sidebar} from 'shared/components/groups'
+import { UserHeader } from 'user/components/partials'
 import classes from './Authenticated.scss'
 
-export default class AuthenticatedTemplate extends Component {
+class Authenticated extends Component {
   render() {
     const { children } = this.props
     return (
       <Flexbox>
+        {alerts && alerts.map((alert) => {
+          return <Alert alert={alert} />
+        })}
 
         <Sidebar />
 
         <Flexbox className={classes.rightColumn} direction="column">
 
           <Navbar>
-            <div className={classes.headerStats}>
-              <ul className={classes.headerList}>
-                <li><UserMenu /></li>
-              </ul>
-            </div>
+            {false  && <UserHeader />}
           </Navbar>
 
           <main>
-            {children}
+            {false && <BrowserRouter>
+              <div>
+                <Switch>
+                  <Route exact path="/" component={Home} />
+                  <Route path="/profile" component={Profile} />
+                  <Route path="/signup" component={SignUp} />
+                </Switch>
+              </div>
+            </BrowserRouter>}
           </main>
         </Flexbox>
       </Flexbox>
@@ -31,7 +47,14 @@ export default class AuthenticatedTemplate extends Component {
   }
 }
 
-AuthenticatedTemplate.propTypes = {
+Authenticated.propTypes = {
   children: PropTypes.node.isRequired,
   donutchart: PropTypes.node,
 }
+const mapStateToProps = (state) => {
+  return { 
+    alerts: state.shared.alerts,
+  }
+}
+
+export default connect(mapStateToProps)(Authenticated)

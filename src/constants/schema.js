@@ -56,7 +56,7 @@ const tables = {
     bannerURL: {
       type: 'string'
     },
-    display_name: {
+    displayName: {
       type: 'string'
     },
     email: {

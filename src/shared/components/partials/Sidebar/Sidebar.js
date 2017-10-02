@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { DropDown, Flexbox, MenuItem } from 'shared/components/elements'
+import { Select, Flexbox, MenuItem } from 'shared/components/elements'
 
 import { firebaseActions } from 'shared/actions'
 import classes from './Sidebar.scss'

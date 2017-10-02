@@ -70,12 +70,8 @@
   "dependencies": {
     "@webpack-blocks/dev-server2": "^0.4.0",
     "aphrodite": "^1.2.1",
-    "bootstrap": "^4.0.0-beta",
-    "bootstrap-loader": "^2.2.0",
     "firebase": "^4.1.3",
     "generate-password": "^1.3.0",
-    "jquery": "^3.2.1",
-    "popper.js": "^1.12.5",
     "prop-types": "^15.5.10",
     "react": "^15.0.0",
     "react-dom": "^15.0.0",

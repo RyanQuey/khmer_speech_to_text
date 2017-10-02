@@ -1,10 +1,10 @@
 import React from 'react'
 import { storiesOf } from '@kadira/storybook'
-import DropDown from '.'
+import Select from '.'
 
-storiesOf('DropDown', module)
+storiesOf('Select', module)
   .add('default', () => (
-    <DropDown
+    <Select
       name="Ryan's Dropdown"
       items={['I\'m not busy', 'I\'m kinda busy', 'I\'m crazy busy']}
     />

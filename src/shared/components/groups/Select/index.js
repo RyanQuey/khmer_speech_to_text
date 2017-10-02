@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Icon } from 'shared/components/elements'
 import theme from 'theme'
 import { StyleSheet, css } from 'aphrodite'
-import classes from './DropDown.scss'
+import classes from './style.scss'
 
 const styles = StyleSheet.create({
   icon: {
@@ -14,12 +14,12 @@ const styles = StyleSheet.create({
   },
 })
 
-const DropDown = ({ value, handleChange, handleSubmit, items, name, submitButton, label, labelAfter }) => (
+const Select = ({ value, handleChange, handleSubmit, items, name, submitButton, label, labelAfter }) => (
   <div className={classes.selectWrapper}>
     {!labelAfter && (label ? (<label htmlFor={name}>{label}</label>) : null)}
     <div className={classes.selectCtn}>
       <select
-        className={`${css(styles.select)} ${classes.dropDown}`}
+        className={`${css(styles.select)} ${classes.select}`}
         name={name}
         id={name}
         onChange={handleChange}
@@ -43,11 +43,11 @@ const DropDown = ({ value, handleChange, handleSubmit, items, name, submitButton
   </div>
 )
 
-DropDown.defaultProps = {
+Select.defaultProps = {
   submitButton: {},
 }
 
-DropDown.propTypes = {
+Select.propTypes = {
   handleChange: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   items: PropTypes.array.isRequired,
@@ -58,4 +58,5 @@ DropDown.propTypes = {
   labelAfter: PropTypes.bool,
 }
 
-export default DropDown
+export default Select
+
