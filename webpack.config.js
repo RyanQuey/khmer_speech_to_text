@@ -89,6 +89,14 @@ const config = createConfig([
       filename: 'index.html',
       template: path.join(process.cwd(), 'public/index.html'),
     }),
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery",
+      "window.jQuery": "jquery",
+      "Popper": "popper.js",
+    }),
+    new webpack.ProvidePlugin({
+    }),
   ]),
   happypack([
     babel(),
