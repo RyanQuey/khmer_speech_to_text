@@ -21,6 +21,10 @@ import adminCombiner from 'admin/reducers'
 import sharedCombiner from 'shared/reducers'
 import userCombiner from 'user/reducers'
 
+import 'theme/normalize.css'
+import 'theme/Global.scss'
+import 'theme/index.scss'
+
 import _ from 'lodash'
 
 window._ = _

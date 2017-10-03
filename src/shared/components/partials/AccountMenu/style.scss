@@ -2,23 +2,22 @@
 
 .menuCtn {
   position: relative;
+  box-sizing: border-box;
+  height: 50px;
+
+  & > img {
+    height: 100%;
+    padding: 5px;
+  }
 
   .menuDropdown {
     background-color: $nav-bg;
     position: absolute;
     top: 47px;
     margin: 0px;
+    padding: 0;
     right: 0;
     display: block;
     min-width: 250px;
-  }
-  li {
-    list-style: none;
-    margin-right: 25px;
-    padding: 10px;
-  }
-
-  a {
-    color: $white;
   }
 }

@@ -1,8 +1,8 @@
 @import 'theme/_helpers';
 
 .menu {
-  li {
+  & > li {
     list-style: none;
-    padding: 10px;
+    padding-left: 10px;
   }
 }

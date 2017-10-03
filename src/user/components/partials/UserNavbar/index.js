@@ -2,7 +2,7 @@ import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Button, Navbar, NavbarBrand } from 'shared/components/elements'
+import { Button, Navbar, NavbarBrand, Flexbox } from 'shared/components/elements'
 import { AccountMenu } from 'shared/components/partials'
 import { StyleSheet, css } from 'aphrodite'
 import theme from 'theme'
@@ -25,11 +25,13 @@ class UserNavbar extends Component {
 
     return (
       <Navbar>
-        <NavbarBrand/>
+        <Flexbox justify="space-between">
+          <NavbarBrand/>
+        </Flexbox>
 
-        <ul className={classes.menu}>
-          <li><AccountMenu /></li>
-        </ul>
+        <Flexbox justify="space-between">
+          <AccountMenu />
+        </Flexbox>
       </Navbar>
     )
   }

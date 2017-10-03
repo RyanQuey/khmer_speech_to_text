@@ -2,7 +2,7 @@ import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Avatar, Button } from 'shared/components/elements'
+import { Avatar, Button, MenuItem } from 'shared/components/elements'
 import { SIGN_OUT } from 'constants/actionTypes'
 import { StyleSheet, css } from 'aphrodite'
 import theme from 'theme'
@@ -20,20 +20,31 @@ class UserHeader extends Component {
     super(props)
 
     this.state = { open: false }
+
+    this.toggleMenu = this.toggleMenu.bind(this)
+    this.handleClickOutside = this.handleClickOutside.bind(this)
   }
-  toggleMenu() {
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
+  }
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+  handleClickOutside(e) {
+    if (this.refs.wrapperRef && !this.refs.wrapperRef.contains(e.target)) {
+      this.setState({ open: false })
+    }  
+  }
+  toggleMenu(newState) {
     this.setState({ open: !this.state.open })
-  }
-  renderMenu() {
-    return 
   }
   render() {
     const { user } = this.props
 
     return (
-      <div className={classes.menuCtn}>
+      <div className={classes.menuCtn} ref="wrapperRef">
         <Avatar
-          onClick={() => this.toggleMenu()}
+          onClick={this.toggleMenu}
           margin="0 20px"
           padding="5px"
           size="50px"
@@ -42,19 +53,13 @@ class UserHeader extends Component {
 
         {this.state.open ? (
           <ul className={`${classes.menuDropdown} ${css(styles.menu)}`}>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/profile">Secret Profile</Link></li>
-            <li><Link to="/signup">Sign Up Landing Page</Link></li>
-            <li><Link to="/signup/create-account/step-1">SignUp-Step-1</Link></li>
-            <li>
-              <Link to="/">
-                <Button
-                  onClick={() => store.dispatch({ type: SIGN_OUT_REQUESTED, user: null })}
-                >
-                  Sign Out
-                </Button>
-              </Link>
-            </li>
+            <MenuItem link="/">Home</MenuItem>
+            <MenuItem link="/profile">Secret Profile</MenuItem>
+            <MenuItem link="/signup">Sign Up Landing Page</MenuItem>
+            <MenuItem link="/signup/create-account/step-1">SignUp-Step-1</MenuItem>
+            <MenuItem link="/">
+              <div onClick={() => store.dispatch({ type: SIGN_OUT, user: null })}>Sign Out</div>
+            </MenuItem>
           </ul>
         ) : (
           <ul></ul>

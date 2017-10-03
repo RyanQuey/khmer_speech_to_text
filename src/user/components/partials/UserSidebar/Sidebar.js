@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Select, Flexbox, MenuItem } from 'shared/components/elements'
+import { Flexbox, MenuItem } from 'shared/components/elements'
+import { Select } from 'shared/components/groups'
 
 import { firebaseActions } from 'shared/actions'
 import classes from './Sidebar.scss'
@@ -23,7 +24,6 @@ class Sidebar extends Component {
     this.setState({
       dirty: true,
       status,
-      value: this.setDonutValue(status),
     })
   }
   handleSubmit() {
@@ -37,17 +37,11 @@ class Sidebar extends Component {
 
         <div className={classes.nav}>
           <ul className={classes.sidebarNav}>
-            <MenuItem link="/profile">
-              Profile<span className={classes.profileEdit}>edit</span>
+            <MenuItem link="/profile" nav={true}>
+              Profile
             </MenuItem>
-            <MenuItem link="/contacts">
-              Contacts <span className={classes.badge}>1</span>
-            </MenuItem>
-            <MenuItem link="/chat">
-              Chat <span className={classes.badge}>1</span>
-            </MenuItem>
-            <MenuItem link="/collab">
-              Collab Sessions <span className={classes.badge}>2</span>
+            <MenuItem link="/stuff" nav={true}>
+              Stuff <span className={classes.badge}>1</span>
             </MenuItem>
           </ul>
         </div>

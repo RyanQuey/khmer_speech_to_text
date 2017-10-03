@@ -1,8 +1,9 @@
-@import 'theme/index';
+@import 'theme/_helpers';
 
 .sidebar {
   min-height: 100vh;
-  width: 300px;
+  width: 250px;
+  box-sizing: border-box;
   background: $sidebar;
   color: $white;
   padding: 40px 20px;
@@ -43,38 +44,12 @@
     border-radius: 5px;
   }
 }
-.nav {
-  margin-top: 20px;
-}
 .sidebarNav {
   list-style: none;
   margin: 0 -20px;
   padding: 0;
   background: $nav-bg;
-  li {
-  }
-  a, a:visited {
-    display: block;
-    padding: 10px 20px;
-    background: $nav-bg;
-    color: $white;
-    border: 1px solid $nav-border;
-    &:hover {
-      color: $primary;
-      background: $nav-hover;
-    }
-  }
-  a.navActive {
-    &:hover {
-      color: $white;
-    }
-  }
-  .profileEdit {
-    display: block;
-    color: $primary;
-    float: right;
-    margin-top: -3px;
-  }
+
   .badge {
     display: block;
     background: $primary;
@@ -85,6 +60,9 @@
     border-radius: 5px;
     margin-top: -3px;
     font-weight: bold;
+  }
+  a {
+    border: 1px solid $nav-border;
   }
 }
 

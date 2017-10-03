@@ -1,8 +1,6 @@
 import { Component } from 'react'
 import { Authenticated, Unauthenticated } from './yields'
 
-import 'theme/normalize.css'
-import 'theme/Global.scss'
 
 export default class App extends Component {
   //not really sure what this is
