@@ -4,9 +4,9 @@ import { connect } from 'react-redux'
 import { Flexbox } from 'shared/components/elements'
 import classes from './Navbar.scss'
 
-const Navbar = ({ children, color}) => {
+const Navbar = ({ children, color, justify}) => {
   return (
-    <Flexbox align="center" className={classes.navbar} background={color} justify="flex-end" >
+    <Flexbox align="center" className={classes.navbar} background={color} justify={justify || "space-between"} >
       {children}
     </Flexbox>
   )
@@ -15,5 +15,6 @@ const Navbar = ({ children, color}) => {
 Navbar.propTypes = {
   children: PropTypes.node.isRequired,
   color: PropTypes.string,
+  justify: PropTypes.string,
 }
 export default Navbar

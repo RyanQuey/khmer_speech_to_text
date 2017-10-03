@@ -25,25 +25,7 @@ class UserHeader extends Component {
     this.setState({ open: !this.state.open })
   }
   renderMenu() {
-    return this.state.open
-      ? (
-        <ul className={`${classes.menuDropdown} ${css(styles.menu)}`}>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/profile">Secret Profile</Link></li>
-          <li><Link to="/signup">Sign Up Landing Page</Link></li>
-          <li><Link to="/signup/create-account/step-1">SignUp-Step-1</Link></li>
-          <li>
-            <Link to="/">
-              <Button
-                onClick={() => store.dispatch({ type: SIGN_OUT_REQUESTED, user: null })}
-              >
-                Sign Out
-              </Button>
-            </Link>
-          </li>
-        </ul>
-      )
-      : <ul></ul>
+    return 
   }
   render() {
     const { user } = this.props
@@ -57,7 +39,26 @@ class UserHeader extends Component {
           size="50px"
           src={user && user.photoURL || avatar}
         />
-        {this.renderMenu()}
+
+        {this.state.open ? (
+          <ul className={`${classes.menuDropdown} ${css(styles.menu)}`}>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/profile">Secret Profile</Link></li>
+            <li><Link to="/signup">Sign Up Landing Page</Link></li>
+            <li><Link to="/signup/create-account/step-1">SignUp-Step-1</Link></li>
+            <li>
+              <Link to="/">
+                <Button
+                  onClick={() => store.dispatch({ type: SIGN_OUT_REQUESTED, user: null })}
+                >
+                  Sign Out
+                </Button>
+              </Link>
+            </li>
+          </ul>
+        ) : (
+          <ul></ul>
+        )}
       </div>
     )
   }

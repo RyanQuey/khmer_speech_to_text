@@ -1,0 +1,14 @@
+@import 'theme/_helpers';
+
+.brand {
+  width: 150px; //should be as wide as the sidebar
+  height: 40px;
+  z-index: 2;
+  color: $white;
+  background-color: $nav-bg; //unless it's overridden in the component
+
+  img {
+    height: 100%;
+  }
+}
+

@@ -5,7 +5,7 @@ import { Home, Profile, SignUp } from 'user/components/templates'
 import { Flexbox, Alert, Navbar } from 'shared/components/elements'
 import classes from './Unauthenticated.scss'
 import { Sidebar} from 'shared/components/groups'
-import { UserHeader } from 'user/components/partials'
+import { UserNavbar } from 'user/components/partials'
 import {
   BrowserRouter,
   Route,
@@ -18,36 +18,31 @@ class Unauthenticated extends Component {
   render() {
     const alerts = _.values(this.props.alerts)
     return (
-      <Flexbox>
-        {alerts && alerts.map((alert) => {
-          return <Alert alert={alert} />
-        })}
-
-        {false && <Sidebar />}
-
-        <Flexbox className={classes.rightColumn} direction="column">
-
-          <Navbar>
-            <div className={classes.headerStats}>
-              <ul className={classes.headerList}>
-                <li><UserHeader /></li>
-              </ul>
-            </div>
-          </Navbar>
-
-          <main>
-            <Flexbox className={classes.content} justify="center" flexWrap="wrap">
-              <BrowserRouter>
-                <div>
-                  <Switch>
-                    <Route exact path="/" component={Home} />
-                    <Route path="/profile" component={Profile} />
-                    <Route path="/signup" component={SignUp} />
-                  </Switch>
-                </div>
-              </BrowserRouter>
-            </Flexbox>
-          </main>
+      <Flexbox direction="column">
+        <UserNavbar />
+  
+        <Flexbox>
+          {false && <Sidebar />}
+  
+          <Flexbox className={classes.rightColumn} direction="column">
+            {alerts && alerts.map((alert) => {
+              return <Alert alert={alert} />
+            })}
+  
+            <main>
+              <Flexbox className={classes.content} justify="center" flexWrap="wrap">
+                <BrowserRouter>
+                  <div>
+                    <Switch>
+                      <Route exact path="/" component={Home} />
+                      <Route path="/profile" component={Profile} />
+                      <Route path="/signup" component={SignUp} />
+                    </Switch>
+                  </div>
+                </BrowserRouter>
+              </Flexbox>
+            </main>
+          </Flexbox>
         </Flexbox>
       </Flexbox>
     )

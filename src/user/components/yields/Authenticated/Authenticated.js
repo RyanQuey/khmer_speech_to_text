@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 import { Home, Profile, SignUp } from 'user/components/templates'
 import { Flexbox, Alert } from 'shared/components/elements'
 import { Navbar, Sidebar} from 'shared/components/groups'
-import { UserHeader } from 'user/components/partials'
+import { UserNavbar } from 'user/components/partials'
 import classes from './Authenticated.scss'
 
 class Authenticated extends Component {
@@ -18,17 +18,15 @@ class Authenticated extends Component {
     const { children } = this.props
     return (
       <Flexbox>
-        {alerts && alerts.map((alert) => {
-          return <Alert alert={alert} />
-        })}
+        <UserNavbar />
 
         <Sidebar />
 
         <Flexbox className={classes.rightColumn} direction="column">
 
-          <Navbar>
-            {false  && <UserHeader />}
-          </Navbar>
+          {alerts && alerts.map((alert) => {
+            return <Alert alert={alert} />
+          })}
 
           <main>
             {false && <BrowserRouter>
