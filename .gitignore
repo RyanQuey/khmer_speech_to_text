@@ -10,6 +10,7 @@ public/user/index.html
 public/admin/index.html
 .DS_Store
 .happypack
+src/config/dev/firebase.js
 dist/
 **.swp
 **.swo

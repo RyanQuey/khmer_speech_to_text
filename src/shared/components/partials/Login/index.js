@@ -31,7 +31,6 @@ class Login extends Component {
     this.toggleView = this.toggleView.bind(this)
   }
   componentWillReceiveProps (props) {
-    console.log("new props", props);
     const user = props.user
     const errors = Helpers.safeDataPath(props, 'errors.Login.onSubmit', false)
 

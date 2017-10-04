@@ -6,7 +6,7 @@ import { Flexbox, Icon } from 'shared/components/elements'
 import { StyleSheet, css } from 'aphrodite'
 import classes from './DropImage.scss'
 
-const DropImage = ({ defaultImage, imageURL, height, label, imageName, setImage, style, uid, width }) => {
+const DropImage = ({ defaultImage, imageURL, height, label, imageName, setImage, style, width, path }) => {
   const styles = StyleSheet.create({
     dropzone: {
       backgroundImage: `url(${imageURL || defaultImage})`,
@@ -21,17 +21,15 @@ const DropImage = ({ defaultImage, imageURL, height, label, imageName, setImage,
 
     const storageRef = firebase.storage().ref()
     const file = acceptedFiles[0]
-    const path = storageRef.child(`images/${uid}/${imageName}`)
+    const storagePath = storageRef.child(`images/${path}/${imageName}`)
 
-    path.put(file)
-      .then((snapshot) => {
-        const url = snapshot.metadata.downloadURLs[0]
-
-        setImage({ name: imageName, url })
-
-        firebase.database().ref(`users/${uid}`).update({ [imageName]: url })
-      })
-      .catch(err => console.log('error: ', err))
+    storagePath.put(file)
+    .then((snapshot) => {
+      const url = snapshot.metadata.downloadURLs[0]
+      setImage({ name: imageName, url })
+      firebase.database().ref(path).update({ [imageName]: url })
+    })
+    .catch(err => console.log('error: ', err))
   }
 
   return (
@@ -57,9 +55,9 @@ DropImage.propTypes = {
   imageURL: PropTypes.string,
   label: PropTypes.string.isRequired,
   imageName: PropTypes.string.isRequired,
+  path: PropTypes.string.isRequired,
   setImage: PropTypes.func.isRequired,
   style: PropTypes.object,
-  uid: PropTypes.string.isRequired,
   width: PropTypes.string,
 }
 

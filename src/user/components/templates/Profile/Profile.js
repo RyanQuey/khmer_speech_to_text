@@ -11,7 +11,7 @@ import schema from 'constants/schema'
 import avatar from 'images/avatar.png'
 import banner from 'images/profile/baby.jpg'
 
-import classes from './Profile.scss'
+import classes from './style.scss'
 
 class Profile extends Component {
   constructor() {
@@ -19,9 +19,6 @@ class Profile extends Component {
 
     this.state = {
     }
-  }
-  setActiveIcon(e) {
-    this.setState({ activeSocial: e.target.id })
   }
   render() {
     return (
@@ -35,6 +32,7 @@ class Profile extends Component {
               imageName="bannerURL"
               label="Drop cover photo here"
               className={classes.editBannerPicture}
+              path={`users/${this.props.uid}`}
               uid={this.props.uid}
               height="70vh"
               width="100%"
@@ -49,7 +47,7 @@ class Profile extends Component {
             <DropImage
               defaultImage={avatar}
               imageURL={this.props.user.avatarURL}
-              uid={this.props.uid}
+              path={`users/${this.props.uid}`}
               imageName="avatarURL"
               setImage={this.props.setImage}
               label="Drop profile photo here"
