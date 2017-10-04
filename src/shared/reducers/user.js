@@ -9,12 +9,10 @@ import {
 
 export default (state = null, action) => {
 
+//TODO: make it consistent and only attach data to action.payload
   switch (action.type) {
     case LOG_IN_WITH_PROVIDER:
       return action.payload
-
-    case SET_CURRENT_USER:
-      return action.user
 
     case SET_IMAGE:
       return Object.assign({}, state, { [action.data.name]: action.data.url })
@@ -26,8 +24,7 @@ export default (state = null, action) => {
       return action.isSignedOut ? state : null
 
     case FETCH_USER:
-      console.log('Merged user auth and user data into store ===>', action.user)
-      return Object.assign({}, state, action.user)
+      return Object.assign({}, state, action.payload.user)
 
     default:
       return state

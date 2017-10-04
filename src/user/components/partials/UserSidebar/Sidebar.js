@@ -12,36 +12,20 @@ class Sidebar extends Component {
     super(props)
 
     this.state = {
-      dirty: false,
     }
+  }
 
-    this.handleChange = this.handleChange.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
-  }
-  handleChange(e) {
-    console.log('changing')
-    const status = e.target.value
-    this.setState({
-      dirty: true,
-      status,
-    })
-  }
-  handleSubmit() {
-    console.log('submitting', this.state.status)
-    this.setState({ dirty: false })
-    firebaseActions(`users/${this.props.user}/status`, this.state.status)
-  }
   render() {
     return (
       <Flexbox className={classes.sidebar} direction="column" background="black">
 
         <div className={classes.nav}>
           <ul className={classes.sidebarNav}>
+            <MenuItem link="/search" nav={true}>
+              Search <span className={classes.badge}>1</span>
+            </MenuItem>
             <MenuItem link="/profile" nav={true}>
               Profile
-            </MenuItem>
-            <MenuItem link="/stuff" nav={true}>
-              Stuff <span className={classes.badge}>1</span>
             </MenuItem>
           </ul>
         </div>

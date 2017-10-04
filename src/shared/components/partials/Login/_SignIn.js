@@ -8,7 +8,7 @@ import { userActions } from 'shared/actions'
 import {
   EMAIL,
   PROVIDER,
-} from 'constants/signIn'
+} from 'constants/login'
 
 import {
   FACEBOOK,

@@ -8,6 +8,7 @@ import { StyleSheet, css } from 'aphrodite'
 import theme from 'theme'
 import avatar from 'images/avatar.png'
 import classes from './style.scss'
+import { userActions } from 'shared/actions'
 
 const styles = StyleSheet.create({
   menu: {
@@ -53,12 +54,9 @@ class UserHeader extends Component {
 
         {this.state.open ? (
           <ul className={`${classes.menuDropdown} ${css(styles.menu)}`}>
-            <MenuItem link="/">Home</MenuItem>
-            <MenuItem link="/profile">Secret Profile</MenuItem>
-            <MenuItem link="/signup">Sign Up Landing Page</MenuItem>
-            <MenuItem link="/signup/create-account/step-1">SignUp-Step-1</MenuItem>
+            <MenuItem link="/profile">Profile</MenuItem>
             <MenuItem link="/">
-              <div onClick={() => store.dispatch({ type: SIGN_OUT, user: null })}>Sign Out</div>
+              <div onClick={() => userActions.signOut()}>Sign Out</div>
             </MenuItem>
           </ul>
         ) : (

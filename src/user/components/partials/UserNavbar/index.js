@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Button, Navbar, NavbarBrand, Flexbox } from 'shared/components/elements'
 import { AccountMenu } from 'shared/components/partials'
+import { viewSettingActions } from 'shared/actions'
 import { StyleSheet, css } from 'aphrodite'
 import theme from 'theme'
 import classes from './style.scss'
@@ -19,7 +20,14 @@ class UserNavbar extends Component {
     super(props)
 
     this.state = { }
+    this.openLoginModal = this.openLoginModal.bind(this)
   }
+
+  openLoginModal(e) {
+    e.preventDefault()
+    viewSettingActions.openModal("UserLogin")
+  }
+
   render() {
     const { user } = this.props
 
@@ -30,7 +38,11 @@ class UserNavbar extends Component {
         </Flexbox>
 
         <Flexbox justify="space-between">
-          <AccountMenu />
+          {user ? (
+            <AccountMenu />
+          ) : (
+            <a href="#" onClick={this.openLoginModal}>Login</a>
+          )}
         </Flexbox>
       </Navbar>
     )

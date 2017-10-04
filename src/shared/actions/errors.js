@@ -17,7 +17,8 @@ export const clearErrors = (templateName, templatePart) => {
   })
 }
 
-export const handleErrors = (templateName, templatePart, errors, options = {})  => {
+export const handleErrors = (errors, templateName, templatePart, options = {})  => {
+  console.log(errors);
 
   if (!templateName) {
     console.log("we are handling this for you, but please pass in a template name");

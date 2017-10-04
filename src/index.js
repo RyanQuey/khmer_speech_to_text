@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
-import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { combineReducers, createStore, applyMiddleware } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
@@ -21,8 +20,6 @@ import adminCombiner from 'admin/reducers'
 import sharedCombiner from 'shared/reducers'
 import userCombiner from 'user/reducers'
 
-import 'theme/normalize.css'
-import 'theme/Global.scss'
 import 'theme/index.scss'
 
 import _ from 'lodash'
@@ -55,15 +52,13 @@ if (isAdmin){
 
 ReactDOM.render(
   <Provider store={store}>
-      <div>
-        <BrowserRouter>
-          {isAdmin ? (
-            <AdminComponent />
-          ) : (
-            <UserComponent />
-          )}
-        </BrowserRouter>
-      </div>
+    <div>
+      {isAdmin ? (
+        <AdminComponent />
+      ) : (
+        <UserComponent />
+      )}
+    </div>
   </Provider>,
   document.querySelector("#app")
 )

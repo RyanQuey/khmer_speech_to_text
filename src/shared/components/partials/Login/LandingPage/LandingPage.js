@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { Icon, Heading, Logo, Button, Flexbox } from 'shared/components/elements'
+import { Icon, Logo, Button, Flexbox } from 'shared/components/elements'
 import theme from 'theme'
 import classes from './LandingPage.scss'
 
@@ -17,12 +17,12 @@ export default class LandingPage extends Component {
         <main>
           <div className={classes.middleCtn}>
             <Flexbox flexWrap="wrap" justify="center" align="center" className={`${classes.aboutCtn} ${classes.layerCtn}`}>
-              <Heading level={1}>Main Header</Heading>
+              <h1>Main Header</h1>
 
               <div className={classes.leftCtn}>
                 <div className='text-ctn'>
-                  <Heading level={2}>Header</Heading>
-                  <Heading level={5}>Text</Heading>
+                  <h2>Header</h2>
+                  <h5>Text</h5>
                 </div>
               </div>
             </Flexbox>
