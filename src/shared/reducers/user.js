@@ -15,9 +15,12 @@ export default (state = null, action) => {
       return action.payload
 
     case SET_IMAGE:
-      return Object.assign({}, state, { [action.data.name]: action.data.url })
+      if (action.payload.path.split("/")[0] === "users") {
+        return Object.assign({}, state, { [action.payload.name]: action.payload.url })      
+      }
 
     case UPDATE_FIREBASE:
+      if (action.payload.path) {}
       return Object.assign({}, state, { [action.inputData.name]: action.inputData.value })
 
     case SIGN_OUT:

@@ -39,6 +39,8 @@ export const findOrCreateUser = (userData) => {
       //TODO: probably will redirect to a page where they fill out more profile information, basically, signing up.
       //redirect = {path: "/fillInProfile"}  
 
+console.log(user);
+console.log(userData, ...userColumns);
       return ref.set(user)
     }
   })

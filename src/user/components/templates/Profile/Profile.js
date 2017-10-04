@@ -1,7 +1,6 @@
 import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { setImage } from 'shared/actions'
 import { Button, Flexbox, Icon, Spinner } from 'shared/components/elements'
 import { DropImage } from 'shared/components/groups'
 import { FirebaseInput } from 'shared/components/partials'
@@ -28,12 +27,10 @@ class Profile extends Component {
             <DropImage
               defaultImage={banner}
               imageURL={this.props.user.bannerURL}
-              setImage={this.props.setImage}
               imageName="bannerURL"
               label="Drop cover photo here"
               className={classes.editBannerPicture}
-              path={`users/${this.props.uid}`}
-              uid={this.props.uid}
+              path={`users/${this.props.user.uid}`}
               height="70vh"
               width="100%"
             />
@@ -47,9 +44,8 @@ class Profile extends Component {
             <DropImage
               defaultImage={avatar}
               imageURL={this.props.user.avatarURL}
-              path={`users/${this.props.uid}`}
+              path={`users/${this.props.user.uid}`}
               imageName="avatarURL"
-              setImage={this.props.setImage}
               label="Drop profile photo here"
               style={{
                 borderRadius: '50%',
@@ -71,4 +67,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, { setImage })(Profile)
+export default connect(mapStateToProps)(Profile)

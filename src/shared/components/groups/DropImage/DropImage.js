@@ -1,52 +1,55 @@
-import React from 'react'
+import { Component } from 'react'
 import PropTypes from 'prop-types'
 import firebase from 'refire/firebase'
 import Dropzone from 'react-dropzone'
+import { setImage } from 'shared/actions'
 import { Flexbox, Icon } from 'shared/components/elements'
 import { StyleSheet, css } from 'aphrodite'
 import classes from './DropImage.scss'
 
-const DropImage = ({ defaultImage, imageURL, height, label, imageName, setImage, style, width, path }) => {
-  const styles = StyleSheet.create({
-    dropzone: {
-      backgroundImage: `url(${imageURL || defaultImage})`,
-      height,
-      width,
-    },
-  })
+class DropImage extends Component {
+  constructor(props) {
+    super(props)
 
-  const onDrop = (acceptedFiles, rejectedFiles) => {
-    console.log('acceptedFiles', acceptedFiles)
-    console.log('rejectedFiles', rejectedFiles)
-
-    const storageRef = firebase.storage().ref()
-    const file = acceptedFiles[0]
-    const storagePath = storageRef.child(`images/${path}/${imageName}`)
-
-    storagePath.put(file)
-    .then((snapshot) => {
-      const url = snapshot.metadata.downloadURLs[0]
-      setImage({ name: imageName, url })
-      firebase.database().ref(path).update({ [imageName]: url })
+    this.state = {
+      pending: false,
+    }
+    this.styles = StyleSheet.create({
+      dropzone: {
+        backgroundImage: `url(${props.imageURL || props.defaultImage})`,
+        height: props.height,
+        width: props.width,
+      },
     })
-    .catch(err => console.log('error: ', err))
+
+    this.onDrop = this.onDrop.bind(this)
   }
 
-  return (
-    <Flexbox align="center" direction="column" justify="center" >
-      <Dropzone
-        className={`${css(styles.dropzone)} ${classes.dropzone}`}
-        multiple={false}
-        onDrop={onDrop.bind(this)}
-        style={style}
-      >
-        <Flexbox align="center" direction="column">
-          <div>{label}</div>
-          <Icon color="black" name="picture-o" />
-        </Flexbox>
-      </Dropzone>
-    </Flexbox>
-  )
+  onDrop (acceptedFiles, rejectedFiles) {
+    console.log('acceptedFiles', acceptedFiles)
+    console.log('rejectedFiles', rejectedFiles)
+    const file = acceptedFiles[0]
+
+    setImage(this.props.imageName, this.props.path, file, )
+  }  
+
+  render() {
+    return (
+      <Flexbox align="center" direction="column" justify="center" >
+        <Dropzone
+          className={`${css(this.styles.dropzone)} ${classes.dropzone}`}
+          multiple={false}
+          onDrop={this.onDrop}
+          style={this.props.style}
+        >
+          <Flexbox align="center" direction="column">
+            <div>{this.props.label}</div>
+            <Icon color="black" name="picture-o" />
+          </Flexbox>
+        </Dropzone>
+      </Flexbox>
+    )
+  }
 }
 
 DropImage.propTypes = {
@@ -56,7 +59,6 @@ DropImage.propTypes = {
   label: PropTypes.string.isRequired,
   imageName: PropTypes.string.isRequired,
   path: PropTypes.string.isRequired,
-  setImage: PropTypes.func.isRequired,
   style: PropTypes.object,
   width: PropTypes.string,
 }

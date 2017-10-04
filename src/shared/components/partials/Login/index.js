@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { userActions } from 'shared/actions'
+import { userActions, errorActions } from 'shared/actions'
 import { Button, Flexbox, Input } from 'shared/components/elements'
 import schema from 'constants/schema'
 import {
@@ -44,7 +44,13 @@ class Login extends Component {
 
     errors && errors.forEach((err) => {
       if (err.type === errorTypes.RECORD_ALREADY_EXISTS.type) {
+        let toReturn = {
+          title: "Account already exists for this email",
+          message: "Please try logging in instead"
+        }
+        errorActions(toReturn)
         
+        this.setState({ view: 'LOGIN' });
       }
     })
   }
