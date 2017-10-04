@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Flexbox, MenuItem } from 'shared/components/elements'
 import { Select } from 'shared/components/groups'
+import { withRouter } from 'react-router-dom'
 
 import { firebaseActions } from 'shared/actions'
 import classes from './Sidebar.scss'
@@ -43,4 +44,4 @@ const mapStateToProps = (state) => {
     user: state.shared.user }
 }
 
-export default connect(mapStateToProps)(Sidebar)
+export default withRouter(connect(mapStateToProps)(Sidebar))

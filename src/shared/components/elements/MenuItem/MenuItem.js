@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, withRouter } from 'react-router-dom'
 import classes from './MenuItem.scss'
 
 const MenuItem = ({ children, link, nav }) => (
@@ -29,4 +29,4 @@ MenuItem.propTypes = {
   nav: PropTypes.bool,
 }
 
-export default MenuItem
+export default withRouter(MenuItem)
