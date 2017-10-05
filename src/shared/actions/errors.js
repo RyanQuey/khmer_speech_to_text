@@ -64,7 +64,7 @@ export const handleErrors = (errors, templateName, templatePart, options = {})  
         newAlert({
           title: err.title || "Unknown error",
           message: err.message || "Please refresh your page and try again",
-          level: err.errorLevel || "WARNING",
+          level: err.level || "WARNING",
           timer: options.timer || true,
         })
       })

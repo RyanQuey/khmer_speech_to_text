@@ -27,7 +27,7 @@ export const findOrCreateUser = (userData) => {
 
   ref.once('value')
   .then((snapshot) => {
-    let user
+    let user, creating
     if (snapshot.val()) {
       user = snapshot.val() 
       return user
@@ -35,6 +35,7 @@ export const findOrCreateUser = (userData) => {
       //if no values retrieved from database, just return info from the user argument
       // extract out the relevant columns from the userData, and create user
       user = _.pick(userData, ...userColumns)
+      creating = true
 
       //TODO: probably will redirect to a page where they fill out more profile information, basically, signing up.
       //redirect = {path: "/fillInProfile"}  
@@ -45,6 +46,10 @@ console.log(userData, ...userColumns);
     }
   })
   .then((persistedUser) => {
+    if (creating) {
+      persistedUser = user
+    }
+
     if (!persistedUser) {
       throw {
         title: "Failure during login:",
@@ -55,7 +60,7 @@ console.log(userData, ...userColumns);
         alert: true,
       }
     }
-console.log(persistedUser);
+
     const u = Object.assign({}, persistedUser)
 
     store.dispatch({ 

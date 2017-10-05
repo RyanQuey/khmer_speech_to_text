@@ -1,4 +1,5 @@
 import theme from 'theme'
+import classes from './style.scss'
 
 export default ({ alert, className, color, ...props }) => {
   let borderStyle = {}
@@ -12,12 +13,13 @@ export default ({ alert, className, color, ...props }) => {
   } else if (alert.level === "WARNING") {
     level = "warning"
   }
+
   return (
     <div 
-      className={`alert alert-${level} alert-dismissible fade show`}
+      className={`${classes.alert} ${classes["alert-" + level]}`}
       role="alert"
     >
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <button type="button" className={classes.closeButton} data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
       <span
