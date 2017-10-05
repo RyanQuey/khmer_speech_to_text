@@ -23,11 +23,11 @@ export const findOrCreateUser = (userData) => {
 
   const userColumns = _.values(Object.keys(schema.tables.users))
   const ref = firebase.database().ref(`users/${userData.uid}`)
-  let redirect
+  let redirect, creating
 
   ref.once('value')
   .then((snapshot) => {
-    let user, creating
+    let user
     if (snapshot.val()) {
       user = snapshot.val() 
       return user
@@ -108,7 +108,7 @@ function _createUserWithEmail(data) {
         title: "Email already in use",
         message: "Please either login or try a different email",
         errorType: errorTypes.RECORD_ALREADY_EXISTS.type,
-        errorLevel: errorTypes.RECORD_ALREADY_EXISTS.level,
+        level: errorTypes.RECORD_ALREADY_EXISTS.level,
       }
 
     }
@@ -122,7 +122,20 @@ function _signInWithEmail(data) {
     return user
   })
   .catch((err) => {
-    errorActions.handleErrors(err)
+    let toReturn = err
+    let options = {
+      alert: true
+    }
+    if (err.code === "auth/wrong-password") {
+      toReturn = {
+        title: "Invalid credentials",
+        message: "Please try again or sign-up to create an account",
+        errorType: errorTypes.INVALID_CREDENTIALS.type,
+        level: errorTypes.INVALID_CREDENTIALS.level,
+      }
+
+    }
+    errorActions.handleErrors(toReturn, "Login", "onSubmit", options)
   })
 }
 

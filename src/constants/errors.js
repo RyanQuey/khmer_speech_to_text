@@ -18,8 +18,8 @@ export default {
     type: "PROMPT_FOR_FURTHER_INPUT",
     level: "ALERT"
   },
-  FAILED_CREDENTIALS: {
-    type: "FAILED_CREDENTIALS",
+  INVALID_CREDENTIALS: {
+    type: "INVALID_CREDENTIALS",
     level: "WARNING"
   },
   INVALID_ARGUMENTS: {

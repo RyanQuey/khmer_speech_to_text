@@ -15,11 +15,12 @@ import classes from './style.scss'
 class UserContent extends Component {
   render() {
     const alerts = _.values(this.props.alerts)
+    const modalOpen = this.props.currentModal
 
     return (
       <main>
         <Flexbox className={classes.rightColumn} direction="column">
-          {alerts && alerts.map((alert) => {
+          {alerts && !modalOpen && alerts.map((alert) => {
             return <Alert alert={alert} />
           })}    
 
@@ -40,6 +41,7 @@ UserContent.propTypes = {
 const mapStateToProps = (state) => {
   return { 
     alerts: state.shared.alerts,
+    currentModal: state.shared.viewSettings.currentModal,
   }
 }
 

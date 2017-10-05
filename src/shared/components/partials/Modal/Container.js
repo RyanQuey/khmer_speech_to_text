@@ -3,6 +3,12 @@ import { viewSettingActions } from 'shared/actions'
 import classes from './style.scss'
 
 export default class ModalContainer extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      alertForModal: false,
+    }
+  }
 
   componentWillReceiveProps (nextProps){
     const html = document.querySelector("html").style.overflowY != "hidden"
@@ -40,18 +46,16 @@ export default class ModalContainer extends Component {
     } = (classes);
 
     const handleSubmit = this.props.handleSubmit
-    let innerContent;
-    if (this.props.bare) {
-      innerContent = []
-    } else {
-      innerContent = [
+    let innerContent = [];
+
+    if (!this.props.bare) {
+      innerContent.push(
         <div key="header" className={modalHeader}>
           <button type="button" className={closeButton} data-dismiss="modal" aria-label="Close" onClick={this.close}>
             <span aria-hidden="true">×</span>
           </button>
-          <h1 className={modalTitle}>{this.props.title}</h1>
         </div>
-      ]
+      )
     }
     
     innerContent.push(this.props.children)

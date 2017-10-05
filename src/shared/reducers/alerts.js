@@ -10,13 +10,15 @@ export default (state = {}, action) => {
       let alert = action.payload
       let lastAlertId
       if (Object.keys(state).length >0) {
-        let alertCount = Object.keys(state).length 
-        lastAlertId = state[Object.keys(state[alertCount -1])].id
+        const alertCount = Object.keys(state).length 
+        const lastAlert = state[alertCount -1]
+        lastAlertId = state[newAlertId].id
       } else {
         lastAlertId = 0
       }
+
+      const newId = lastAlertId +1
       alert.id = newId
-      const newId = state.lastAlertId +1
        
       const toMerge = {
         [newId]: action.payload

@@ -29,6 +29,8 @@ class Login extends Component {
     }
     
     this.toggleView = this.toggleView.bind(this)
+    this.handleEmail = this.handleEmail.bind(this)
+    this.handlePassword = this.handlePassword.bind(this)
   }
   componentWillReceiveProps (props) {
     const user = props.user
@@ -65,6 +67,11 @@ class Login extends Component {
     }
   }
 
+  handlePassword(e, errors) {
+    this.setState({
+      password: e.target.value,
+    })
+  }
   handleEmail(e, errors) {
     this.setState({
       email: e.target.value,
@@ -83,6 +90,7 @@ class Login extends Component {
       type,
       {
         email: this.state.email,
+        password: this.state.password,
         history: this.props.history,
       },
     )
