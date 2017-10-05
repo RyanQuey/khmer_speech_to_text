@@ -21,6 +21,7 @@ class UserNavbar extends Component {
 
     this.state = { }
     this.openLoginModal = this.openLoginModal.bind(this)
+    this.nothing = this.nothing.bind(this)
   }
 
   openLoginModal(e) {
@@ -28,21 +29,32 @@ class UserNavbar extends Component {
     viewSettingActions.openModal("UserLogin")
   }
 
+  nothing(e) {
+    e.preventDefault()
+  }
+
   render() {
     const { user } = this.props
-
+console.log(classes.mainNav, "ab");
     return (
       <Navbar>
         <Flexbox justify="space-between">
           <NavbarBrand/>
         </Flexbox>
 
-        <Flexbox justify="space-between">
-          {user ? (
-            <AccountMenu />
-          ) : (
-            <a href="#" onClick={this.openLoginModal}>Login</a>
-          )}
+        <Flexbox className={classes.mainNav} justify="space-between">
+          <Flexbox className={classes.leftNav} align="center" justify="space-between">
+            <a href="#" onClick={this.nothing}>Fake link</a>
+          </Flexbox>
+
+          <Flexbox className={classes.rightNav} align="center" justify="space-between">
+          
+            {user ? (
+              <AccountMenu />
+            ) : (
+              <a href="#" onClick={this.openLoginModal}>Login</a>
+            )}
+          </Flexbox>
         </Flexbox>
       </Navbar>
     )
