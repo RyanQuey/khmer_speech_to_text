@@ -1,5 +1,8 @@
 import theme from 'theme'
 import classes from './style.scss'
+import {
+  closeAlerts
+} from 'shared/actions/alerts'
 
 export default ({ alert, className, color, ...props }) => {
   let borderStyle = {}
@@ -19,7 +22,7 @@ export default ({ alert, className, color, ...props }) => {
       className={`${classes.alert} ${classes["alert-" + level]}`}
       role="alert"
     >
-      <button type="button" className={classes.closeButton} data-dismiss="alert" aria-label="Close">
+      <button type="button" className={classes.closeButton} onClick={closeAlerts.bind(null, alert.id)} aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
       <span

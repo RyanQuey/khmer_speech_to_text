@@ -20,3 +20,4 @@ export const SIGN_OUT = 'SIGN_OUT'
 
 // viewSettings
 export const SET_CURRENT_MODAL = 'SET_CURRENT_MODAL'
+export const CLOSE_MODAL = 'CLOSE_MODAL'

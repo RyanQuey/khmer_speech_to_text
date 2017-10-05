@@ -58,6 +58,7 @@ export const handleErrors = (errors, templateName, templatePart, options = {})  
         message: options.combinedMessage || "Please check the fields below and try again",
         level: options.combinedLevel || "WARNING",
         timer: options.timer || true,
+        options: options.alertOptions || {},
       })
     } else {
       errors.forEach((err) => {
@@ -66,6 +67,7 @@ export const handleErrors = (errors, templateName, templatePart, options = {})  
           message: err.message || "Please refresh your page and try again",
           level: err.level || "WARNING",
           timer: options.timer || true,
+          options: options.alertOptions || {},
         })
       })
     }
