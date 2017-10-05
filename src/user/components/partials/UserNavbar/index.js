@@ -35,7 +35,7 @@ class UserNavbar extends Component {
 
   render() {
     const { user } = this.props
-console.log(classes.mainNav, "ab");
+
     return (
       <Navbar>
         <Flexbox justify="space-between">

@@ -20,16 +20,30 @@ export const clearErrors = (templateName, templatePart) => {
 export const handleErrors = (errors, templateName, templatePart, options = {})  => {
   console.log(errors);
 
+  //as a shortcut, allow passing in an error obj with all the arguments as properties
+  if (typeof errors === "object") {
+    if (!Array.isArray(errors)) {
+      if (!templateName && errors.templateName) {
+        templateName = errors.templateName
+      }
+      if (!templatePart && errors.templatePart) {
+        templatePart = errors.templatePart
+      }
+      if (options.alert === undefined && errors.alert) {
+        options.alert = errors.alert
+      }
+
+      errors = [errors]
+    } 
+  }
+
   if (!templateName) {
-    console.log("we are handling this for you, but please pass in a template name");
+    console.log("we are handling this, but pass in a template name");
     templateName = "Generic"
   }
   if (!templatePart) {
-    console.log("we are handling this for you, but please pass in a template part");
+    console.log("we are handling this, but pass in template part");
     templateName = "generic"
-  }
-  if (!Array.isArray(errors)) {
-    errors = [errors]
   }
 
   //by default, we will just override whatever errors existed previously for this part of the template

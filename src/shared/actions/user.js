@@ -45,6 +45,16 @@ console.log(userData, ...userColumns);
     }
   })
   .then((persistedUser) => {
+    if (!persistedUser) {
+      throw {
+        title: "Failure during login:",
+        message: "Please refresh the page and try again",
+        templateName: "Login",
+        templatePart: "onSubmit",
+        level: "BUG",
+        alert: true,
+      }
+    }
 console.log(persistedUser);
     const u = Object.assign({}, persistedUser)
 
