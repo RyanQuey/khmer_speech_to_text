@@ -8,7 +8,9 @@
   background-color: $nav-bg; //unless it's overridden in the component
   @include rems(14);
   a {
-    color: $primary;
+    color: $white;
+    padding: 5px;
+    margin: 0 5px;
   }
 }
 
