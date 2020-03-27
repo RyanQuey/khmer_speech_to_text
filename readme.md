@@ -4,9 +4,11 @@
 
 1. Clone the project
 2. Run `npm i`
-3. Then run `npm start`
+3. Then run `npm run local`
 
 That's it! Now go party on `localhost:3000` !
+
+For running cloud server locally as well, do `firebase serve --only functions --host 0.0.0.0`
 
 
 ![](https://media.giphy.com/media/fsULJFFGv8X3G/giphy.gif)
