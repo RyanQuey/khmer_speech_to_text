@@ -1,7 +1,7 @@
 import firebase from 'firebase'
 import config from '../config'
 
-firebase.initializeApp({
+const firebaseApp = firebase.initializeApp({
   apiKey: config.firebase.apiKey,
   authDomain: config.firebase.authDomain,
   databaseURL: config.firebase.databaseURL,
@@ -10,4 +10,4 @@ firebase.initializeApp({
   messagingSenderId: config.firebase.messagingSenderId,
 })
 
-export default firebase
+export default firebaseApp

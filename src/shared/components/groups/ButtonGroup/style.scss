@@ -1,0 +1,24 @@
+.buttonGroup {
+  margin: 10px;
+
+  &.vertical {
+    .container {
+      width: 100%;
+      display: block;
+    }
+  }
+
+  &.horizontal {
+    .container {
+      display: inline-block;
+    }
+  }
+  .container {
+    button {
+      width: 100%;
+      margin: 0;
+      border-radius: 0;
+    }
+  }
+
+}

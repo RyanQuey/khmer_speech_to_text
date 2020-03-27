@@ -1,0 +1,23 @@
+@import 'theme/_helpers';
+.userSettings {
+  text-align: left;
+}
+.tab {
+  border-bottom: 1px solid #ccc;
+
+  &.selected {
+    border-style: solid;
+    border-color: #ccc;
+    font-weight: bold;
+    border-bottom-color: #fff;
+    border-width: 1px 1px 0px 1px;
+  }
+  &:hover {
+    font-weight: bold;
+  }
+}
+.tabContent {
+  background-color: white;
+  padding: 20px;
+  border: solid 1px #ccc;
+}

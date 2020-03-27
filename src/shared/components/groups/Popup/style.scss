@@ -1,0 +1,87 @@
+@import 'theme/_helpers';
+
+//****
+//NOTE make sure is sibling with target, and parent div is position: relative
+//if not sibling to target, hovering gets weird. so Make sibling of target
+//****
+
+.popup {
+  position: absolute;
+  background-color: transparent;
+  z-index: 100;
+
+  .scrim {
+    display: block !important;
+    background-color: transparent;
+  }
+  .caret {
+    display: block;
+    position: relative;
+    //position: absolute;
+    //top: 47px;
+    z-index: 2;
+    background-color: $nav-bg;
+    width: 12px;
+    height: 12px;
+    -webkit-transform: rotate(45deg);
+    -webkit-transform-origin: 0% 0;
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    transform-origin: 0% 0;
+  }
+
+  .container {
+    position: relative;
+    //needs padding, but don't want to hardcode in
+    //padding: 10px 5px 5px 5px;
+    border: 1px solid #d6d6d6;
+  }
+
+  //float is side of parent which caret is on; body is where body is relative to caret
+  &.body-left {
+    .container {
+      left: calc(-100% + 45px)
+    }
+  }
+  &.body-right {
+    .container {
+      right: calc(-100% + 45px)
+    }
+  }
+
+  &.float-left {
+    left: 0;
+    .caret {
+      left: calc(0px + 25px);
+    }
+
+  }
+  &.float-center {
+    .caret {
+      left: 7px; //makes up for the rotation
+    }
+
+  }
+  &.float-right {
+    right: 0;
+    .caret {
+      left: calc(100% - 25px);
+    }
+  }
+  &.side-bottom {
+    top: calc(100% - 6px);
+    .caret {
+      top: 3px;
+      border-top: 1px solid #d6d6d6;
+      border-left: 1px solid #d6d6d6;
+    }
+  }
+  &.side-top {
+    bottom: calc(100% - 6px);
+    .caret {
+      top: -9px;
+      border-bottom: 1px solid #d6d6d6;
+      border-right: 1px solid #d6d6d6;
+    }
+  }
+}

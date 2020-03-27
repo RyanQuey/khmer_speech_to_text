@@ -1,0 +1,70 @@
+@import 'theme/_helpers';
+
+.menuItem {
+  text-decoration: none;
+  cursor: pointer;
+  text-align: left;
+  list-style: none;
+  //basic style for all links
+  & > a, & > a:visited, & > .noLink {
+    display: block;
+    padding: 10px 20px;
+    background: $nav-bg;
+    color: $text;
+    &:hover {
+      color: $nav-hover-font;
+      background: $nav-hover-bg;
+    }
+  }
+
+  //for any active nav, w/ or w/o link
+  & > a.navActive, .navActive.noLink {
+    background: $nav-hover-bg;
+    color: $nav-hover-font;
+    &:hover {
+      color: $nav-hover-font;
+    }
+  }
+
+  & > a.noHover,
+  & > a.noHover:visited,
+  & > a.navActive.noHover {
+    &:hover {
+      color: inherit;
+      background: inherit;
+    }
+  }
+
+  //using for navbar items mostly
+  & > a.textOnly,
+  & > a.textOnly:visited,
+  & > a.navActive.textOnly {
+    &:hover {
+      background: inherit;
+      color: $alt-nav-hover-font; //might be set to identical as nav-hover-font, but allows option to change this
+      text-decoration: underline;
+    }
+  }
+
+  .badge {
+    display: block;
+    background: $primary;
+    color: $white;
+    float: right;
+    min-width: 10px;
+    padding: 3px 10px;
+    border-radius: 5px;
+    margin-top: -3px;
+    font-weight: bold;
+  }
+
+  .icon {
+    //float: right;
+    padding: 3px 10px;
+    margin-top: -3px;
+  }
+
+  ul {
+    padding-left: 30px;
+  }
+}

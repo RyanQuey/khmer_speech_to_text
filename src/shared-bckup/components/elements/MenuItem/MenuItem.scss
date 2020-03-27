@@ -1,0 +1,24 @@
+@import 'theme/_helpers';
+
+.menuItem {
+  text-decoration: none;
+  cursor: pointer;
+  list-style: none;
+  a, a:visited {
+    display: block;
+    padding: 10px 20px;
+    background: $nav-bg;
+    color: $white;
+    &:hover {
+      color: $primary;
+      background: $nav-hover;
+    }
+  }
+  a.navActive {
+    background: black;
+    &:hover {
+      color: $white;
+    }
+  }
+  
+}

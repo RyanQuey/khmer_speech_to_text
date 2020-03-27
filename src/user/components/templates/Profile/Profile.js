@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Button, Flexbox, Icon, Spinner } from 'shared/components/elements'
 import { DropImage } from 'shared/components/groups'
 import { FirebaseInput } from 'shared/components/partials'
-import { Authenticated } from 'shared/components/yields'
+import { withRouter } from 'react-router-dom'
 
 import schema from 'constants/schema'
 import avatar from 'images/avatar.png'
@@ -63,7 +63,7 @@ class Profile extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    user: state.shared.user,
+    user: state.user,
   }
 }
 

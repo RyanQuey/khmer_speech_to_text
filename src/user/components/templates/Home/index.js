@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Heading } from 'shared/components/elements'
 import { SignIn } from 'shared/components/partials'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 class Home extends Component {
   render() {
@@ -10,8 +11,8 @@ class Home extends Component {
     return (
       <div id="home-ctn">
         <div className="menu-ctn">
+          <h1>Head over to uploads page to upload a file</h1>
         </div>
-        <h1>You are Home</h1>
       </div>
     )
   }
@@ -23,8 +24,7 @@ Home.propTypes = {
 }
 
 const mapStateToProps = (state) => {
-  return { user: state.shared.user }
+  return { user: state.user }
 }
 
-export default connect(mapStateToProps)(Home)
-
+export default withRouter(connect(mapStateToProps)(Home))

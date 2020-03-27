@@ -1,0 +1,32 @@
+import PropTypes from 'prop-types'
+import classes from './style.scss'
+
+const Col = ({ background, children, color, border, onClick, className, col}) => {
+  return (
+    <div
+      className={`${className} ${classes.col} ${col ? classes[`col-${col}`] : ""}`}
+      onClick={onClick}
+    >
+      {children}
+    </div>
+  )
+}
+
+Col.defaultProps = {
+  background: 'primary',
+  color: 'white',
+}
+
+Col.propTypes = {
+  background: PropTypes.string,
+  children: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.node
+  ]),
+  color: PropTypes.string,
+  onClick: PropTypes.func,
+  border: PropTypes.string,
+}
+
+export default Col
+

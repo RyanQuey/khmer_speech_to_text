@@ -7,18 +7,19 @@ import {
 export default ({ alert, className, color, ...props }) => {
   let borderStyle = {}
   //TODO: maybe create a parent component, that goes around all of the alerts
-  //TODO: if alert.timer send the action to close alert.id after five seconds or so
   let level
   if (["BUG", "DANGER"].includes(alert.level)) {
     level = 'danger'
-  } else if (alert.level === "ALERT") {
+  } else if (["SUCCESS", "ALERT"].includes(alert.level)) {
     level = "success"
   } else if (alert.level === "WARNING") {
     level = "warning"
+  } else {
+    level = "success"
   }
 
   return (
-    <div 
+    <div
       className={`${classes.alert} ${classes["alert-" + level]}`}
       role="alert"
     >
@@ -30,7 +31,7 @@ export default ({ alert, className, color, ...props }) => {
       >
         <strong>{alert.title}</strong>&nbsp;{alert.message}
       </span>
-      
+
     </div>
   )
 }

@@ -1,0 +1,61 @@
+@import 'theme/_helpers';
+
+.navbar {
+  width: 100%;
+  height: 50px;
+  z-index: 2;
+  color: $white;
+  @include rems(14);
+
+  //I'm doing this kind of weird...but you kind of have to, because of the way that classes are hashed
+  & > ul {
+    list-style: none;
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    padding: 0;
+
+    & > li {
+      margin: 0 20px;
+    }
+  }
+  &.flex-start > ul {
+    justify-content: flex-start;
+  }
+  &.flex-end > ul {
+    justify-content: flex-end;
+  }
+  &.space-evenly > ul {
+    justify-content: space-evenly;
+  }
+  &.space-between > ul {
+    justify-content: space-between;
+  }
+  &.center > ul {
+    justify-content: center;
+  }
+  &.navTabs > ul {
+    //border-bottom: solid black 1px;
+    margin-bottom: 0;
+  }
+  &.navTabs > ul > li {
+    padding: 10px 20px;
+    margin: 0px;
+    //border: 1px black solid;
+    //border-bottom: none;
+    border-radius: 15px 15px 0 0;
+    background-color: $white;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  input {
+    margin: 0 5px;
+  }
+  a {
+    padding: 5px;
+    margin: 0 5px;
+  }
+}
+

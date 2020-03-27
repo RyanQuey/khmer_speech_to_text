@@ -8,6 +8,7 @@ import {
 } from 'shared/components/partials/Modal'
 import { Login } from 'shared/components/partials'
 import { viewSettingActions } from 'shared/actions'
+import { withRouter } from 'react-router-dom'
 
 class UserLogin extends Component {
   constructor() {
@@ -32,17 +33,17 @@ class UserLogin extends Component {
       <ModalContainer
         visible={this.props.currentModal === "UserLogin"}
         onClose={this.handleClose}
-        >
-          <ModalBody>
-            <Login modal={true} onSuccess={this.onSuccess} onCancel={this.handleClose} />
-          </ModalBody>
+      >
+        <ModalBody>
+          <Login modal={true} onSuccess={this.onSuccess} onCancel={this.handleClose} />
+        </ModalBody>
       </ModalContainer>
     )
   }
 }
 
 const mapStateToProps = (state) => {
-  return { currentModal: state.shared.viewSettings.currentModal }
+  return { currentModal: state.viewSettings.currentModal }
 }
 
-export default connect(mapStateToProps)(UserLogin)
+export default withRouter(connect(mapStateToProps)(UserLogin))

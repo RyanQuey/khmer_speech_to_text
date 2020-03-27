@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import avatar from 'images/avatar.png'
-import classes from './Avatar.scss'
+import classes from './style.scss'
 
 const Avatar = ({ onClick, size, src }) => {
   return (

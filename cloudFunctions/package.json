@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/speech": "^3.6.0",
     "firebase-admin": "^5.4.1",
     "firebase-functions": "^0.7.0"
   }

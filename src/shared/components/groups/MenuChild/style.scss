@@ -1,0 +1,45 @@
+@import 'theme/_helpers';
+
+.menuChild {
+  text-decoration: none;
+  cursor: pointer;
+  list-style: none;
+  text-align: left;
+  //basic style for all links
+  & > a, & > a:visited, & > .noLink  {
+    display: block;
+    padding: 10px 20px;
+    background: $nav-bg;
+    color: $text;
+    &:hover {
+      color: $nav-hover-font;
+      background: $nav-hover-bg;
+    }
+  }
+  //for any active nav, w/ or w/o link
+  & > a.navActive, div.navActive.noLink  {
+    background: $nav-hover-bg;
+    color: $nav-hover-font;
+    &:hover {
+      color: $nav-hover-font;
+    }
+  }
+
+  .icon {
+    //float: right;
+    padding: 3px 10px;
+    margin-top: -3px;
+  }
+
+  .badge {
+    display: block;
+    background: $primary;
+    color: $white;
+    float: right;
+    min-width: 10px;
+    padding: 3px 10px;
+    border-radius: 5px;
+    margin-top: -3px;
+    font-weight: bold;
+  }
+}

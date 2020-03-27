@@ -1,11 +1,11 @@
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { Flexbox, MenuItem } from 'shared/components/elements'
+import { Flexbox } from 'shared/components/elements'
+import { MenuItem } from 'shared/components/groups'
 import { Select } from 'shared/components/groups'
 import { withRouter } from 'react-router-dom'
 
-import { firebaseActions } from 'shared/actions'
 import classes from './Sidebar.scss'
 
 class Sidebar extends Component {
@@ -22,12 +22,8 @@ class Sidebar extends Component {
 
         <div className={classes.nav}>
           <ul className={classes.sidebarNav}>
-            <MenuItem link="/search" nav={true}>
-              Search <span className={classes.badge}>1</span>
-            </MenuItem>
-            <MenuItem link="/profile" nav={true}>
-              Profile
-            </MenuItem>
+            <MenuItem link="/upload" text="Upload" nav={true} exact={true} icon="bullhorn"/>
+            <MenuItem link="/profile" text="Profile" nav={true} exact={true} icon="bullhorn"/>
           </ul>
         </div>
       </Flexbox>
@@ -41,7 +37,7 @@ Sidebar.propTypes = {
 
 const mapStateToProps = (state) => {
   return { 
-    user: state.shared.user }
+    user: state.user }
 }
 
 export default withRouter(connect(mapStateToProps)(Sidebar))

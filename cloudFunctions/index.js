@@ -3,7 +3,7 @@ const admin = require('firebase-admin');
 admin.initializeApp(cloudFunctions.config().firebase);
 
 //NOTE: disabling this, so don't run up the charge unnecessarily
-/*exports.bookSearch = cloudFunctions.database.ref('/users/{id}')
+/*exports.updateUser = cloudFunctions.database.ref('/users/{id}')
   .onWrite(event => {
     const original = event.data.val()
 

@@ -3,17 +3,15 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { userActions, errorActions } from 'shared/actions'
 import { Button, Flexbox, Input } from 'shared/components/elements'
-import schema from 'constants/schema'
 import {
-  EMAIL,
-  CREATE_WITH_EMAIL,
-  PROVIDER,
-} from 'constants/login'
+  SIGN_IN_REQUEST,
+} from 'constants/actionTypes'
+import { 
+  //SocialLogin, 
+  UserCredentials 
+} from 'shared/components/partials'
+import { withRouter } from 'react-router-dom'
 
-import {
-  FACEBOOK,
-  GOOGLE,
-} from 'constants/providers'
 import errorTypes from 'constants/errors'
 
 import classes from './style.scss'
@@ -22,28 +20,29 @@ class Login extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      email: '',
-      validEmail: false,
       view: props.initialView || 'LOGIN',
-      loginPending: false
+      pending: false,
     }
-    
+
     this.toggleView = this.toggleView.bind(this)
-    this.handleEmail = this.handleEmail.bind(this)
-    this.handlePassword = this.handlePassword.bind(this)
+    this.togglePending = this.togglePending.bind(this)
+    this.toggleResetPassword = this.toggleResetPassword.bind(this)
+    this.submitCredentials = this.submitCredentials.bind(this)
   }
+
   componentWillReceiveProps (props) {
     const user = props.user
     const errors = Helpers.safeDataPath(props, 'errors.Login.onSubmit', false)
 
     if (errors.length > 0 || user && Object.keys(user).length >0) {
-      this.setState({ signingIn: false });
+      this.setState({ pending: false });
     }
 
     if (user && Object.keys(user).length > 0) {
       this.props.onSuccess();
     }
 
+//TODO just use a callback in the action
     errors && errors.forEach((err) => {
       if (err.type === errorTypes.RECORD_ALREADY_EXISTS.type) {
         let toReturn = {
@@ -51,126 +50,116 @@ class Login extends Component {
           message: "Please try logging in instead"
         }
         errorActions(toReturn)
-        
+
         this.setState({ view: 'LOGIN' });
       }
     })
   }
+  togglePending(value = !this.state.pending) {
+    this.setState({pending: value})
+  }
 
+  toggleResetPassword(e) {
+    e.preventDefault()
+    this.setState({
+      view: "RESETTING_PASSWORD",
+    })
+  }
   toggleView(e) {
     e.preventDefault()
 
-    if (this.state.view === "SIGN_UP") {
-      this.setState({view: "LOGIN"})
-    } else {
+    if (this.state.view === "LOGIN") {
       this.setState({view: "SIGN_UP"})
+    } else {
+      this.setState({view: "LOGIN"})
     }
   }
 
-  handlePassword(e, errors) {
-    this.setState({
-      password: e.target.value,
-    })
+  setOnboardingStage(value) {
+    this.setState({onboardingStage: value}) //CHOOSE_PRICING_PLAN, ADD_CARD, or ADD_CREDENTIALS
   }
-  handleEmail(e, errors) {
-    this.setState({
-      email: e.target.value,
-      validEmail: (errors.length === 0),
-    })
-  }
-  signInWithEmail() {
-    let type
-    this.setState({ loginPending: true });
-    if (this.state.view === 'SIGN_UP') {
-      type = CREATE_WITH_EMAIL
-    } else {
-      type = EMAIL
+
+  submitCredentials () {
+    let signInType
+    if (this.state.view === "LOGIN"){
+      signInType = 'SIGN_IN_WITH_EMAIL'
+
+    } else if (this.state.view === 'SIGN_UP') {
+      signInType = 'SIGN_UP_WITH_EMAIL'
     }
-    userActions.signIn(
-      type,
-      {
-        email: this.state.email,
-        password: this.state.password,
-        history: this.props.history,
-      },
-    )
+
+      //not a login token, but any other token that needs a logged in user for it to operate
+    const token = this.props.viewSettings.modalToken
+    const onFailure = () => {
+      this.togglePending(false)
+    }
+    const cb = (allData) => {
+    }
+
+    const credentials = {password: this.props.password, email: this.props.email}
+    this.props.signInRequest(signInType, credentials, token, onFailure, cb)
   }
-  providerSignIn(provider) {
-    this.setState({ loginPending: true });
-    userActions.signIn(
-      PROVIDER,
-      {
-        provider,
-        history: this.props.history,
-      },
-    )
-  }
+
   render() {
     const view = this.state.view
-    const generalText = view === "LOGIN" ? "Login" : "Sign Up"
-    const socialText = view === "LOGIN" ? "Login" : "Create account"
+    let generalText
+    switch (view) {
+      case "SIGN_UP":
+        generalText = "Signup"
+        break
+
+      case "LOGIN":
+        generalText = "Login"
+        break
+
+      case "RESETTING_PASSWORD":
+        generalText = "Reset Password"
+        break
+    }
+
+    //const socialText = view === "LOGIN" ? "Login" : "Create account"
+    const credentialsOnly = true //Helpers.safeDataPath(this.props, "viewSettings.modalOptions.credentialsOnly", false);
+    const resettingPassword = view === "RESETTING_PASSWORD"
     //TODO: set the title using props into the modal container
 
     return (
       <Flexbox className={classes.fields} direction="column" justify="center" align="center">
         <h1 color="primary">{generalText}</h1>
-        <div className={classes.form}>
-          <h3>Email address{view === "LOGIN" && " and password" }:</h3>
-          <Input
-            color="primary"
-            onChange={(e, errors) => this.handleEmail(e, errors)}
-            placeholder="your-email@gmail.com"
-            type="email"
-            value={this.state.email}
-            validations={['required', 'email']}
-          />
-          {view === "LOGIN" ? (
-            <Input
-              color="primary"
-              onChange={(e, errors) => this.handlePassword(e, errors)}
-              placeholder="password"
-              type="password"
-              value={this.state.password}
-              validations={['required']}
-            />
-          ) : (
-            <h5>We&apos;ll send you an email to set your password.</h5>
-          )}          
-          <Button
-            onClick={() => this.signInWithEmail()}
-            disabled={(!this.state.validEmail || this.state.loginPending)}
-          >
-            {generalText}
-          </Button>
-          <br />
-          <h3>Or {socialText.toLowerCase()} through Google or Facebook:</h3>
-          <Button
-            background="facebook"
-            onClick={() => this.providerSignIn(FACEBOOK)}
-            disabled={(this.state.loginPending)}
-          >
-            {socialText}&nbsp;with Facebook
-          </Button>
-          <Button
-            background="google"
-            onClick={() => this.providerSignIn(GOOGLE)}
-            disabled={(this.state.loginPending)}
-          >
-            {socialText}&nbsp;with Google
-          </Button>
+        <UserCredentials
+          view={view}
+          buttonText={generalText}
+          pending={this.state.pending}
+          token={this.props.viewSettings.modalToken}
+          togglePending={this.togglePending}
+          submit={this.submitCredentials}
+        />
+        {view === "LOGIN"  &&
+          <a href="#" onClick={this.toggleResetPassword}>{this.state.resettingPassword ? "Login or signup" : "Forget your password?"}</a>
+        }
 
-          <br/>
-          <a
-            onClick={this.toggleView}
-            href="#"
-          >
-            {view === "LOGIN" ? (
-              "Don't have an account? Click here to sign up"
-            ) : (
-              "Already have an account? Click here to login"
-            )}
-          </a>
-        </div>
+        <br/>
+        {!credentialsOnly && !resettingPassword && view === "LOGIN" && <div>
+          <h3>{socialText} through one of your social networks:</h3>
+          <SocialLogin
+            pending={this.state.pending}
+            togglePending={this.togglePending}
+          />
+        </div>}
+        {false && <a
+          onClick={this.toggleView}
+          href="#"
+        >
+          {view === "LOGIN" ? (
+            "Don't have an account? Click here to sign up"
+          ) : (
+            "Already have an account? Click here to login"
+          )}
+        </a>}
+        <a
+          href="https://www.growthramp.io/seo-dashboard/"
+        >
+          Don't have an account? Click here to learn more
+        </a>
       </Flexbox>
     )
   }
@@ -181,10 +170,23 @@ Login.propTypes = {
 }
 
 const mapStateToProps = (state) => {
-  return { 
-    user: state.shared.user,
-    errors: state.shared.errors,
+  return {
+    user: state.user,
+    errors: state.errors,
+    viewSettings: state.viewSettings,
+    password: Helpers.safeDataPath(state, "forms.UserCredentials.credentials.params.password", ""),
+    email: Helpers.safeDataPath(state, "forms.UserCredentials.credentials.params.email", ""),
   }
 }
 
-export default connect(mapStateToProps)(Login)
+const mapDispatchToProps = (dispatch) => {
+  return {
+    signInRequest: (signInType, credentials, token, onFailure, cb) => store.dispatch({
+      type: SIGN_IN_REQUEST,
+      payload: {signInType, credentials, token},
+      onFailure,
+      cb,
+    }),
+  }
+}
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Login))

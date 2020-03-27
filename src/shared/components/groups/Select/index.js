@@ -1,9 +1,9 @@
-import React from 'react'
+import { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Icon } from 'shared/components/elements'
 import theme from 'theme'
 import { StyleSheet, css } from 'aphrodite'
 import classes from './style.scss'
+import Select from 'react-select'
 
 const styles = StyleSheet.create({
   icon: {
@@ -11,46 +11,70 @@ const styles = StyleSheet.create({
   },
   select: {
     backgroundColor: theme.color.white,
+    width: "100%",
   },
 })
 
-const Select = ({ value, handleChange, handleSubmit, items, name, submitButton, label, labelAfter }) => (
-  <div className={classes.selectWrapper}>
-    {!labelAfter && (label ? (<label htmlFor={name}>{label}</label>) : null)}
-    <div className={classes.selectCtn}>
-      <select
-        className={`${css(styles.select)} ${classes.select}`}
-        name={name}
-        id={name}
-        onChange={handleChange}
-        value={value}
-      >
-        {items.map(item => <option key={item} value={item}>{item}</option>)}
-      </select>
+class MySelect extends Component {
 
-      <Icon className={`${css(styles.icon)} ${classes.angleDown}`} name="angle-down" />
-    </div>
+  render() {
+    const { currentOption, onChange, handleSubmit, options, name, submitButton, label, labelAfter, asynchronous, loadOptions, className, clearable = false, creatable, openOnClick } = this.props
 
-    {submitButton.text
-      ? (
-        <button type="submit" className={submitButton.classes} onClick={handleSubmit}>
-          {submitButton.text}
-        </button>
-      )
-      : null
-    }
-    {labelAfter && (label ? (<label htmlFor={name}>{label}</label>) : null)}
-  </div>
-)
+    //might add Select.Async in here too to furtner DRY up? ? TODO
+    //haevn't added creatable to async yet TODO
+    const SelectTag = creatable ? Select.Creatable : Select
 
-Select.defaultProps = {
+    return (
+      <div className={`${classes.selectWrapper} ${className}`}>
+        {!labelAfter && (label ? (<label htmlFor={name}>{label}</label>) : null)}
+        <div className={classes.selectCtn}>
+          {asynchronous ? (
+            <Select.Async
+              className={`${css(styles.select)} ${classes.select}`}
+              name={name}
+              id={name}
+              onChange={onChange}
+              openOnClick={openOnClick}
+              loadOptions={loadOptions}
+              value={currentOption}
+              clearable={clearable}
+            />
+          ) : (
+            <SelectTag
+              className={`${css(styles.select)} ${classes.select}`}
+              name={name}
+              id={name}
+              onChange={onChange}
+              openOnClick={openOnClick}
+              options={options}
+              value={currentOption}
+              clearable={clearable}
+            />
+          )}
+        </div>
+
+        {submitButton.text
+          ? (
+            <button type="submit" className={submitButton.classes} onClick={handleSubmit}>
+              {submitButton.text}
+            </button>
+          )
+          : null
+        }
+        {labelAfter && (label ? (<label htmlFor={name}>{label}</label>) : null)}
+      </div>
+    )
+  }
+}
+
+MySelect.defaultProps = {
   submitButton: {},
 }
 
-Select.propTypes = {
-  handleChange: PropTypes.func.isRequired,
+MySelect.propTypes = {
+  onChange: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
-  items: PropTypes.array.isRequired,
+  options: PropTypes.array.isRequired,
   name: PropTypes.string,
   value: PropTypes.string,
   submitButton: PropTypes.object,
@@ -58,5 +82,5 @@ Select.propTypes = {
   labelAfter: PropTypes.bool,
 }
 
-export default Select
+export default MySelect
 

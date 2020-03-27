@@ -4,6 +4,7 @@
   position: relative;
   box-sizing: border-box;
   height: 50px;
+  display: inline-block;
 
   & > img {
     height: 100%;
@@ -12,12 +13,20 @@
 
   .menuDropdown {
     background-color: $nav-bg;
-    position: absolute;
-    top: 47px;
+    //position: absolute;
+    top: 55px;
     margin: 0px;
     padding: 0;
     right: 0;
     display: block;
     min-width: 250px;
+    //border-bottom: 1px solid #d6d6d6;
+    //border-left: 1px solid #d6d6d6;
+    //border-right: 1px solid #d6d6d6;
+    border-radius: 2px;
+
+    li {
+      //border-top: 1px solid #e3e3e3;
+    }
   }
 }

@@ -29,7 +29,6 @@ export default (state = {}, action)=>{
 
       newState = Object.assign({}, state)
       _.set(newState, [templateName, templatePart], errors)
-console.log(newState, errors);
 
       return newState
 

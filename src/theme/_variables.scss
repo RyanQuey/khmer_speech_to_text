@@ -45,7 +45,6 @@ $module_quote: #dedede;
 
 $text: #333;
 $msg: #A3A3A3;
-$sidebar: $gray-bg;
 $nav-bg: #595959;
 $header: $nav-bg;
 $footer: $navy;
@@ -66,10 +65,36 @@ $accent1: rgb(155, 155, 155);
 $accent2: rgb(250, 175, 0);
 $accent3: rgb(176, 69, 69);
 
-$nav-hover: #626262;
-$nav-border: #474747;
+// GR colors
+//$primary: #4f4081;
+//$secondary: #95669c;
+$light-purple-gray: #ada4cd;
+$even-lighter-purple-gray: #ada4cd61;
+$dark-purple-gray: #7e7796;
+$light-purple-complement: #7e66cd;
+$dark-purple-complement: #30274e;
+
+//this is for nav buttons
+$nav-hover-bg: $light-purple-gray;
+$nav-hover-font: $white;
+$alt-nav-hover-font: $ghost-blue;
+$active: $nav-hover-bg;
+$nav-hover: #626262; // might stop using, deprecated
+$nav-border: #474747; // might stop using, deprecated
 
 $light-gray-bg: #FAFAFA;
+
+$user-content-bg: $module_gray-1;
+
+/*     Sidebar      */
+// GR color $sidebar: $white;
+$sidebar: $gray-bg;
+$sidebar-width: 240px;
+
+// header and footer
+$header-bg: $white;
+$header-height: 50px;
+$footer: $navy;
 
 /*     Link colors     */
 $link: $blue;
@@ -83,3 +108,4 @@ $psych: #ed4343;
 /*     Fonts     */
 $source-sans: 'source_sans_pro_reg', 'Helvetica Neue', Arial, sans-serif;
 $source-sans-semibold: 'source_sans_pro_semibold', 'Helvetica Neue', Arial, sans-serif;
+

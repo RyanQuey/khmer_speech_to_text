@@ -1,0 +1,58 @@
+@import 'theme/_helpers';
+.wrapper {
+  overflow: visible;
+  padding: 0 5px 20px 5px;
+  box-sizing: border-box;
+
+  @include mq(2xs) {
+    @include cols(12)
+  }
+  @include mq(md) {
+    @include cols(6)
+  }
+  @include mq(lg) {
+    @include cols(4)
+  }
+}
+
+.card {
+  //can easily be overridden by just nesting two or more classes
+  text-align: left;
+  border-radius: 3px;
+  border-top: $primary solid 3px; //might make the color dynamic
+  overflow-y: auto;
+  overflow-x: none;
+  padding: 10px;
+  width: 100%;
+  @include box-shadow(0 1px 1px rgba(0,0,0,0.1))
+
+  &.selected {
+    @include box-shadow(5px 5px 5px rgba(0,0,0,0.25))
+  }
+
+  h2, h3, h4, h5 {
+    display: inline-block;
+    margin: 0;
+    line-height: 1;
+  }
+  h3 {
+    @include rems(18)
+  }
+  h3 {
+    @include rems(18)
+  }
+  h4 {
+    @include rems(16)
+  }
+  h5 {
+    @include rems(14)
+  }
+  label {
+    font-weight: bold;
+  }
+  img.headerImg {
+    border-radius: 15px;
+    width: 50px;
+    float: right;
+  }
+}

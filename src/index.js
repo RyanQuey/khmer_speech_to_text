@@ -1,64 +1,51 @@
 import React, { Component } from 'react'
+import babel from 'babel-polyfill'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { combineReducers, createStore, applyMiddleware } from 'redux'
-import { composeWithDevTools } from 'redux-devtools-extension'
+import { createStore, applyMiddleware } from 'redux'
+import axios from 'axios'
+import {
+  BrowserRouter,
+} from 'react-router-dom'
 import watch from 'redux-watch'
+import _ from 'lodash'
+import moment from 'moment'
 
 import firebase from 'refire/firebase'
-
-import AdminComponent from 'admin/components'
-import UserComponent from 'user/components'
-
-import sharedInitializers from './shared/initializers'
-import adminInitializers from './admin/initializers'
-import userInitializers from './user/initializers'
-
 import refire from './refire'
 
-import adminCombiner from 'admin/reducers'
-import sharedCombiner from 'shared/reducers'
-import userCombiner from 'user/reducers'
-
+import UserComponent from 'user/components'
+import Helpers from 'helpers'
+import initializers from './user/initializers'
+import store from 'shared/reducers'
 import 'theme/index.scss'
+import App from './App';
 
-import _ from 'lodash'
-
+window.Helpers = Helpers
 window._ = _
-
+window.axios = axios;
+window._ = _
+window.moment = moment
 window.React = React
+window.firebase = firebase
+console.log(firebase)
 
-const combined = combineReducers({
-  admin: adminCombiner,
-  user: userCombiner,
-  shared: sharedCombiner
-})
-window.store = createStore(combined, composeWithDevTools(
+// If don't use middleware, just use dev tools enhancer
+//window.store = createStore(combined, composeWithDevTools(
 //  applyMiddleware(refire)
-))
+//))
 
-sharedInitializers()
+initializers()
 
 refire()
 
 const url = location.href
-const isAdmin = url.includes('//admin.')
-
-if (isAdmin){
-  adminInitializers()
-} else {
-  userInitializers()
-}
+const root = document.getElementById('app')
 
 ReactDOM.render(
   <Provider store={store}>
-    <div>
-      {isAdmin ? (
-        <AdminComponent />
-      ) : (
-        <UserComponent />
-      )}
-    </div>
-  </Provider>,
-  document.querySelector("#app")
-)
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </Provider>, root
+);

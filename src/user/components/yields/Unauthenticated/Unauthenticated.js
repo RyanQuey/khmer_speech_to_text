@@ -1,29 +1,37 @@
 import { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Flexbox, Navbar } from 'shared/components/elements'
+import { Alert, Flexbox, Navbar } from 'shared/components/elements'
+import { 
+  withRouter,
+  Route,
+  Switch,
+} from 'react-router-dom'
 import classes from './Unauthenticated.scss'
-import { UserNavbar, UserSidebar, UserContent } from 'user/components/partials'
-import { UserLogin } from 'user/components/templates'
+import { UserNavbar, UserSidebar } from 'user/components/partials'
+import { UserLogin, UserContent } from 'user/components/templates'
 import {
   BrowserRouter,
 } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 class Unauthenticated extends Component {
   
   render() {
+    const { children } = this.props
+    const alerts = _.values(this.props.alerts)
+    const modalOpen = this.props.currentModal
+     
     return (
       <div>
-        <BrowserRouter>
           <Flexbox direction="column">
             <UserNavbar />
       
             <Flexbox>
               <UserSidebar />
       
-              <UserContent />
+              <h1>Login to Upload your audio file</h1>
             </Flexbox>
           </Flexbox>
-        </BrowserRouter>
 
         <UserLogin />
       </div>
@@ -34,4 +42,11 @@ class Unauthenticated extends Component {
 Unauthenticated.propTypes = {
 }
 
-export default Unauthenticated
+const mapStateToProps = (state) => {
+  return { 
+    alerts: state.alerts,
+    currentModal: state.viewSettings.currentModal,
+  }
+}
+
+export default withRouter(connect(mapStateToProps)(Unauthenticated))

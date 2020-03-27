@@ -1,36 +1,54 @@
 import {
-  UPDATE_FIREBASE,
+  CREATE_DRAFT_SUCCESS,
+  INPUT_UPDATE_SUCCESS,
+  LINK_ACCOUNT_SUCCESS,
   LOG_IN_WITH_PROVIDER,
   SET_CURRENT_USER,
   SET_IMAGE,
-  SIGN_OUT,
-  FETCH_USER,
+  SIGN_OUT_SUCCESS,
+  SIGN_IN_SUCCESS,
+  SIGN_IN_FAILURE,
+  FETCH_USER_SUCCESS,
+  UPDATE_USER_SUCCESS,
+
 } from 'constants/actionTypes'
 
-export default (state = null, action) => {
+const userReducer = (state = null, action) => {
 
-//TODO: make it consistent and only attach data to action.payload
   switch (action.type) {
-    case LOG_IN_WITH_PROVIDER:
-      return action.payload
+    case LINK_ACCOUNT_SUCCESS:
+      return Object.assign({}, state, { providerData: action.payload.providerData })
+
+    case SET_CURRENT_USER:
+      //cover that up, in case some xss can get it or something
+      if (Helpers.safeDataPath(action.payload, "apiToken", false)) {
+        action.payload.apiToken = true
+      }
+      return Object.assign({}, action.payload)
+
+    case UPDATE_USER_SUCCESS:
+      return Object.assign({}, action.payload)
 
     case SET_IMAGE:
-      if (action.payload.path.split("/")[0] === "users") {
-        return Object.assign({}, state, { [action.payload.name]: action.payload.url })      
+      return Object.assign({}, state, { [action.payload.name]: action.payload.url })
+
+    case SIGN_OUT_SUCCESS:
+      return false
+
+    case FETCH_USER_SUCCESS:
+      return Object.assign({}, state, action.payload)
+
+    case SIGN_IN_SUCCESS:
+      //cover that up, in case some xss can get it or something
+      if (Helpers.safeDataPath(action.payload, "apiToken", false)) {
+        action.payload.apiToken = true
       }
-
-    case UPDATE_FIREBASE:
-      if (action.payload.path) {}
-      return Object.assign({}, state, { [action.inputData.name]: action.inputData.value })
-
-    case SIGN_OUT:
-      return action.isSignedOut ? state : null
-
-    case FETCH_USER:
-      return Object.assign({}, state, action.payload.user)
+      return Object.assign({}, state, action.payload)
 
     default:
       return state
   }
 }
+
+export default userReducer
 
