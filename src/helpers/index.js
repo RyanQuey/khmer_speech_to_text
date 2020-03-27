@@ -86,6 +86,28 @@ let Helpers = {
 
     return userData
   },
+  getBase64: (file) => {
+    return new Promise((resolve, reject) => {
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function () {
+        console.log("start of base64", reader.result.slice(0, 15));
+        console.log("end of base64", reader.result.slice(-15, -1));
+        // remove metadata added to front of string
+        let encoded = reader.result.toString().replace(/^data:(.*,)?/, '');
+        if ((encoded.length % 4) > 0) {
+          encoded += '='.repeat(4 - (encoded.length % 4));
+        }
+        
+        return resolve(encoded)
+      };
+      reader.onerror = function (error) {
+        console.log('Error: ', error);
+        return reject(error)
+      };
+    })
+  },
+
 }
 
 // for adding more helper files to this one

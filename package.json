@@ -70,6 +70,7 @@
     "webpack-dev-server": "^2.11.5"
   },
   "dependencies": {
+    "@google-cloud/speech": "^3.6.0",
     "@webpack-blocks/dev-server2": "^0.4.0",
     "aphrodite": "^1.2.5",
     "axios": "^0.19.2",

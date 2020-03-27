@@ -23,12 +23,25 @@ import App from './App';
 
 window.Helpers = Helpers
 window._ = _
-window.axios = axios;
-window._ = _
 window.moment = moment
 window.React = React
 window.firebase = firebase
-console.log(firebase)
+window.$ = jQuery
+
+// to hit the cloud func server
+window.endpoint = process.env.NODE_ENV == "production" ? "https://us-central1-khmer-speech-to-text.cloudfunctions.net/app" : `http://${window.location.hostname}:5000/khmer-speech-to-text/us-central1/app`
+const axiosInstance = axios.create({
+  baseURL: endpoint,
+  timeout: 10*1000, // 10 sec. for longer operations, poll it instead of leaving it open
+  headers: {
+    //'Content-Type': 'multipart/form-data'
+    //'Content-Type': 'multipart/form-data; boundary="--this is a test boundary--"'
+   'Content-Type': 'application/json'
+  }
+
+})
+// delete axiosInstance.defaults.headers.common["Content-Type"]; // hacky trick that might not have even worked
+window.axios = axiosInstance;
 
 // If don't use middleware, just use dev tools enhancer
 //window.store = createStore(combined, composeWithDevTools(
