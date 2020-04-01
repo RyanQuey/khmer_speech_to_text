@@ -20,10 +20,9 @@ app.use(cors);
 
 // can do v1 or v1 beta...don't think there's an alpha yet
 const apis = ["v1", "v1p1beta"]
+const fileTypes = ["flac", "mp3", "wav"] // note: not all flietypes supported yet. E.g., mp4 might end up being under flac or something. Eventually, handle all file types and either convert file or do something
 const requestOptions = {
-  flac: false,
-  mp3: true,
-  wav: false,
+  fileType: fileTypes[0], //I think generally mp3 should be base... TODO change dynamically based on filetype received. mp3 doesn't work with mp4 files
   // a test option, to try to convert from base64 to file so see if it is right
   convertToFile: false,
   // not sure when this is helpful, but sometimes it is 
@@ -33,7 +32,6 @@ const requestOptions = {
 
 // TODO add error handling
 app.post('/upload-audio', (req, res, next) => {
-  console.log("endpoint hit")
   async function main() {
   
     console.log("req.headers", req.headers)

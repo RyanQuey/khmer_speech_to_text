@@ -13,6 +13,7 @@ class DropAudio extends Component {
 
     this.state = {
       pending: false,
+      maxSize: 10*1000*1000, // 10 MB ish// TODO what is good max?
     }
     this.styles = StyleSheet.create({
       dropzone: {
@@ -26,8 +27,7 @@ class DropAudio extends Component {
   }
 
   handleError(e, a) {
-    console.log(e, a);
-
+    console.error(e, a);
   }
 
   // setup for sending to google apis
@@ -36,9 +36,11 @@ class DropAudio extends Component {
     const rejectedFile = rejectedFiles[0]
 
     if (rejectedFile) {
+      console.error("rejected file", rejectedFile)
+      
       let message
-      if (rejectedFile.size > 4*1000*1000) {
-        message = "Maximum file size is 4MB"
+      if (rejectedFile.size > this.state.maxSize) { 
+        message = "Maximum file size is 10MB"
       } else if (!rejectedFile.type.includes("audio/")) {
         message = "File must be an audio"
       } else {
@@ -78,9 +80,9 @@ class DropAudio extends Component {
           multiple={false}
           onDrop={this.onDrop}
           style={this.props.style}
-          maxSize={4*1000*1000} //4MB
+          maxSize={this.state.maxSize} 
           onDragOver={this.onDragOver}
-          accept="audio/*"
+          accept="audio/*, video/mp4"
           preventDropOnDocument={true}
         >
           <Flexbox align="center" direction="column">

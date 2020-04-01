@@ -19,9 +19,10 @@ const baseConfig = {
 const flacConfig = Object.assign({}, baseConfig, {
   // or maybe FLAC ?
   encoding: 'flac',
-  audioChannelCount: 2,
-  sampleRateHertz: 48000, 
-  separateChannelRecognition: true,
+  sampleRateHertz: undefined, // NOTE one time, flac file (that was from mp4) had 44100 herz required, so better to just not set until can find out dynamically
+  // NOTE sometimes has two channels, sometimes not
+  //audioChannelCount: 2,
+  //enableSeparateRecognitionPerChannel: true, 
 })
 
 const mp3Config = Object.assign({}, baseConfig, {
@@ -81,6 +82,9 @@ const Helpers = {
 
   setupRequest: (req, requestOptions) => {
     let fileData = req.file
+    const { fileType } = requestOptions
+    requestOptions[fileType] = true
+
     const {flac, wav, mp3, convertToFile, multipleChannels} = requestOptions
 
     if (fileData) {
@@ -103,6 +107,8 @@ const Helpers = {
     // TODO set flac, mp3, or base64 dynamically depending on the file received (base64 encoding the file will set it with a header which states the filetype)
     if (flac) {
       // not sure if owrks
+      console.log("setting as flac")
+
       content = fileData
       config = flacConfig;
 
@@ -132,6 +138,7 @@ const Helpers = {
       config = baseConfig
     }
 
+    // NOTE flac config automatically sets this
     if (multipleChannels) {
       config.audioChannelCount = 2, //might try more later
       config.enableSeparateRecognitionPerChannel = true
