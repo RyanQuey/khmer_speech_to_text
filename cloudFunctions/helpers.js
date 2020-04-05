@@ -13,6 +13,8 @@ const WHITE_LISTED_USERS = [
   "rlquey2@gmail.com",
   "borachheang@gmail.com",
 ]
+const FILE_TYPES = ["flac", "mp3", "wav"] // note: not all flietypes supported yet. E.g., mp4 might end up being under flac or something. Eventually, handle all file types and either convert file or do something
+const fileTypesSentence = FILE_TYPES.slice(0, FILE_TYPES.length - 1).join(', ') + ", and " + FILE_TYPES.slice(-1);
 
 
 const baseConfig = {
@@ -76,7 +78,7 @@ const Helpers = {
 
     try {
       const decodedIdToken = await admin.auth().verifyIdToken(idToken);
-      console.log('ID Token correctly decoded', decodedIdToken);
+      console.log('ID Token correctly decoded');
       req.user = decodedIdToken;
 
       if (!req.user.email_verified) {
@@ -101,8 +103,13 @@ const Helpers = {
 
   setupRequest: (req, requestOptions) => {
     let fileData = req.file
-    const { fileType } = requestOptions
+    const fileType = req.body.fileType
+    requestOptions.fileType = fileType
     requestOptions[fileType] = true
+
+    if (!FILE_TYPES.includes(fileType)) {
+      throw `File type ${fileType} is not allowed, only ${fileTypesSentence}`
+    }
 
     const {flac, wav, mp3, convertToFile, multipleChannels} = requestOptions
 

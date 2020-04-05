@@ -110,11 +110,11 @@ function* _sendIt(file) {
   // if less than 1.5MB (about 1 min for mp3 file), can do normal recognize, if longer do long recognize
   // base64 for 12 sec file was .length 415820
   if (file.size < 1.5*1000) {
-    response = yield axios.post(`/upload-audio`, { base64 })
+    response = yield axios.post(`/upload-audio`, { base64, fileType: file.type.replace("audio/", "") })
   } else {
     // large file, do longRunningRecognize
     // TODO for now, just hitting the same endpoint, but probably eventually either handling it different, or sending to a different endpoint
-    response = yield axios.post(`/upload-audio`, { base64 })
+    response = yield axios.post(`/upload-audio`, { base64, fileType: file.type.replace("audio/", "") })
   
   }
 
