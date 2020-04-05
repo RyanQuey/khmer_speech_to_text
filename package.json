@@ -23,7 +23,7 @@
   "repository": "",
   "author": "Ryan Quey",
   "engines": {
-    "node": ">=0.12"
+    "node": "8"
   },
   "devDependencies": {
     "@kadira/storybook": "^2.35.3",

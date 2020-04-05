@@ -15,8 +15,8 @@ const {Helpers} = require("./helpers.js")
 
 app.use(cors);
 // TODO add back in for security
-//app.use(cookieParser);
-//app.use(Helpers.validateFirebaseIdToken);
+app.use(cookieParser);
+app.use(Helpers.validateFirebaseIdToken);
 
 // can do v1 or v1 beta...don't think there's an alpha yet
 const apis = ["v1", "v1p1beta"]

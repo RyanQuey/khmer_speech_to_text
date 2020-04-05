@@ -6,7 +6,7 @@
     "source": "cloudFunctions"
   },
   "hosting": {
-    "public": "public",
+    "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",
