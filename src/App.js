@@ -44,7 +44,7 @@ class App extends Component {
     
       } else {
         // stop preloading, because no user in firebase to preload
-        store.dispatch(isPreloadingStore(false))
+        //store.dispatch(isPreloadingStore(false))
 
       }
     })

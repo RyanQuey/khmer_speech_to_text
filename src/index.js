@@ -11,7 +11,8 @@ import watch from 'redux-watch'
 import _ from 'lodash'
 import moment from 'moment'
 
-import firebase from 'refire/firebase'
+import firebase from 'firebase'
+import firebaseApp from 'refire/firebase'
 import refire from './refire'
 
 import UserComponent from 'user/components'
@@ -26,6 +27,7 @@ window._ = _
 window.moment = moment
 window.React = React
 window.firebase = firebase
+window.firebaseApp = firebaseApp
 window.$ = jQuery
 
 // to hit the cloud func server

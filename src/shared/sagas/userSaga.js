@@ -21,8 +21,8 @@ import {
 import { USER_FIELDS_TO_PERSIST } from 'constants'
 //import { setupSession } from 'lib/socket' // Not using a socket
 import { errorActions, alertActions } from 'shared/actions'
-import firebase from 'refire/firebase'
-const database = firebase.database();
+import firebaseApp from 'refire/firebase'
+const database = firebaseApp.database();
 
 
 function* signIn(action) {
@@ -193,11 +193,9 @@ function* fetchCurrentUser(action) {
 function* signUserOut() {
   try {
     //actually call the signout
-    //yield firebase.auth().signOut()
+    yield firebase.auth().signOut()
     //handle the successful signout
 
-    Cookie.remove('sessionUser')
-    Cookie.remove('requestedScopes')
     yield put({type: SIGN_OUT_SUCCESS, payload: true})
     yield axios.get(`/api/users/signOut`)
 
