@@ -7,11 +7,12 @@ const express = require('express');
 const cookieParser = require('cookie-parser')();
 const cors = require('cors')({origin: true});
 const _ = require('lodash')
+const {Helpers} = require("./helpers.js")
 
 const fs = require('fs');
+
 admin.initializeApp(cloudFunctions.config().firebase);
 const app = express();
-const {Helpers} = require("./helpers.js")
 
 app.use(cors);
 // TODO add back in for security
@@ -33,36 +34,45 @@ const requestOptions = {
 // TODO add error handling
 app.post('/upload-audio', (req, res, next) => {
   async function main() {
+    try {
   
-    console.log("req.headers", req.headers)
-    const requestData = Helpers.setupRequest(req, requestOptions)
+      console.log("req.headers", req.headers)
+      const requestData = Helpers.setupRequest(req, requestOptions)
 
-    // Detects speech in the audio file
-    const isLongFile = Helpers.isLongFile(requestData)
+      // Detects speech in the audio file
+      const isLongFile = Helpers.isLongFile(requestData)
 
-    let response
-    if (isLongFile) {
-      response = await Helpers.requestLongRunningRecognize(requestData)
-    } else {
-      response = await Helpers.requestRecognize(requestData)
+      let response
+      if (isLongFile) {
+        response = await Helpers.requestLongRunningRecognize(requestData)
+      } else {
+        response = await Helpers.requestRecognize(requestData)
+      }
+
+      console.log("full response: ", response)
+      const results = response.results
+      const transcription = results
+        .map(result => result.alternatives[0].transcript)
+        .join('\n');
+      console.log(`Transcription: ${transcription}`);
+
+      res.send({
+        transcription,
+        results,
+      });
+      return
+
+    } catch (error) {
+      console.error("Error while requesting transcript for audio file: ", error);
+      next(error)
+      return;
     }
-
-    console.log("full response: ", response)
-    const results = response.results
-    const transcription = results
-      .map(result => result.alternatives[0].transcript)
-      .join('\n');
-    console.log(`Transcription: ${transcription}`);
-
-    res.send({
-      transcription,
-      results,
-    });
   }
 
   // TODO do this the middleware way, once we figure out how it can work!
   console.log("base64 body end", req.body.base64.slice(-15, -1))
   req.base64 = req.body.base64
+
   main().catch(console.error);
 
 });

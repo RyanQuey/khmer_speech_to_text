@@ -197,6 +197,10 @@ function* signUserOut() {
     //handle the successful signout
 
     yield put({type: SIGN_OUT_SUCCESS, payload: true})
+    // token should already be obsolete, but remove it just in case
+    axios.defaults.headers.common['Authorization'] = "";
+
+    // I think this should be unnecessary, might even break things
     yield axios.get(`/api/users/signOut`)
 
   } catch (err) {

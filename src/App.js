@@ -34,6 +34,16 @@ class App extends Component {
   componentDidMount() {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
+        // when hit api, make sure to send bearer token
+        firebase.auth().currentUser.getIdToken(/* forceRefresh */ true)
+        .then(function(idToken) {
+          // Send token to your backend via HTTPS
+          axios.defaults.headers.common['Authorization'] = `Bearer ${idToken}`;
+
+        })
+        .catch(function(error) {
+          console.error("error setting bearer token: ", error)
+        });
     
         //need to retrieve user data from firebase, to put into redux
         //mostly only gets ran when reloading the page after already logged in
@@ -41,6 +51,7 @@ class App extends Component {
           const userData = Helpers.extractUserData(user)
           this.props.fetchUserRequest(userData)
         }
+      
     
       } else {
         // stop preloading, because no user in firebase to preload

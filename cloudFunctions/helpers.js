@@ -1,4 +1,5 @@
 const fs = require('fs');
+const admin = require('firebase-admin');
 // Imports the Google Cloud client library
 // TODO consider hitting the api directly, might be able to do all in the browser
 const speech = require('@google-cloud/speech');
@@ -7,6 +8,12 @@ const betaSpeech = speech.v1p1beta1;
 // Creates a client
 const client = new speech.SpeechClient();
 const betaClient = new betaSpeech.SpeechClient();
+
+const WHITE_LISTED_USERS = [
+  "rlquey2@gmail.com",
+  "borachheang@gmail.com",
+]
+
 
 const baseConfig = {
   encoding: 'LINEAR16',
@@ -71,6 +78,18 @@ const Helpers = {
       const decodedIdToken = await admin.auth().verifyIdToken(idToken);
       console.log('ID Token correctly decoded', decodedIdToken);
       req.user = decodedIdToken;
+
+      if (!req.user.email_verified) {
+        // make them verify it first
+        res.status(403).send('Unauthorized');
+        return;
+      }
+      // currently only allowing whitelisted users to use
+      if (!WHITE_LISTED_USERS.includes(req.user.email)) {
+        res.status(403).send("Your email isn't allowed to use our service yet; please contact us to get your account setup");
+        return
+      }
+
       next();
       return;
     } catch (error) {
