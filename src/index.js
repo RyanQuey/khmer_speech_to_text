@@ -12,6 +12,8 @@ import _ from 'lodash'
 import moment from 'moment'
 
 import firebase from 'firebase'
+require("firebase/firestore");
+
 import firebaseApp from 'refire/firebase'
 import refire from './refire'
 
@@ -22,6 +24,7 @@ import store from 'shared/reducers'
 import 'theme/index.scss'
 import App from './App';
 
+window.db = firebaseApp.firestore();
 window.Helpers = Helpers
 window._ = _
 window.moment = moment

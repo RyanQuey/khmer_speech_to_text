@@ -7,13 +7,12 @@ const express = require('express');
 const cookieParser = require('cookie-parser')();
 const cors = require('cors')({origin: true});
 const _ = require('lodash')
-const {Helpers} = require("./helpers.js")
 
 const fs = require('fs');
 
-admin.initializeApp(cloudFunctions.config().firebase);
-const app = express();
+const {Helpers} = require("./helpers.js")
 
+const app = express();
 app.use(cors);
 // TODO add back in for security
 app.use(cookieParser);
@@ -39,26 +38,30 @@ app.post('/upload-audio', (req, res, next) => {
       const requestData = Helpers.setupRequest(req, options)
 
       // Detects speech in the audio file
-      const isLongFile = Helpers.isLongFile(requestData)
+      // For now, just always doing long requests, for simplicity in handling
+      const isLongFile = true || Helpers.isLongFile(requestData)
 
       let response
       if (isLongFile) {
-        response = await Helpers.requestLongRunningRecognize(requestData)
+        response = await Helpers.requestLongRunningRecognize(requestData, req, options)
+        res.send({
+          response,
+        });
+
       } else {
-        response = await Helpers.requestRecognize(requestData)
+        response = await Helpers.requestRecognize(requestData, options)
+        const results = response.results
+        const transcription = results
+          .map(result => result.alternatives[0].transcript)
+          .join('\n');
+
+        res.send({
+          transcription,
+          results,
+        });
       }
 
       console.log("full response: ", response)
-      const results = response.results
-      const transcription = results
-        .map(result => result.alternatives[0].transcript)
-        .join('\n');
-      console.log(`Transcription: ${transcription}`);
-
-      res.send({
-        transcription,
-        results,
-      });
       return
 
     } catch (error) {

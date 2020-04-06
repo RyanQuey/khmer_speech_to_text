@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom'
 import handleQuery from 'utils/handleQuery'
 import { 
-  FETCH_USER_REQUEST,
+  FETCH_CURRENT_USER_REQUEST,
 } from 'constants/actionTypes'
 
 class App extends Component {
@@ -49,7 +49,7 @@ class App extends Component {
         //mostly only gets ran when reloading the page after already logged in
         if (!this.props.user) {
           const userData = Helpers.extractUserData(user)
-          this.props.fetchUserRequest(userData)
+          this.props.fetchCurrentUserRequest(userData, {findOrCreate: true})
         }
       
     
@@ -85,7 +85,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    fetchUserRequest: payload => dispatch({ type: FETCH_USER_REQUEST, payload }),
+    fetchCurrentUserRequest: (payload, options) => dispatch({ type: FETCH_CURRENT_USER_REQUEST, payload, options }),
   }
 }
 

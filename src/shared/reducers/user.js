@@ -20,10 +20,6 @@ const userReducer = (state = null, action) => {
       return Object.assign({}, state, { providerData: action.payload.providerData })
 
     case SET_CURRENT_USER:
-      //cover that up, in case some xss can get it or something
-      if (Helpers.safeDataPath(action.payload, "apiToken", false)) {
-        action.payload.apiToken = true
-      }
       return Object.assign({}, action.payload)
 
     case UPDATE_USER_SUCCESS:
@@ -39,10 +35,6 @@ const userReducer = (state = null, action) => {
       return Object.assign({}, state, action.payload)
 
     case SIGN_IN_SUCCESS:
-      //cover that up, in case some xss can get it or something
-      if (Helpers.safeDataPath(action.payload, "apiToken", false)) {
-        action.payload.apiToken = true
-      }
       return Object.assign({}, state, action.payload)
 
     default:

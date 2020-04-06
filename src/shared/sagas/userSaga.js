@@ -22,7 +22,6 @@ import { USER_FIELDS_TO_PERSIST } from 'constants'
 //import { setupSession } from 'lib/socket' // Not using a socket
 import { errorActions, alertActions } from 'shared/actions'
 import firebaseApp from 'refire/firebase'
-const database = firebaseApp.database();
 
 
 function* signIn(action) {
@@ -72,7 +71,6 @@ function* signIn(action) {
     let user = result
 
     if (user) {
-      // _handleInitialUserData(result.data)
 
       yield put({type: SIGN_IN_SUCCESS, payload: user})
       alertActions.newAlert({
@@ -150,19 +148,20 @@ function* signIn(action) {
 function* fetchUser(action, options = {}) {
   try {
     const userData = action.payload
-    console.log("userData", action)
-    const ref = database.ref(`users/${userData.uid}`)
+    console.log("userData", action.payload)
+    const ref = db.collection("users").doc(userData.uid)
 
     let returnedUser
-    yield ref.once('value', (snapshot) => {
-      if (snapshot.val()) {
-        //is no values retrieved from database, just return info from the payload
-        returnedUser = snapshot.val()
-      }
+    const result = yield ref.get()
+    if (result.exists) {
+      returnedUser = result.data()
+    
+    } else if (options.findOrCreate) {
+      // e.g., if data gets corrupted sometimes and just want it to work
+    
+    }
 
-      //TODO: probably will redirect to a page where they fill out more profile information, basically, signing up.
-    })
-
+    //TODO: probably will redirect to a page where they fill out more profile information, basically, signing up.
     yield put({type: FETCH_USER_SUCCESS, payload: returnedUser})
 
   } catch (e) {
@@ -173,11 +172,23 @@ function* fetchUser(action, options = {}) {
 function* fetchCurrentUser(action) {
   try {
     const userData = action.payload
-    const result = res.data
+    const options = action.options || {}
+    const ref = db.collection("users").doc(userData.uid)
+
+    let returnedUser
+    const result = yield ref.get()
+    if (result.exists) {
+      returnedUser = result.data()
+    
+    } else if (options.findOrCreate) {
+      // e.g., if data gets corrupted sometimes and just want it to work
+      returnedUser = userData
+      ref.set(userData)
+    }
+
+    yield put({type: SET_CURRENT_USER, payload: returnedUser})
 
     //no reason to restart the socket here; this event should only occur is already retrieving the user data from the cookie, which means that API token and headers already are set correctly.
-    _handleInitialUserData(result, {resetSocket: false})
-
     action.cb && action.cb(result.data)
 
   } catch (err) {
@@ -263,27 +274,6 @@ function* resetPassword(action) {
     })
   }
 }
-
-// function _handleInitialUserData(data, options = {}) {
-//   if (options.keepHeaders) {
-//     Cookie.set('sessionUser', data.user)
-//   } else {
-//     //setupSession(data.user)
-//   }
-//   store.dispatch({type: FETCH_CURRENT_USER_SUCCESS, payload: data.user})
-//   store.dispatch({type: FETCH_ACCOUNT_SUBSCRIPTION_SUCCESS, payload: data.accountSubscription})
-// 
-//   //doesn't need to succeed; so don't raise error if doesn't necesarily, and make sure everything just moves forward
-//   //Also don't want this to slow down getting initial user, or cause it to fail, so don't want to do this in api as part of initialUserData call
-// 
-//   //check if there's a stripe acct. If not, go make one real quick
-//   let accountSubscription = data.accountSubscription
-//   if (!accountSubscription) {
-//     //they don't have a customer record in stripe yet. Initialize for them
-//     //don't want this in afterCreate cb, since that would either delay the ttfb, or if stripe api is bugging, make things even worse, etc. So just do it here
-//     store.dispatch({type: INITIALIZE_USER_ACCOUNT_SUBSCRIPTION_REQUEST})
-//   }
-// }
 
 export default function* userSaga() {
   yield takeLatest(FETCH_USER_REQUEST, fetchUser)

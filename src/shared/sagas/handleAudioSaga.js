@@ -8,7 +8,6 @@ import {
 import { errorActions, alertActions } from 'shared/actions'
 import firebase from 'refire/firebase'
 // TODO use firestore instead
-const database = firebase.database();
 
 // using fetch
 async function postData(url = '', data = {}) {
@@ -30,6 +29,7 @@ async function postData(url = '', data = {}) {
   return await response.json(); // parses JSON response into native JavaScript objects
 }
 
+// TODO add something that automatically refreshes token or something every so often. Or find some solution for where that's not necessary
 function* uploadAudio(action) {
 
   try {
