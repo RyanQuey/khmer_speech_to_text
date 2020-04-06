@@ -20,6 +20,7 @@ import refire from './refire'
 import UserComponent from 'user/components'
 import Helpers from 'helpers'
 import initializers from './user/initializers'
+import 'prototypeHelpers'
 import store from 'shared/reducers'
 import 'theme/index.scss'
 import App from './App';

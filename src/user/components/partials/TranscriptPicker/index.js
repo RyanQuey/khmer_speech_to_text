@@ -9,6 +9,7 @@ import { SET_CURRENT_TRANSCRIPT } from 'constants/actionTypes'
 
 import classes from './style.scss'
 
+// TODO migrate over to cards, so is more mobile friendly by default and it's still easy to show lots of different kinds of information without being too crowded
 class TranscriptPicker extends Component {
   constructor(props) {
     super(props)
@@ -26,7 +27,7 @@ class TranscriptPicker extends Component {
 
     //TODO: set the title using props into the modal container
     return (
-      <table>
+      <table >
         <tbody>
         <tr>
           <th>Filename</th>

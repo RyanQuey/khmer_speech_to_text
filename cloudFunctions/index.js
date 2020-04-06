@@ -33,7 +33,6 @@ app.post('/upload-audio', (req, res, next) => {
   async function main() {
     try {
   
-      console.log("req.headers", req.headers)
       const options = _.clone(requestOptions)
       const requestData = Helpers.setupRequest(req, options)
 

@@ -37,7 +37,6 @@ function* uploadAudio(action) {
     const response = yield _sendIt(file)
     const { data } = response
 
-    console.log("response from local server", response)
     yield put({type: UPLOAD_AUDIO_SUCCESS, payload: data})
     alertActions.newAlert({
       //title: response.data.transcription,
@@ -46,7 +45,6 @@ function* uploadAudio(action) {
       options: {timer: false}
     })
 
-    console.log(action.cb, file)
     action.cb && action.cb(file)
 
   } catch (err) {
