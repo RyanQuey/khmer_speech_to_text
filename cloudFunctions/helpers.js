@@ -275,6 +275,10 @@ const Helpers = {
       return result
     } catch (error) {
       console.error('Error while doing a long-running request:', error);
+      if (error.details == "Invalid audio channel count") {
+        // try again with different channel configuration
+        // TODO
+      }
     }
   },
 

@@ -191,9 +191,15 @@ function* fetchCurrentUser(action) {
     yield put({type: SET_CURRENT_USER, payload: returnedUser})
 
     const userTranscriptsRef = userRef.collection("transcripts")
-    const transcriptsResult = yield userTranscriptsRef.get()
-    const mappedTranscripts = transcriptsResult.docs.map(doc => doc.data())
-    yield put({type: FETCH_TRANSCRIPTS_SUCCESS, payload: mappedTranscripts})
+    // const transcriptsResult = yield userTranscriptsRef.get()
+    // const mappedTranscripts = transcriptsResult.docs.map(doc => doc.data())
+
+    // setup listener so every change to transcripts in firestore is reflected
+    userTranscriptsRef.onSnapshot((snapshot) => { 
+      console.log("foudn some", snapshot)
+      const mappedTranscripts = snapshot.docs.map(doc => doc.data())
+      store.dispatch({type: FETCH_TRANSCRIPTS_SUCCESS, payload: mappedTranscripts})
+    })
 
     //no reason to restart the socket here; this event should only occur is already retrieving the user data from the cookie, which means that API token and headers already are set correctly.
     action.cb && action.cb(result.data)
@@ -208,6 +214,9 @@ function* fetchCurrentUser(action) {
   }
 }
 
+
+
+// TODO detach transcript listener on signout
 function* signUserOut() {
   try {
     //actually call the signout
