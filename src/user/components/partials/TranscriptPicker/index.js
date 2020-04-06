@@ -18,7 +18,7 @@ class TranscriptPicker extends Component {
 
   viewTranscript (transcript, e) {
     this.props.setTranscript(transcript)
-    this.props.history.push(`/transcripts/${transcript.name}`)
+    this.props.history.push(Helpers.transcriptUrl(transcript))
   }
 
   render() {

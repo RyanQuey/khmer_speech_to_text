@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { TranscriptPicker } from 'user/components/partials'
 
-class Transcript extends Component {
+class Transcripts extends Component {
   render() {
     const { user } = this.props
     return (
@@ -22,7 +22,7 @@ class Transcript extends Component {
   }
 }
 
-Transcript.propTypes = {
+Transcripts.propTypes = {
   history: PropTypes.object,
   user: PropTypes.object,
 }
@@ -34,4 +34,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps)(Transcript))
+export default withRouter(connect(mapStateToProps)(Transcripts))
