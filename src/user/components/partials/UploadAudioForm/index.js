@@ -15,17 +15,18 @@ import classes from './style.scss'
 import { formActions } from 'shared/actions'
 
 class UploadAudioForm extends Component {
+  constructor(props) {
+    super(props)
+
+    this.cb = this.cb.bind(this)
+  }
+
+  cb (file) {
+    this.props.history.push(Helpers.transcriptUrlForFile(file))
+  }
+
   render() {
     const modalOpen = this.props.currentModal
-    // TODO remove, now unnecessary
-function doIt (e) {
-  e.preventDefault()
-  const file = $("#audio-file-form input")[0].files[0]
-  console.log("doing it", file)
-
-  formActions.uploadAudioFile(file)
-}
-
 
     return (
       <div>
@@ -37,13 +38,8 @@ function doIt (e) {
             label="Drop audio file here"
             height="70vh"
             width="100%"
+            cb={this.cb}
           />
-          {false && <form id="audio-file-form" action={location.href} method="post" enctype="multipart/form-data">
-            <input type="file" name="file" />
-            <button type="submit" onClick={doIt}>Submit</button>
-          </form>}
-
-
         </Flexbox>
       </div>
     )

@@ -57,7 +57,7 @@ class DropAudio extends Component {
       this.setState({pending: true})
       this.props.onStart && this.props.onStart(acceptedFile, rejectedFile)
 
-      formActions.uploadAudioFile(acceptedFile)
+      formActions.uploadAudioFile(acceptedFile, this.props.cb)
 
       //clear url from browser memory to avoid memory leak
       //TODO might not need; disabling preview

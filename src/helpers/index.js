@@ -108,6 +108,15 @@ let Helpers = {
     })
   },
 
+  // each transcript will be name spaced by file name and last modified date.
+  // If a single file has been uploaded multiple times, will eventually show a list of versions on the side somewhere, which the user can select, but just start by default by showing the last created transcript. TODO
+  transcriptUrl: (transcript) => (
+    `/transcripts/${transcript.filename}-${transcript.fileLastModified}`
+  ),
+
+  transcriptUrlForFile: (file) => (
+    `/transcripts/${file.name}-${file.lastModified}`
+  ),
 }
 
 // for adding more helper files to this one

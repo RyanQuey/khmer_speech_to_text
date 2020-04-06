@@ -134,10 +134,11 @@ const Helpers = {
     let fileData = req.file
     const fileType = req.body.fileType
     requestOptions.fileType = fileType
-    requestOptions[fileType] = true
+    requestOptions.fileExtension = fileType.replace("audio/", "")
+    requestOptions[requestOptions.fileExtension] = true
 
-    if (!FILE_TYPES.includes(fileType)) {
-      throw `File type ${fileType} is not allowed, only ${fileTypesSentence}`
+    if (!FILE_TYPES.includes(requestOptions.fileExtension)) {
+      throw `File type ${requestOptions.fileExtension} is not allowed, only ${fileTypesSentence}`
     }
 
     const {flac, wav, mp3, convertToFile, multipleChannels} = requestOptions
@@ -229,12 +230,14 @@ const Helpers = {
     const theClient = options.beta ? betaClient : client
     const [response] = await theClient.recognize(request);
 
+    await Helpers.handleTranscriptResults(req, response.results)
     return response
   },
 
   requestLongRunningRecognize: async (request, req, options = {}) => {
     try {
       console.log("long file found!")
+      console.log("Using Beta client?", !!options.beta)
 
       const theClient = options.beta ? betaClient : client
       const result = await theClient.longRunningRecognize(request);
@@ -272,6 +275,7 @@ const Helpers = {
   handleTranscriptResults: async (req, results) => {
     const { user } = req
     const base64Start = req.body.base64.slice(0, 10)
+    const { fileMetadata, filename, fileType } = req.body
     // want sorted by base64 so each file is easily grouped, but also timestamped so can support multiple uploads
     const timestamp = moment().format("YYYYMMDDHHMMss")
     // could also grab the name of the request (its a short-ish unique assigned by Google integer) if ever want to match this to the api call to google
@@ -279,9 +283,14 @@ const Helpers = {
     const docRef = db.collection('users').doc(user.uid)
       .collection("transcripts").doc(docName);
 
-    let transcript = await docRef.set({
+    // set results into firestore
+    await docRef.set({
       base64Start: base64Start,
       createdAt: timestamp,
+      filename,
+      fileType,
+      fileLastModified,
+      fileSize,
       // array of objects with single key: "alternatives" which is array as well
       // need to convert to objects or arrays only, can't do other custom types like "SpeechRecognitionResult"
       utterances: JSON.parse(JSON.stringify(results)),
@@ -297,11 +306,9 @@ const Helpers = {
   }, 
 
   handleDbError: (err) => {
-  
-    // TODO eventually dynamically query the err to see if it has this 
     // see https://stackoverflow.com/questions/52207155/firestore-admin-in-node-js-missing-or-insufficient-permissions
     if (err.message.includes("PERMISSION_DENIED: Missing or insufficient permissions")) {
-      console.log("Try running 'gcloud auth login' if in dev env.")
+      console.log("alternatively, check to make sure service account key put into 'admin.credential.cert(serviceAccount)' has firebase-adminsdk role")
     }
 
     console.error("Error hitting firestore DB: ", err)

@@ -8,6 +8,7 @@ import errorReducer from './errors'
 import formsReducer from './forms'
 import userReducer from './user'
 import viewSettingsReducer from './viewSettings'
+import transcripts from './transcripts'
 
 const rootReducer = combineReducers({
   alerts: alertReducer,
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   // the current user
   user: userReducer,
   viewSettings: viewSettingsReducer,
+  transcripts,
 })
 
 const sagaMiddleware = createSagaMiddleware()

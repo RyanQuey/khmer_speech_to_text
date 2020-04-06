@@ -35,6 +35,8 @@ class App extends Component {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         // when hit api, make sure to send bearer token
+        // TODO make a helper function, will need to call whenever the token expires in order to hit the cloud functions
+        // TODO can make token last a whole day or something?
         firebase.auth().currentUser.getIdToken(/* forceRefresh */ true)
         .then(function(idToken) {
           // Send token to your backend via HTTPS

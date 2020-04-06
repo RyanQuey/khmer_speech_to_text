@@ -43,21 +43,18 @@ app.post('/upload-audio', (req, res, next) => {
 
       let response
       if (isLongFile) {
-        response = await Helpers.requestLongRunningRecognize(requestData, req, options)
+        // not using await, to avoid timeout. Letting it run async
+        response = Helpers.requestLongRunningRecognize(requestData, req, options)
         res.send({
-          response,
+          done: false
         });
 
       } else {
-        response = await Helpers.requestRecognize(requestData, options)
+        response = Helpers.requestRecognize(requestData, options)
         const results = response.results
-        const transcription = results
-          .map(result => result.alternatives[0].transcript)
-          .join('\n');
 
         res.send({
-          transcription,
-          results,
+          done: true
         });
       }
 

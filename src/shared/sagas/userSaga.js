@@ -4,6 +4,7 @@ import {
   FETCH_CURRENT_USER_REQUEST,
   FETCH_USER_SUCCESS,
   FETCH_CURRENT_USER_SUCCESS,
+  FETCH_TRANSCRIPTS_SUCCESS,
   HANDLE_ERRORS,
   RESET_PASSWORD_REQUEST,
   RESET_PASSWORD_SUCCESS,
@@ -173,10 +174,11 @@ function* fetchCurrentUser(action) {
   try {
     const userData = action.payload
     const options = action.options || {}
-    const ref = db.collection("users").doc(userData.uid)
+    const userRef = db.collection("users").doc(userData.uid)
 
+    // get users and transcripts simultaneously TODO 
     let returnedUser
-    const result = yield ref.get()
+    const result = yield userRef.get()
     if (result.exists) {
       returnedUser = result.data()
     
@@ -187,6 +189,11 @@ function* fetchCurrentUser(action) {
     }
 
     yield put({type: SET_CURRENT_USER, payload: returnedUser})
+
+    const userTranscriptsRef = userRef.collection("transcripts")
+    const transcriptsResult = yield userTranscriptsRef.get()
+    const mappedTranscripts = transcriptsResult.docs.map(doc => doc.data())
+    yield put({type: FETCH_TRANSCRIPTS_SUCCESS, payload: mappedTranscripts})
 
     //no reason to restart the socket here; this event should only occur is already retrieving the user data from the cookie, which means that API token and headers already are set correctly.
     action.cb && action.cb(result.data)

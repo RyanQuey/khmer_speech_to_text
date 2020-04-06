@@ -41,12 +41,13 @@ function* uploadAudio(action) {
     yield put({type: UPLOAD_AUDIO_SUCCESS, payload: data})
     alertActions.newAlert({
       //title: response.data.transcription,
-      title: data.transcription,
+      title: "Now creating transcript, please wait",
       level: "SUCCESS",
       options: {timer: false}
     })
 
-    action.cb && action.cb(result)
+    console.log(action.cb, file)
+    action.cb && action.cb(file)
 
   } catch (err) {
     yield put({type: UPLOAD_AUDIO_FAILURE})
@@ -109,12 +110,19 @@ function* _sendIt(file) {
   let response
   // if less than 1.5MB (about 1 min for mp3 file), can do normal recognize, if longer do long recognize
   // base64 for 12 sec file was .length 415820
+  const body = { 
+    base64, 
+    fileType: file.type,
+    filename: file.name,
+    fileSize: file.size,
+    fileLastModified: file.lastModified,
+  }
   if (file.size < 1.5*1000) {
-    response = yield axios.post(`/upload-audio`, { base64, fileType: file.type.replace("audio/", "") })
+    response = yield axios.post(`/upload-audio`, body)
   } else {
     // large file, do longRunningRecognize
     // TODO for now, just hitting the same endpoint, but probably eventually either handling it different, or sending to a different endpoint
-    response = yield axios.post(`/upload-audio`, { base64, fileType: file.type.replace("audio/", "") })
+    response = yield axios.post(`/upload-audio`, body)
   
   }
 
