@@ -129,6 +129,7 @@ const Helpers = {
     }
   },
 
+  // returns request body and mutates requestOptions along the way 
   setupRequest: (req, requestOptions) => {
     // TODO doesn't work
     let fileData = req.file
@@ -201,6 +202,11 @@ const Helpers = {
       config.enableSeparateRecognitionPerChannel = true
     }
 
+    // set which api client to use
+    if (requestOptions.api == "v1p1beta") {
+      requestOptions.beta = true
+    }
+
     console.log("sending with config", config)
 
     // content should be base64 by this point
@@ -227,6 +233,7 @@ const Helpers = {
 
   // NOTE not for real transcript handling, will not write results to DB
   requestRecognize: async (request, options = {}) => {
+    console.log("options here is", options)
     const theClient = options.beta ? betaClient : client
     const [response] = await theClient.recognize(request);
 
@@ -239,6 +246,7 @@ const Helpers = {
       console.log("long file found!")
       console.log("Using Beta client?", !!options.beta)
 
+      console.log("options here is", options)
       const theClient = options.beta ? betaClient : client
       const result = await theClient.longRunningRecognize(request);
       console.log("initial response from long running recognize:", result)
@@ -267,7 +275,6 @@ const Helpers = {
       return result
     } catch (error) {
       console.error('Error while doing a long-running request:', error);
-      throw error
     }
   },
 
@@ -275,7 +282,7 @@ const Helpers = {
   handleTranscriptResults: async (req, results) => {
     const { user } = req
     const base64Start = req.body.base64.slice(0, 10)
-    const { fileMetadata, filename, fileType } = req.body
+    const { fileMetadata, filename, fileType, fileLastModified, fileSize } = req.body
     // want sorted by base64 so each file is easily grouped, but also timestamped so can support multiple uploads
     const timestamp = moment().format("YYYYMMDDHHMMss")
     // could also grab the name of the request (its a short-ish unique assigned by Google integer) if ever want to match this to the api call to google
@@ -285,7 +292,7 @@ const Helpers = {
 
     // set results into firestore
     await docRef.set({
-      base64Start: base64Start,
+      base64Start,
       createdAt: timestamp,
       filename,
       fileType,
