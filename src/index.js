@@ -36,10 +36,11 @@ window.$ = jQuery
 
 // to hit the cloud func server
 // NOTE make sure that the local server isn't running on hostname that includes "khmer-speech-to-text" 
-window.endpoint = window.location.hostname.includes("khmer-speech-to-text") ? "https://us-central1-khmer-speech-to-text.cloudfunctions.net/app" : `http://${window.location.hostname}:5000/khmer-speech-to-text/us-central1/app`
+window.endpoint = true || window.location.hostname.includes("khmer-speech-to-text") ? "https://us-central1-khmer-speech-to-text.cloudfunctions.net" : `http://${window.location.hostname}:5000/khmer-speech-to-text/us-central1`
 const axiosInstance = axios.create({
   baseURL: endpoint,
-  timeout: 10*1000, // 10 sec. for longer operations, poll it instead of leaving it open
+  //timeout: 10*1000, // 10 sec. for longer operations, poll it instead of leaving it open
+  timeout: 20*1000, // 10 sec. for longer operations, poll it instead of leaving it open
   headers: {
     //'Content-Type': 'multipart/form-data'
     //'Content-Type': 'multipart/form-data; boundary="--this is a test boundary--"'

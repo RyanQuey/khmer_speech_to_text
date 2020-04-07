@@ -144,14 +144,7 @@ const Helpers = {
 
     const {flac, wav, mp3, convertToFile, multipleChannels} = requestOptions
 
-    if (fileData) {
-      // TODO doesn't work
-      // means we sent file...only happens if use some middleware that sets req.file (like formidable or formidable-express)
-      //const audioBytes = Buffer.from(file.buffer, 'base64')
-
-    } else {
-      fileData = req.base64
-    }
+    fileData = req.body.base64
 
     // just for testing
     if (convertToFile) {

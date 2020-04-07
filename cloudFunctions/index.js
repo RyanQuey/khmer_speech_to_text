@@ -30,6 +30,7 @@ const requestOptions = {
 
 // TODO add error handling
 app.post('/upload-audio', (req, res, next) => {
+  console.log("starting")
   async function main() {
     try {
   
@@ -43,6 +44,7 @@ app.post('/upload-audio', (req, res, next) => {
       let response
       if (isLongFile) {
         // not using await, to avoid timeout. Letting it run async
+				console.log("starting long running recognize")
         Helpers.requestLongRunningRecognize(requestData, req, options)
         res.send({
           done: false
@@ -57,7 +59,10 @@ app.post('/upload-audio', (req, res, next) => {
         });
       }
 
-      return
+      console.log("returning res")
+
+      // not doing anything with returned value
+      return {message: "done calling it, now wait to see if the bg job finishes"}
 
     } catch (error) {
       console.error("Error while requesting transcript for audio file: ", error);
@@ -78,3 +83,20 @@ app.post('/upload-audio', (req, res, next) => {
 // Requests need to be authorized by providing an `Authorization` HTTP header
 // with value `Bearer <Firebase ID Token>`.
 exports.app = cloudFunctions.https.onRequest(app);
+
+const app2 = express();
+
+// Automatically allow cross-origin requests
+app2.use(cors);
+
+// Add middleware to authenticate requests
+
+// build multiple CRUD interfaces:
+app2.get('/:id', (req, res) => res.send(req.body));
+app2.post('/', (req, res) => res.send(req.body));
+app2.put('/:id', (req, res) => res.send(req.body));
+app2.delete('/:id', (req, res) => res.send(req.body));
+app2.get('/', (req, res) => res.send(req.body));
+
+// Expose Express API as a single Cloud Function:
+exports.widgets = cloudFunctions.https.onRequest(app);
