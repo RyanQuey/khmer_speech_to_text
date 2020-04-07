@@ -42,7 +42,6 @@ function* signIn(action) {
           .then((user) => {
             const userData = user
             userData.redirect = true
-            userData.history = data.history
             return userData
           })
 
@@ -185,7 +184,7 @@ function* fetchCurrentUser(action) {
     } else if (options.findOrCreate) {
       // e.g., if data gets corrupted sometimes and just want it to work
       returnedUser = userData
-      ref.set(userData)
+      userRef.set(JSON.parse(JSON.stringify(userData)))
     }
 
     yield put({type: SET_CURRENT_USER, payload: returnedUser})

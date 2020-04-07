@@ -145,7 +145,7 @@ class Login extends Component {
             togglePending={this.togglePending}
           />
         </div>}
-        {false && <a
+        <a
           onClick={this.toggleView}
           href="#"
         >
@@ -154,11 +154,6 @@ class Login extends Component {
           ) : (
             "Already have an account? Click here to login"
           )}
-        </a>}
-        <a
-          href="https://www.growthramp.io/seo-dashboard/"
-        >
-          Don't have an account? Click here to learn more
         </a>
       </Flexbox>
     )

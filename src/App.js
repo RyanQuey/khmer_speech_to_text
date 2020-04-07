@@ -10,6 +10,7 @@ import handleQuery from 'utils/handleQuery'
 import { 
   FETCH_CURRENT_USER_REQUEST,
 } from 'constants/actionTypes'
+import { errorActions, userActions } from 'shared/actions'
 
 class App extends Component {
   // make sure runs first, or login/signup currently will just do login, will never start at signup due to race conditions
@@ -36,16 +37,8 @@ class App extends Component {
       if (user) {
         // when hit api, make sure to send bearer token
         // TODO make a helper function, will need to call whenever the token expires in order to hit the cloud functions
-        // TODO can make token last a whole day or something?
-        firebase.auth().currentUser.getIdToken(/* forceRefresh */ true)
-        .then(function(idToken) {
-          // Send token to your backend via HTTPS
-          axios.defaults.headers.common['Authorization'] = `Bearer ${idToken}`;
-
-        })
-        .catch(function(error) {
-          console.error("error setting bearer token: ", error)
-        });
+        // will have to refresh this every hour or it expires, so call this before hitting cloud functions
+        userActions.setBearerToken()
     
         //need to retrieve user data from firebase, to put into redux
         //mostly only gets ran when reloading the page after already logged in

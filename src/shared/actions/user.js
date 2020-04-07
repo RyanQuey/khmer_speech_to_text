@@ -1,4 +1,3 @@
-import firebase from 'refire/firebase'
 import generator from 'generate-password'
 
 import schema from 'constants/schema'
@@ -15,7 +14,7 @@ import {
 } from 'constants/providers'
 import errorTypes from 'constants/errors'
 
-import { errorActions } from 'shared/actions'
+import { errorActions, userActions } from 'shared/actions'
 
 //if the user cannot be found by the userData.uid, creates a new User newUserData
 //TODO: combine this with the generic firebase action
@@ -191,4 +190,17 @@ export const signOut = () => {
     //TODO: buildout these error objects, this one in the ones above 
     errorActions.handleErrors(err)
   })
+}
+
+export const setBearerToken = () => {
+  return firebase.auth().currentUser.getIdToken(/* forceRefresh */ true)
+  .then(function(idToken) {
+    // Send token to your backend via HTTPS
+    axios.defaults.headers.common['Authorization'] = `Bearer ${idToken}`;
+
+    return "complete"
+  })
+  .catch(function(error) {
+    console.error("error setting bearer token: ", error)
+  });
 }

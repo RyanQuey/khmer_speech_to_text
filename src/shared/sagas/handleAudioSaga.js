@@ -5,7 +5,7 @@ import {
   UPLOAD_AUDIO_SUCCESS,
 }  from 'constants/actionTypes'
 //import { setupSession } from 'lib/socket' // Not using a socket
-import { errorActions, alertActions } from 'shared/actions'
+import { errorActions, alertActions, userActions } from 'shared/actions'
 import firebase from 'refire/firebase'
 // TODO use firestore instead
 
@@ -39,6 +39,9 @@ function* uploadAudio(action) {
     //const response = yield _sendIt(file)
     const response = _sendIt(file)
     const { data } = response
+        // will have to refresh this every hour or it expires, so call this before hitting cloud functions
+    // TODO haven't tested
+    yield userActions.setBearerToken()
 
     yield put({type: UPLOAD_AUDIO_SUCCESS, payload: data})
     alertActions.newAlert({

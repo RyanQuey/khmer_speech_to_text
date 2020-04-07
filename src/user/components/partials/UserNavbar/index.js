@@ -50,7 +50,10 @@ class UserNavbar extends Component {
           <Flexbox className={classes.rightNav} align="center" justify="space-between">
           
             {user ? (
-              <AccountMenu />
+              <div>
+                {user.email}
+                <AccountMenu />
+              </div>
             ) : (
               <a href="#" onClick={this.openLoginModal}>Login</a>
             )}

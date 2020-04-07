@@ -70,7 +70,8 @@ class DropAudio extends Component {
   }
 
   render() {
-    // NOTE currently mp4 doesn't work
+    // NOTE currently mp4 doesn't work. when it does, can do 
+    // accept="audio/*, video/mp4"
     return (
       <Flexbox align="center" direction="column" justify="center" className={this.props.className || ""}>
         <Dropzone
@@ -81,9 +82,9 @@ class DropAudio extends Component {
           multiple={false}
           onDrop={this.onDrop}
           style={this.props.style}
+          accept="audio/*"
           maxSize={this.state.maxSize} 
           onDragOver={this.onDragOver}
-          accept="audio/*, video/mp4"
           preventDropOnDocument={true}
         >
           <Flexbox align="center" direction="column">

@@ -48,9 +48,10 @@ db = admin.firestore()
 const baseConfig = {
   encoding: 'LINEAR16',
   languageCode: 'km-KH',
-  sampleRateHertz: undefined, // TODO or try 16000...but undefined lets google set it themselves,
+  sampleRateHertz: undefined, // TODO or try 16000...but undefined lets google set it themselves. For some mp3s, this returns no utterances or worse results though
   enableAutomaticPunctuation: true,
   model: "default", //  Google: "Best for audio that is not one of the specific audio models. For example, long-form audio. Ideally the audio is high-fidelity, recorded at a 16khz or greater sampling rate."
+  maxAlternatives: 3, // I think it's free, so why not get more ha
 }
 
 const flacConfig = Object.assign({}, baseConfig, {
@@ -64,7 +65,7 @@ const flacConfig = Object.assign({}, baseConfig, {
 
 const mp3Config = Object.assign({}, baseConfig, {
   encoding: 'mp3',
-  sampleRateHertz: 16000,  // 8000 might be plenty 
+  sampleRateHertz: 16000,  // Google's docs say: "When using this encoding, sampleRateHertz has to match the sample rate of the file being used." TODO need to find a way to dynamically test the file to see its sample rate hertz
 })
 
 const Helpers = {
@@ -100,6 +101,7 @@ const Helpers = {
       idToken = req.cookies.__session;
     } else {
       // No cookie
+      console.log('No bearer token or cookie');
       res.status(403).send('Unauthorized');
       return;
     }
@@ -109,13 +111,15 @@ const Helpers = {
       console.log('ID Token correctly decoded');
       req.user = decodedIdToken;
 
-      if (!req.user.email_verified) {
-        // make them verify it first
-        res.status(403).send('Unauthorized');
-        return;
-      }
+      // NOTE right now don't care if email is verified
+      // if (!req.user.email_verified) {
+      //   // make them verify it first
+      //   console.log('Email not verified');
+      //   res.status(403).send('Unauthorized');
+      //   return;
+      // }
       // currently only allowing whitelisted users to use
-      if (!WHITE_LISTED_USERS.includes(req.user.email)) {
+      if (!WHITE_LISTED_USERS.includes(req.user.email) && !req.user.email.match(/rlquey2\+.*@gmail.com/)) {
         res.status(403).send("Your email isn't allowed to use our service yet; please contact us to get your account setup");
         return
       }
@@ -158,19 +162,15 @@ const Helpers = {
     // TODO set flac, mp3, or base64 dynamically depending on the file received (base64 encoding the file will set it with a header which states the filetype)
     if (flac) {
       // not sure if owrks
-      console.log("setting as flac")
-
       content = fileData
       config = flacConfig;
 
     } else if (mp3) {
-      console.log("setting as mp3")
       // strangely enough, if send base64 of mp3 file, but use flacConfig, returns results like the flac file, but smaller file size. In part, possibly due ot the fact that there is multiple speakers set for flacConfig currently
       content = fileData
       config = mp3Config;
 
     } else if (Helpers.isBase64(fileData)) {
-      console.log("got the base64")
       content = fileData
       config = baseConfig
 
@@ -200,6 +200,7 @@ const Helpers = {
       requestOptions.beta = true
     }
 
+    console.log("sending file: ", req.body.filename)
     console.log("sending with config", config)
 
     // content should be base64 by this point
