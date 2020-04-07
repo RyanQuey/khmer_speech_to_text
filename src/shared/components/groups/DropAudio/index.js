@@ -70,6 +70,7 @@ class DropAudio extends Component {
   }
 
   render() {
+    // NOTE currently mp4 doesn't work
     return (
       <Flexbox align="center" direction="column" justify="center" className={this.props.className || ""}>
         <Dropzone

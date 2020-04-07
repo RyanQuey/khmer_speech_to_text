@@ -325,7 +325,7 @@ const Helpers = {
   handleDbError: (err) => {
     // see https://stackoverflow.com/questions/52207155/firestore-admin-in-node-js-missing-or-insufficient-permissions
     if (err.message.includes("PERMISSION_DENIED: Missing or insufficient permissions")) {
-      console.log("alternatively, check to make sure service account key put into 'admin.credential.cert(serviceAccount)' has firebase-adminsdk role")
+      console.log("NOTE: check to make sure service account key put into 'admin.credential.cert(serviceAccount)' has firebase-adminsdk role")
     }
 
     console.error("Error hitting firestore DB: ", err)
