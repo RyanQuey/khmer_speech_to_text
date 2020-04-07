@@ -16,6 +16,7 @@ class Transcripts extends Component {
         </div>
         <TranscriptPicker 
           transcripts={this.props.transcripts}
+          pickable={true}
         />
       </div>
     )

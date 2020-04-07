@@ -236,13 +236,12 @@ const Helpers = {
 
   requestLongRunningRecognize: async (request, req, options = {}) => {
     try {
-      console.log("long file found!")
       console.log("Using Beta client?", !!options.beta)
 
       console.log("options here is", options)
       const theClient = options.beta ? betaClient : client
+      // this is initial response, not complete transcript yet
       const result = await theClient.longRunningRecognize(request);
-      console.log("initial response from long running recognize:", result)
       const [operation] = result
 
       // Get a Promise representation of the final result of the job
@@ -252,9 +251,10 @@ const Helpers = {
       operation.promise()
         .then((final) => {
           console.log("so what is this anyways?", final)
-          const [response] = final
+          const [response, longRunningRecognizeMetadata, data] = final
           
-          return Helpers.handleTranscriptResults(req, response.results)
+          console.log(data, typeof data)
+          return Helpers.handleTranscriptResults(req, response.results, data.name)
         })
         .then(() => {
           console.log("all done?")
@@ -268,15 +268,27 @@ const Helpers = {
       return result
     } catch (error) {
       console.error('Error while doing a long-running request:', error);
-      if (error.details == "Invalid audio channel count") {
-        // try again with different channel configuration
-        // TODO
+      if (options.failedAttempts == 0) {
+        options.failedAttempts ++ 
+
+        if ([
+          "Must use single channel (mono) audio, but WAV header indicates 2 channels.",  // got with fileout.wav. code 3
+          "Invalid audio channel count", // got with fileout.flac 
+        ].includes(error.details)) {
+          // try again with different channel configuration
+          
+          console.log("trying again, but with multiple channel configuration.")
+          options.multipleChannels = true
+          const newRequestData = Helpers.setupRequest(req, options)
+          console.log(`Attempt #: ${options.failedAttempts + 1}`)
+          Helpers.requestLongRunningRecognize(newRequestData, req, options)
+        }
       }
     }
   },
 
   // maybe in future, store base64. Not necessary for now though, and we're billed by amount of data is stored here, so better not to. There's cheaper ways if we want to do this
-  handleTranscriptResults: async (req, results) => {
+  handleTranscriptResults: async (req, results, transactionName) => {
     const { user } = req
     const base64Start = req.body.base64.slice(0, 10)
     const { fileMetadata, filename, fileType, fileLastModified, fileSize } = req.body
@@ -295,6 +307,7 @@ const Helpers = {
       fileType,
       fileLastModified,
       fileSize,
+      transactionId: transactionName, // best way to ensure a uid for this transcription
       // array of objects with single key: "alternatives" which is array as well
       // need to convert to objects or arrays only, can't do other custom types like "SpeechRecognitionResult"
       utterances: JSON.parse(JSON.stringify(results)),

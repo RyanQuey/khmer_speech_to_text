@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { connect } from 'react-redux'
-import { Flexbox, Button, Input, Checkbox, Icon } from 'shared/components/elements'
+import { Flexbox, Button, Input, Checkbox, Icon, Spinner } from 'shared/components/elements'
 import {
 } from 'constants/actionTypes'
 import {formActions} from 'shared/actions'
@@ -8,6 +8,7 @@ import classes from './style.scss'
 import {
   withRouter,
 } from "react-router-dom";
+import { TranscriptPicker } from 'user/components/partials'
 
 //shows up as buttons in mobile, or sidebar in browser?
 //used in channels and send
@@ -27,10 +28,11 @@ class ShowTranscript extends Component {
     const {filename, lastModified} = Helpers.getTranscriptDataFromParam(transcriptIdentifier)
     const { transcripts } = this.props
     const matchingTranscripts = Helpers.matchingTranscripts(transcripts, filename, lastModified)
+    // TODO will delete old records and select current one by transcactionId
     const currentTranscriptObj = matchingTranscripts.pop()
-    console.log("tr", currentTranscriptObj, "mtchs", matchingTranscripts, "trs", transcripts)
+    console.log("tr", currentTranscriptObj, "mtchs", matchingTranscripts)
     if (!currentTranscriptObj) {
-      return null
+      return <Spinner />
     }
     //const transcript = Transcript.new(currentTranscriptObj)
     const transcript = currentTranscriptObj
@@ -44,13 +46,40 @@ class ShowTranscript extends Component {
               <div>
                 {Helpers.humanReadableTranscript(transcript)}
               </div>
+              <hr />
               <Flexbox>
-                Coming soon: transcript and file metadata
+                <h3>File Data:</h3>
+                
+                <div>
+                  {transcript.filename}
+                </div>
+                <div>
+                  {moment(transcript.createdAt, "YYYYMMDDHHMMss").format()}
+                </div>
+                <div>
+                  {moment(transcript.fileLastModified).format()}
+                </div>
+                <div>
+                  {(transcript.fileSize / 1048576).toFixed(2)} MB
+                </div>
+                <div>
+                  Base64 Starts with: {transcript.base64Start || ""}
+                </div>
               </Flexbox>
             </Flexbox>
 
           </div>
         </div>
+
+        {matchingTranscripts.length > 1 && 
+          <Flexbox>
+            <h2>Older transcripts for same file:</h2>
+            <TranscriptPicker 
+              transcripts={matchingTranscripts.filter(t => (t !== currentTranscriptObj))}
+              pickable={false}
+            />
+          </Flexbox>
+        }
       </Flexbox>
     )
   }

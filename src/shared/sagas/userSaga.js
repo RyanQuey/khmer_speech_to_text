@@ -195,10 +195,19 @@ function* fetchCurrentUser(action) {
     // const mappedTranscripts = transcriptsResult.docs.map(doc => doc.data())
 
     // setup listener so every change to transcripts in firestore is reflected
+    let first = true
     userTranscriptsRef.onSnapshot((snapshot) => { 
-      console.log("foudn some", snapshot)
+      console.log("foudn some transcripts for user", snapshot)
       const mappedTranscripts = snapshot.docs.map(doc => doc.data())
       store.dispatch({type: FETCH_TRANSCRIPTS_SUCCESS, payload: mappedTranscripts})
+      if (first) {
+        alertActions.newAlert({
+          title: "Transcript is ready",
+          level: "SUCCESS",
+          options: {}
+        })
+        first = false
+      }
     })
 
     //no reason to restart the socket here; this event should only occur is already retrieving the user data from the cookie, which means that API token and headers already are set correctly.

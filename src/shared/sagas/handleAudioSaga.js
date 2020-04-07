@@ -34,7 +34,10 @@ function* uploadAudio(action) {
 
   try {
     const file = action.payload
-    const response = yield _sendIt(file)
+    // TODO since cloud functions are so slow, just don't wait for it, and return success
+    // NOTE cloud functions are so slow, not doing alerts, just send out HTTP request and wait for listener to detect results
+    //const response = yield _sendIt(file)
+    const response = _sendIt(file)
     const { data } = response
 
     yield put({type: UPLOAD_AUDIO_SUCCESS, payload: data})
@@ -99,10 +102,11 @@ function* uploadAudio(action) {
   }
 }
 
+//////////////////////////////
+// HELPERS 
 // takes a file with File web api, converts it to base 64, and sends the base 64 to our cloud functions server which will send it to the Google speech to text API
-function* _sendIt(file) {
-  const base64 = yield Helpers.getBase64(file); // prints the base64 string
-  // const response = yield postData(`${endpoint}/upload-audio`, { base64 })
+async function _sendIt (file) {
+  const base64 = await Helpers.getBase64(file); // prints the base64 string
   console.log(" audio file length", file, base64.length)
   // later, can conditionally send large files elsewhere by doing something like: file.size < 1.5*1000
 
@@ -117,12 +121,13 @@ function* _sendIt(file) {
     fileLastModified: file.lastModified,
   }
   //response = yield axios.post(`/app/upload-audio/`, body)
-  response = yield axios.post(`/widgets/upload-audio/`, body)
+  response = await axios.post(`/app/upload-audio/`, body)
 
   return response
 };
 
-
+///////////////////////
+// EXPORTS
 export default function* userSaga() {
   yield takeLatest(UPLOAD_AUDIO_REQUEST, uploadAudio)
 }

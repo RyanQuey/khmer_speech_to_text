@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser')();
 const cors = require('cors')({origin: true});
 const _ = require('lodash')
 
-const fs = require('fs');
+// const fs = require('fs');
 
 const {Helpers} = require("./helpers.js")
 
@@ -26,6 +26,7 @@ const requestOptions = {
   // not sure when this is helpful, but sometimes it is 
   multipleChannels: false, 
   api: apis[1],
+  failedAttempts: 0,
 }
 
 // TODO add error handling
@@ -46,23 +47,16 @@ app.post('/upload-audio', (req, res, next) => {
         // not using await, to avoid timeout. Letting it run async
 				console.log("starting long running recognize")
         Helpers.requestLongRunningRecognize(requestData, req, options)
-        res.send({
-          done: false
-        });
 
       } else {
         Helpers.requestRecognize(requestData, options)
         const results = response.results
-
-        res.send({
-          done: true
-        });
       }
 
       console.log("returning res")
 
       // not doing anything with returned value
-      return {message: "done calling it, now wait to see if the bg job finishes"}
+      return
 
     } catch (error) {
       console.error("Error while requesting transcript for audio file: ", error);
@@ -76,27 +70,18 @@ app.post('/upload-audio', (req, res, next) => {
   req.base64 = req.body.base64
 
   main().catch(console.error);
+  res.send({
+    done: false
+  });
 
+  return
 });
 
 // This HTTPS endpoint can only be accessed by your Firebase Users.
 // Requests need to be authorized by providing an `Authorization` HTTP header
 // with value `Bearer <Firebase ID Token>`.
 exports.app = cloudFunctions.https.onRequest(app);
-
-const app2 = express();
-
-// Automatically allow cross-origin requests
-app2.use(cors);
-
-// Add middleware to authenticate requests
-
-// build multiple CRUD interfaces:
-app2.get('/:id', (req, res) => res.send(req.body));
-app2.post('/', (req, res) => res.send(req.body));
-app2.put('/:id', (req, res) => res.send(req.body));
-app2.delete('/:id', (req, res) => res.send(req.body));
-app2.get('/', (req, res) => res.send(req.body));
-
-// Expose Express API as a single Cloud Function:
-exports.widgets = cloudFunctions.https.onRequest(app);
+// NOTE for some reason app endpoint only works if there are at least two endpoints. Even if I just do`exports.test = cloudFunctions.https.onRequest(app);` it works, as long as there's two. TODO report on SO
+exports.test = cloudFunctions.https.onRequest((req, res) => {
+  res.send({testing: true})
+});

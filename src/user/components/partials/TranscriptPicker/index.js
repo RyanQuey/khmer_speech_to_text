@@ -23,7 +23,7 @@ class TranscriptPicker extends Component {
   }
 
   render() {
-    const transcripts = this.props.transcripts
+    const { pickable, transcripts } = this.props
 
     //TODO: set the title using props into the modal container
     return (
@@ -34,8 +34,6 @@ class TranscriptPicker extends Component {
           <th>Transcript Created At</th>
           <th>File Last Modified</th>
           <th>File Size</th>
-          <th>Status</th>
-          <th>Base64 starts with</th>
           <th></th>
         </tr>
         {transcripts && Object.keys(transcripts).map((transcriptId) => {
@@ -46,22 +44,16 @@ class TranscriptPicker extends Component {
                 {transcript.filename}
               </td>
               <td>
-                {transcript.createdAt}
+                {moment(transcript.createdAt, "YYYYMMDDHHMMss").format()}
               </td>
               <td>
-                {transcript.fileLastModified}
+                {moment(transcript.fileLastModified).format()}
               </td>
               <td>
-                {transcript.fileSize}
+                {(transcript.fileSize / 1048576).toFixed(2)} MB
               </td>
               <td>
-                {transcript.status || "not implemented yet"}
-              </td>
-              <td>
-                {transcript.base64Start || ""}
-              </td>
-              <td>
-                <button onClick={this.viewTranscript.bind(this, transcript)}>View</button>
+                {pickable && <button onClick={this.viewTranscript.bind(this, transcript)}>View</button>}
               </td>
             </tr>
           )
@@ -80,7 +72,7 @@ const mapDispatchToProps = (dispatch) => {
 
 const mapStateToProps = (state) => {
   return {
-    transcripts: state.transcripts,
+    //transcripts: state.transcripts,
   }
 }
 
