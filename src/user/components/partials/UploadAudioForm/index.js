@@ -32,6 +32,9 @@ class UploadAudioForm extends Component {
       <div>
         <Flexbox className={classes.rightColumn} direction="column">
 
+          <div>WARNING: MP3s might work, but might not. </div>
+          <div>Currently, MP3s must have sample rate hertz of 16,000, and even then might not work. WAV or FLAC are best</div>
+          <div>Best audio types: No noise cancellation, highest quality</div>
           <DropAudio
             circle
             defaultImage="/public/images/profile/defaultBanner.jpg"

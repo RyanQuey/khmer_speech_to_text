@@ -58,14 +58,16 @@ const flacConfig = Object.assign({}, baseConfig, {
   // or maybe FLAC ?
   encoding: 'flac',
   sampleRateHertz: undefined, // NOTE one time, flac file (that was from mp4) had 44100 herz required, so better to just not set until can find out dynamically
-  // NOTE sometimes has two channels, sometimes not
-  //audioChannelCount: 2,
-  //enableSeparateRecognitionPerChannel: true, 
 })
 
 const mp3Config = Object.assign({}, baseConfig, {
   encoding: 'mp3',
   sampleRateHertz: 16000,  // Google's docs say: "When using this encoding, sampleRateHertz has to match the sample rate of the file being used." TODO need to find a way to dynamically test the file to see its sample rate hertz
+})
+
+const wavConfig = Object.assign({}, baseConfig, {
+  encoding: undefined, // The FLAC and WAV audio file formats include a header that describes the included audio content. You can request recognition for WAV files that contain either LINEAR16 or MULAW encoded audio. If you send FLAC or WAV audio file format in your request, you do not need to specify an AudioEncoding; the audio encoding format is determined from the file header. If you specify an AudioEncoding when you send send FLAC or WAV audio, the encoding configuration must match the encoding described in the audio header; otherwise the request returns an google.rpc.Code.INVALID_ARGUMENT error code.
+  sampleRateHertz: undefined, // NOTE one time, flac file (that was from mp4) had 44100 herz required, so better to just not set until can find out dynamically
 })
 
 const Helpers = {
@@ -165,12 +167,17 @@ const Helpers = {
       content = fileData
       config = flacConfig;
 
+    } else if (wav) {
+      // not sure if owrks
+      content = fileData
+      config = wavConfig;
     } else if (mp3) {
       // strangely enough, if send base64 of mp3 file, but use flacConfig, returns results like the flac file, but smaller file size. In part, possibly due ot the fact that there is multiple speakers set for flacConfig currently
       content = fileData
       config = mp3Config;
 
     } else if (Helpers.isBase64(fileData)) {
+      // TODO should never get here...I think
       content = fileData
       config = baseConfig
 
@@ -269,9 +276,11 @@ const Helpers = {
       return result
     } catch (error) {
       console.error('Error while doing a long-running request:', error);
-      if (options.failedAttempts == 0) {
+      if (options.failedAttempts < 2) {
+        // need at least two, one for if internal error, and then if another is for channels 
         options.failedAttempts ++ 
 
+        // https://cloud.google.com/speech-to-text/docs/error-messages
         if ([
           "Must use single channel (mono) audio, but WAV header indicates 2 channels.",  // got with fileout.wav. code 3
           "Invalid audio channel count", // got with fileout.flac 
@@ -280,9 +289,20 @@ const Helpers = {
           
           console.log("trying again, but with multiple channel configuration.")
           options.multipleChannels = true
-          const newRequestData = Helpers.setupRequest(req, options)
           console.log(`Attempt #: ${options.failedAttempts + 1}`)
+          const newRequestData = Helpers.setupRequest(req, options)
           Helpers.requestLongRunningRecognize(newRequestData, req, options)
+        } else if (error.code == 13) {
+          // this is internal error Error while doing a long-running request: Error: 13 INTERNAL
+          // not tested TODO
+
+          console.log("internal error, so just trying same thing again")
+          console.log(`Attempt #: ${options.failedAttempts + 1}`)
+          Helpers.requestLongRunningRecognize(request, req, options)
+        } else if (error.details == "WAV header indicates an unsupported format.") {
+        
+          // TODO panic
+          // not tested TODO
         }
       }
     }
