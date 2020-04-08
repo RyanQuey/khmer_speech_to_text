@@ -115,6 +115,8 @@ exports.storageHook = cloudFunctions.storage.object().onFinalize(async (object) 
 
   main(data).catch(console.error);
 
+
+
   return "great job"
   // TODO try this later, once we're converting filetypes to flac
   //const tempFilePath = path.join(os.tmpdir(), fileName);

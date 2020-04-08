@@ -7,6 +7,7 @@ const speech = require('@google-cloud/speech');
 const betaSpeech = speech.v1p1beta1;
 const cloudFunctions = require('firebase-functions')
 const _ = require('lodash')
+const ffmpeg = require('fluent-ffmpeg');
 // required for local development to work with firestore according to https://github.com/firebase/firebase-tools/issues/1363#issuecomment-498364771
 
 // Creates a client
@@ -40,7 +41,9 @@ if (isDev) {
   })
 
 } else {
-  admin.initializeApp(cloudFunctions.config().firebase);
+  admin.initializeApp(Object.assign(cloudFunctions.config().firebase || {}, {
+    storageBucket: "khmer-speech-to-text.appspot.com",
+  }));
 }
 
 db = admin.firestore()
@@ -160,7 +163,7 @@ const Helpers = {
         uri: `gs://khmer-speech-to-text.appspot.com/${data.filePath}`
       }
 
-      // if no data.fileUri, then there should just be base64
+      // if no data.filePath, then there should just be base64
     } else {
       audio = {
         content: data.base64
@@ -237,7 +240,7 @@ const Helpers = {
           return Helpers.handleTranscriptResults(data, response.results, responseData.name)
         })
         .then(() => {
-          console.log("all done?")
+          console.log("all done")
         })
         .catch((err) => {
         
@@ -284,7 +287,8 @@ const Helpers = {
   handleTranscriptResults: async (data, results, transactionName) => {
     const { user } = data
     const base64Start = data.base64 && data.base64.slice(0, 10)
-    const { filename, fileType, fileLastModified, fileSize } = data
+    // only has filePath for uploads to storage
+    const { filename, fileType, fileLastModified, fileSize, filePath } = data
 
     // want sorted by filename so each file is easily grouped, but also timestamped so can support multiple uploads
     const timestamp = moment().format("YYYYMMDDHHMMss")
@@ -314,7 +318,16 @@ const Helpers = {
       .join('\n');
     console.log(`Transcription: ${transcription}`);
 
-    return "all done"
+    console.log("delete?")
+    if (filePath) {
+      // delete file from cloud storage (bucket assigned in the admin initializeApp call)
+      const storageRef = admin.storage().bucket()
+
+    console.log("yes delete")
+      await storageRef.file(filePath).delete()
+    }
+
+    return "all finished"
   }, 
 
   handleDbError: (err) => {
