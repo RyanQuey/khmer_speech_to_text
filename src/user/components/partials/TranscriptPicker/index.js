@@ -47,7 +47,7 @@ class TranscriptPicker extends Component {
                 {moment(transcript.createdAt, "YYYYMMDDHHMMss").format()}
               </td>
               <td>
-                {moment(transcript.fileLastModified).format()}
+                {moment(parseInt(transcript.fileLastModified)).format()}
               </td>
               <td>
                 {(transcript.fileSize / 1048576).toFixed(2)} MB

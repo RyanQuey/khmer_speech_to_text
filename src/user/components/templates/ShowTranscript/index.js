@@ -57,7 +57,7 @@ class ShowTranscript extends Component {
                   {moment(transcript.createdAt, "YYYYMMDDHHMMss").format()}
                 </div>
                 <div>
-                  {moment(transcript.fileLastModified).format()}
+                  {moment(parseInt(transcript.fileLastModified)).format()}
                 </div>
                 <div>
                   {(transcript.fileSize / 1048576).toFixed(2)} MB
