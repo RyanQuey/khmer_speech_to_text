@@ -6,6 +6,7 @@ const moment = require("moment");
 const speech = require('@google-cloud/speech');
 const betaSpeech = speech.v1p1beta1;
 const cloudFunctions = require('firebase-functions')
+const _ = require('lodash')
 // required for local development to work with firestore according to https://github.com/firebase/firebase-tools/issues/1363#issuecomment-498364771
 
 // Creates a client
@@ -231,10 +232,9 @@ const Helpers = {
       operation.promise()
         .then((final) => {
           console.log("so what is this anyways?", final)
-          const [response, longRunningRecognizeMetadata, data] = final
+          const [response, longRunningRecognizeMetadata, responseData] = final
           
-          console.log(data, typeof data)
-          return Helpers.handleTranscriptResults(data, response.results, data.name)
+          return Helpers.handleTranscriptResults(data, response.results, responseData.name)
         })
         .then(() => {
           console.log("all done?")
@@ -294,8 +294,8 @@ const Helpers = {
       .collection("transcripts").doc(docName);
 
     // set results into firestore
-    await docRef.set({
-      base64Start,
+    // lodash stuff removes empty keys , which firestore refuses to store
+    await docRef.set(Object.assign({
       createdAt: timestamp,
       filename,
       fileType,
@@ -305,7 +305,8 @@ const Helpers = {
       // array of objects with single key: "alternatives" which is array as well
       // need to convert to objects or arrays only, can't do other custom types like "SpeechRecognitionResult"
       utterances: JSON.parse(JSON.stringify(results)),
-    });
+    }, base64Start ? {base64Start} : {}));
+      
   
     console.log("results: ", results)
     const transcription = results
