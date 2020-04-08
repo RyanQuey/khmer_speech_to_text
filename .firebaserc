@@ -1,5 +1,6 @@
 {
   "projects": {
-    "develop": "khmer-speech-to-text"
+    "develop": "khmer-speech-to-text",
+    "default": "khmer-speech-to-text"
   }
 }

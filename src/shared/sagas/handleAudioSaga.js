@@ -6,8 +6,6 @@ import {
 }  from 'constants/actionTypes'
 //import { setupSession } from 'lib/socket' // Not using a socket
 import { errorActions, alertActions, userActions } from 'shared/actions'
-import firebase from 'refire/firebase'
-// TODO use firestore instead
 
 // using fetch
 async function postData(url = '', data = {}) {
@@ -36,8 +34,10 @@ function* uploadAudio(action) {
     const file = action.payload
     // TODO since cloud functions are so slow, just don't wait for it, and return success
     // NOTE cloud functions are so slow, not doing alerts, just send out HTTP request and wait for listener to detect results
-    //const response = yield _sendIt(file)
-    const response = _sendIt(file)
+
+    // NOTE No longer sending as base 64, since current quotas that if a file is over one minute, it needs to be uploaded as an entire file and sent in as a URI
+    //const response = _sendBase64(file)
+    const response = _uploadToStorage(file)
     const { data } = response
         // will have to refresh this every hour or it expires, so call this before hitting cloud functions
     // TODO haven't tested
@@ -108,7 +108,7 @@ function* uploadAudio(action) {
 //////////////////////////////
 // HELPERS 
 // takes a file with File web api, converts it to base 64, and sends the base 64 to our cloud functions server which will send it to the Google speech to text API
-async function _sendIt (file) {
+async function _sendBase64 (file) {
   const base64 = await Helpers.getBase64(file); // prints the base64 string
   console.log(" audio file length", file, base64.length)
   // later, can conditionally send large files elsewhere by doing something like: file.size < 1.5*1000
@@ -129,8 +129,40 @@ async function _sendIt (file) {
   return response
 };
 
+async function _uploadToStorage(file) {
+  try {
+    const { user } = store.getState()
+    const path = user.uid
+    const audioName = file.name
+    // Create file metadata including the content type
+    var metadata = {
+      contentType: file.type,
+      customMetadata: {fileLastModified: file.lastModified}
+    };
+
+    const storageRef = firebase.storage().ref()
+    // temporarily upload to storage, will remove once finished transcribing
+    const storagePath = storageRef.child(`audio/${path}/${audioName}`)
+
+    const snapshot = await storagePath.put(file, metadata)
+    const url = snapshot.metadata.downloadURLs[0]
+    console.log("finished uploading to storage; now setting in firestore", path, audioName, url);
+    const docRef = db.collection('users').doc(user.uid).collection("untranscribedUploads")
+    const response = await docRef.add({ 
+      filename: audioName,
+      url,
+      uploadedAt: firebase.firestore.Timestamp.now() // could also try snapshot.timeCreated (or something liek that, google attaches it but I'm not sure if it is file's created At or the upload time)
+    })
+
+    return response
+  
+  } catch (err) {
+    console.error('error uploading to storage: ', err)
+  }
+}
+
 ///////////////////////
 // EXPORTS
-export default function* userSaga() {
+export default function* audioSaga() {
   yield takeLatest(UPLOAD_AUDIO_REQUEST, uploadAudio)
 }

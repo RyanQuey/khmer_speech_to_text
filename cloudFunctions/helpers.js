@@ -136,10 +136,9 @@ const Helpers = {
   },
 
   // returns request body and mutates requestOptions along the way 
-  setupRequest: (req, requestOptions) => {
+  setupRequest: (data, requestOptions) => {
     // TODO doesn't work
-    let fileData = req.file
-    const fileType = req.body.fileType
+    const fileType = data.fileType
     requestOptions.fileType = fileType
     requestOptions.fileExtension = fileType.replace("audio/", "")
     requestOptions[requestOptions.fileExtension] = true
@@ -148,51 +147,37 @@ const Helpers = {
       throw `File type ${requestOptions.fileExtension} is not allowed, only ${fileTypesSentence}`
     }
 
-    const {flac, wav, mp3, convertToFile, multipleChannels} = requestOptions
+    const {flac, wav, mp3, multipleChannels} = requestOptions
 
-    fileData = req.body.base64
-
-    // just for testing
-    if (convertToFile) {
-      fs.writeFileSync(`/home/ryan/projects/khmer-speech-to-text/temp-audio.${flac ? "flac" : "m4a"}`, Buffer.from(fileData))
-      // if converting to file, not continuing for now because converting to file is only for testing, so don't waste api hits
-      return
-    }
-  
     // The audio file's encoding, sample rate in hertz, and BCP-47 language code
-    let config, audioBytes, content
+    let config, audioBytes, audio
     // TODO set flac, mp3, or base64 dynamically depending on the file received (base64 encoding the file will set it with a header which states the filetype)
+    if (data.filePath) {
+      // is in google cloud storage
+
+      audio = {
+        uri: `gs://khmer-speech-to-text.appspot.com/${data.filePath}`
+      }
+
+      // if no data.fileUri, then there should just be base64
+    } else {
+      audio = {
+        content: data.base64
+      }
+    }
+
     if (flac) {
-      // not sure if owrks
-      content = fileData
       config = flacConfig;
 
     } else if (wav) {
-      // not sure if owrks
-      content = fileData
       config = wavConfig;
+
     } else if (mp3) {
       // strangely enough, if send base64 of mp3 file, but use flacConfig, returns results like the flac file, but smaller file size. In part, possibly due ot the fact that there is multiple speakers set for flacConfig currently
-      content = fileData
       config = mp3Config;
 
     } else if (Helpers.isBase64(fileData)) {
-      // TODO should never get here...I think
-      content = fileData
-      config = baseConfig
-
-    } else {
-      // NOTE doesn't work
-      // turn it into base64 / linear16
-      // Reads a local audio file and converts it to base64
-      // req.body is a buffer, so read it and send it to base64
-      //
-      // Not sure which one is right
-      // audioBytes = Buffer.from(req.body, 'base64')
-      audioBytes = Buffer.from(req.body)
-      // audioBytes = req.body
-      console.log("not the base64, so making it base64")
-      content = audioBytes.toString("base64")
+      // This is for other audio files...but not sure if we should support anything else
       config = baseConfig
     }
 
@@ -207,13 +192,9 @@ const Helpers = {
       requestOptions.beta = true
     }
 
-    console.log("sending file: ", req.body.filename)
+    console.log("sending file: ", data.filename)
     console.log("sending with config", config)
 
-    // content should be base64 by this point
-    const audio = {
-      content,
-    };
     const request = {
       audio,
       config,
@@ -222,6 +203,7 @@ const Helpers = {
     return request
   },
 
+  // NOTE no longer using, just always doing long running recognize
   isLongFile: (requestPayload) => {
     // base64 for 12 sec file was .length 415820, assuming 60 sec is 5* that, around 2 mil
     // 2:36 mp3 from bible recording (1 Sam 31) is length 834668
@@ -232,17 +214,7 @@ const Helpers = {
     return base64.length > 6*100*1000
   },
 
-  // NOTE not for real transcript handling, will not write results to DB
-  requestRecognize: async (request, options = {}) => {
-    console.log("options here is", options)
-    const theClient = options.beta ? betaClient : client
-    const [response] = await theClient.recognize(request);
-
-    await Helpers.handleTranscriptResults(req, response.results)
-    return response
-  },
-
-  requestLongRunningRecognize: async (request, req, options = {}) => {
+  requestLongRunningRecognize: async (request, data, options = {}) => {
     try {
       console.log("Using Beta client?", !!options.beta)
 
@@ -262,7 +234,7 @@ const Helpers = {
           const [response, longRunningRecognizeMetadata, data] = final
           
           console.log(data, typeof data)
-          return Helpers.handleTranscriptResults(req, response.results, data.name)
+          return Helpers.handleTranscriptResults(data, response.results, data.name)
         })
         .then(() => {
           console.log("all done?")
@@ -290,15 +262,15 @@ const Helpers = {
           console.log("trying again, but with multiple channel configuration.")
           options.multipleChannels = true
           console.log(`Attempt #: ${options.failedAttempts + 1}`)
-          const newRequestData = Helpers.setupRequest(req, options)
-          Helpers.requestLongRunningRecognize(newRequestData, req, options)
+          const newRequestData = Helpers.setupRequest(data, options)
+          Helpers.requestLongRunningRecognize(newRequestData, data, options)
         } else if (error.code == 13) {
           // this is internal error Error while doing a long-running request: Error: 13 INTERNAL
           // not tested TODO
 
           console.log("internal error, so just trying same thing again")
           console.log(`Attempt #: ${options.failedAttempts + 1}`)
-          Helpers.requestLongRunningRecognize(request, req, options)
+          Helpers.requestLongRunningRecognize(request, data, options)
         } else if (error.details == "WAV header indicates an unsupported format.") {
         
           // TODO panic
@@ -309,14 +281,15 @@ const Helpers = {
   },
 
   // maybe in future, store base64. Not necessary for now though, and we're billed by amount of data is stored here, so better not to. There's cheaper ways if we want to do this
-  handleTranscriptResults: async (req, results, transactionName) => {
-    const { user } = req
-    const base64Start = req.body.base64.slice(0, 10)
-    const { fileMetadata, filename, fileType, fileLastModified, fileSize } = req.body
-    // want sorted by base64 so each file is easily grouped, but also timestamped so can support multiple uploads
+  handleTranscriptResults: async (data, results, transactionName) => {
+    const { user } = data
+    const base64Start = data.base64 && data.base64.slice(0, 10)
+    const { filename, fileType, fileLastModified, fileSize } = data
+
+    // want sorted by filename so each file is easily grouped, but also timestamped so can support multiple uploads
     const timestamp = moment().format("YYYYMMDDHHMMss")
     // could also grab the name of the request (its a short-ish unique assigned by Google integer) if ever want to match this to the api call to google
-    const docName = `${base64Start}-at-${timestamp}`
+    const docName = `${filename}-at-${timestamp}`
     const docRef = db.collection('users').doc(user.uid)
       .collection("transcripts").doc(docName);
 
