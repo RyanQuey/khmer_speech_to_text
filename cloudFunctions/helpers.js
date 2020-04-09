@@ -1,4 +1,3 @@
-const fs = require('fs');
 const admin = require('firebase-admin');
 const moment = require("moment");
 // Imports the Google Cloud client library
@@ -7,7 +6,15 @@ const speech = require('@google-cloud/speech');
 const betaSpeech = speech.v1p1beta1;
 const cloudFunctions = require('firebase-functions')
 const _ = require('lodash')
+const spawn = require('child-process-promise').spawn;
+const path = require('path');
+const os = require('os');
+const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
+
+const ffmpeg_static = require('ffmpeg-static');
+console.log("ffmpeg is at", ffmpeg_static)
+
 // required for local development to work with firestore according to https://github.com/firebase/firebase-tools/issues/1363#issuecomment-498364771
 
 // Creates a client
@@ -285,31 +292,25 @@ const Helpers = {
 
   // maybe in future, store base64. Not necessary for now though, and we're billed by amount of data is stored here, so better not to. There's cheaper ways if we want to do this
   handleTranscriptResults: async (data, results, transactionName) => {
-    const { user } = data
     const base64Start = data.base64 && data.base64.slice(0, 10)
     // only has filePath for uploads to storage
-    const { filename, fileType, fileLastModified, fileSize, filePath } = data
+    const { user, filename, fileType, fileLastModified, fileSize, filePath, originalFilePath } = data
 
     // want sorted by filename so each file is easily grouped, but also timestamped so can support multiple uploads
-    const timestamp = moment().format("YYYYMMDDHHMMss")
+    data.createdAt = moment().format("YYYYMMDDHHMMss")
+    // array of objects with single key: "alternatives" which is array as well
+    // need to convert to objects or arrays only, can't do other custom types like "SpeechRecognitionResult"
+    data.utterances = JSON.parse(JSON.stringify(results))
+    data.transactionId = transactionName // best way to ensure a uid for this transcription
+
     // could also grab the name of the request (its a short-ish unique assigned by Google integer) if ever want to match this to the api call to google
-    const docName = `${filename}-at-${timestamp}`
+    const docName = `${filename}-at-${data.createdAt}`
     const docRef = db.collection('users').doc(user.uid)
       .collection("transcripts").doc(docName);
 
     // set results into firestore
     // lodash stuff removes empty keys , which firestore refuses to store
-    await docRef.set(Object.assign({
-      createdAt: timestamp,
-      filename,
-      fileType,
-      fileLastModified,
-      fileSize,
-      transactionId: transactionName, // best way to ensure a uid for this transcription
-      // array of objects with single key: "alternatives" which is array as well
-      // need to convert to objects or arrays only, can't do other custom types like "SpeechRecognitionResult"
-      utterances: JSON.parse(JSON.stringify(results)),
-    }, base64Start ? {base64Start} : {}));
+    await docRef.set(_.pickBy(data, _.identity));
       
   
     console.log("results: ", results)
@@ -323,11 +324,19 @@ const Helpers = {
       // delete file from cloud storage (bucket assigned in the admin initializeApp call)
       const storageRef = admin.storage().bucket()
 
-    console.log("yes delete")
+      console.log("yes delete")
       await storageRef.file(filePath).delete()
     }
 
-    return "all finished"
+    if (originalFilePath) {
+      // delete file from cloud storage (bucket assigned in the admin initializeApp call)
+      const storageRef = admin.storage().bucket()
+
+      console.log("yes delete original too")
+      await storageRef.file(originalFilePath).delete()
+    }
+
+    return
   }, 
 
   handleDbError: (err) => {
@@ -340,6 +349,76 @@ const Helpers = {
   },
 
   isDev,
+
+  // Makes an ffmpeg command return a promise.
+  promisifyCommand: (command) => {
+    return new Promise((resolve, reject) => {
+      command.on('end', resolve).on('error', reject).run();
+    });
+  },
+
+  // based on https://github.com/firebase/functions-samples/blob/master/ffmpeg-convert-audio/functions/index.js
+  makeItFlac: async (data, options = {}) => {
+    try {
+      const {filename, fileType, filePath } = data
+  
+      console.log("try converting file", filename)
+		  if (fileType == "audio/flac") {
+		    console.log('Already a flac.');
+		    return null;
+		  }
+		  
+		  // Download file from bucket.
+		  //const bucket = gcs.bucket(fileBucket);
+      const bucket = admin.storage().bucket()
+		  const tempFilePath = path.join(os.tmpdir(), filename);
+		  // We add a '_output.flac' suffix to target audio file name. That's where we'll upload the converted audio.
+		  const targetTempFileName = filename.replace(/\.[^/.]+$/, '') + '_output.flac';
+		  const targetTempFilePath = path.join(os.tmpdir(), targetTempFileName);
+		  const targetStorageFilePath = path.join(path.dirname(filePath), targetTempFileName);
+		  
+		  await bucket.file(filePath).download({destination: tempFilePath});
+		  console.log('Audio downloaded locally to', tempFilePath);
+		  // Convert the audio to mono channel using FFMPEG.
+		  
+		  let command = ffmpeg(tempFilePath)
+		    .setFfmpegPath(ffmpeg_static)
+		    .format('flac')
+		    .output(targetTempFilePath);
+
+      if (options.forceSingleChannel) {
+        // TODO untested
+		    command = command.audioChannels(1)
+		      .audioFrequency(16000) // not sure if necessary for anything, much less single channel, but google used in their example
+      }
+		  
+		  await Helpers.promisifyCommand(command);
+		  console.log('Output audio created at', targetTempFilePath);
+
+      await bucket.upload(targetTempFilePath, {destination: targetStorageFilePath});
+      console.log('Output audio uploaded to', targetStorageFilePath);
+		  
+		  // Once the audio has been uploaded delete the local file to free up disk space.
+		  fs.unlinkSync(tempFilePath);
+		  fs.unlinkSync(targetTempFilePath);
+
+      data.convertedFileName = targetTempFileName
+      data.originalFileType = fileType
+      data.fileType = "audio/flac"
+      // need both filepath and original file path since need to delete both once we're done
+      data.originalFilePath = filePath
+      data.filePath = targetStorageFilePath
+
+      return
+    } catch (error) {
+      // 
+      console.error("Error flacifying file: ", error);
+      console.log("just try it without flacifying");
+
+    }
+  },
+
+
 }
 
 exports.Helpers = Helpers

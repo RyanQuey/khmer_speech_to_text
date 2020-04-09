@@ -7,12 +7,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser')();
 const cors = require('cors')({origin: true});
 const _ = require('lodash')
-const spawn = require('child-process-promise').spawn;
 const path = require('path');
-const os = require('os');
-const fs = require('fs');
-
-// const fs = require('fs');
 
 const {Helpers} = require("./helpers.js")
 // can do v1 or v1 beta...don't think there's an alpha yet
@@ -52,6 +47,8 @@ app.post('/upload-audio', (req, res, next) => {
 // TODO maybe don't be async since nothing is async anymore?
 async function main(data) {
   try {
+    console.log("flacify it")
+    await Helpers.makeItFlac(data)
 
     const options = _.clone(requestOptions)
     const requestData = Helpers.setupRequest(data, options)
@@ -92,20 +89,19 @@ exports.storageHook = cloudFunctions.storage.object().onFinalize(async (object) 
   const fileBucket = object.bucket; // The Storage bucket that contains the file.
   const filePath = object.name; // File path in the bucket.
   const contentType = object.contentType
-  const fileName = path.basename(filePath);
+  const filename = path.basename(filePath);
 
   // Exit if this is triggered on a file that is not an image.
   if (!contentType.startsWith('audio/')) {
     return console.log('This is not an audio file.');
   }
   
-  console.log("obj", object)
   const data = {
     // google storage path
     filePath, 
     // various metadata
     fileType: contentType,
-    filename: fileName,
+    filename,
     fileLastModified: object.metadata.fileLastModified, 
     fileSize: object.size,
     fileType: contentType, 
@@ -113,14 +109,10 @@ exports.storageHook = cloudFunctions.storage.object().onFinalize(async (object) 
     user: {uid: filePath.split("/")[1]} // from `audio/${uid}/${myfile.flac}`
   }
 
+
   main(data).catch(console.error);
 
 
 
   return "great job"
-  // TODO try this later, once we're converting filetypes to flac
-  //const tempFilePath = path.join(os.tmpdir(), fileName);
-
-  // Once uploaded delete the local file to free up disk space.
-  //return fs.unlinkSync(tempFilePath);
 })

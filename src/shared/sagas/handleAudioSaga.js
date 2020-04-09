@@ -110,7 +110,6 @@ function* uploadAudio(action) {
 // takes a file with File web api, converts it to base 64, and sends the base 64 to our cloud functions server which will send it to the Google speech to text API
 async function _sendBase64 (file) {
   const base64 = await Helpers.getBase64(file); // prints the base64 string
-  console.log(" audio file length", file, base64.length)
   // later, can conditionally send large files elsewhere by doing something like: file.size < 1.5*1000
 
   let response
@@ -146,7 +145,6 @@ async function _uploadToStorage(file) {
 
     const snapshot = await storagePath.put(file, metadata)
     const url = snapshot.metadata.downloadURLs[0]
-    console.log("finished uploading to storage; now setting in firestore", path, audioName, url);
     const docRef = db.collection('users').doc(user.uid).collection("untranscribedUploads")
     const response = await docRef.add({ 
       filename: audioName,
