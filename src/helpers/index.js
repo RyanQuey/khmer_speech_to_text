@@ -158,6 +158,7 @@ let Helpers = {
     return matches
   }, 
 
+  // joins all utterances together
   humanReadableTranscript: (transcript) => {
     const { utterances } = transcript
     console.log("utterances: ", utterances)

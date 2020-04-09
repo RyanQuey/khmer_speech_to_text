@@ -33,7 +33,11 @@ app.post('/upload-audio', (req, res, next) => {
 
   // TODO maybe want to deepclone first
   req.body.user = req.user
-  main(req.body).catch(console.error);
+  main(req.body).catch((error) => {
+    console.error("Error while requesting transcript for audio file: ", error);
+    next(error)
+    return;
+  })
 
   console.log("returning res")
   res.send({
@@ -46,29 +50,20 @@ app.post('/upload-audio', (req, res, next) => {
 // takes req object with keys: body: {}
 // TODO maybe don't be async since nothing is async anymore?
 async function main(data) {
-  try {
-    console.log("flacify it")
-    await Helpers.makeItFlac(data)
+  await Helpers.makeItFlac(data)
 
-    const options = _.clone(requestOptions)
-    const requestData = Helpers.setupRequest(data, options)
+  const options = _.clone(requestOptions)
+  const requestData = Helpers.setupRequest(data, options)
 
-    // Detects speech in the audio file
-    // For now, just always doing long requests, for simplicity in handling
+  // Detects speech in the audio file
+  // For now, just always doing long requests, for simplicity in handling
 
-    // not using await, to avoid timeout. Letting it run async
-		console.log("starting long running recognize")
-    Helpers.requestLongRunningRecognize(requestData, data, options)
+  // not using await, to avoid timeout. Letting it run async
+  console.log("starting long running recognize")
+  Helpers.requestLongRunningRecognize(requestData, data, options)
 
-
-    // not doing anything with returned value
-    return
-
-  } catch (error) {
-    console.error("Error while requesting transcript for audio file: ", error);
-    next(error)
-    return;
-  }
+  // not doing anything with returned value
+  return
 }
 
 
@@ -92,8 +87,8 @@ exports.storageHook = cloudFunctions.storage.object().onFinalize(async (object) 
   const filename = path.basename(filePath);
 
   // Exit if this is triggered on a file that is not an image.
-  if (!contentType.startsWith('audio/')) {
-    return console.log('This is not an audio file.');
+  if (!contentType.startsWith('audio/') && !contentType == 'video/mp4') {
+    return console.log('This is not an audio file or mp4.');
   }
   
   const data = {
@@ -109,10 +104,10 @@ exports.storageHook = cloudFunctions.storage.object().onFinalize(async (object) 
     user: {uid: filePath.split("/")[1]} // from `audio/${uid}/${myfile.flac}`
   }
 
-
-  main(data).catch(console.error);
-
-
+  main(data).catch((error) => {
+    console.error("Error while requesting transcript for audio file in storage hook: ", error);
+    return;
+  })
 
   return "great job"
 })

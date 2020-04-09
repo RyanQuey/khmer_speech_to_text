@@ -13,7 +13,6 @@ const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
 
 const ffmpeg_static = require('ffmpeg-static');
-console.log("ffmpeg is at", ffmpeg_static)
 
 // required for local development to work with firestore according to https://github.com/firebase/firebase-tools/issues/1363#issuecomment-498364771
 
@@ -32,7 +31,6 @@ const fileTypesSentence = FILE_TYPES.slice(0, FILE_TYPES.length - 1).join(', ') 
 
 // Setup firebase admin sdk
 const isDev = cloudFunctions.config().app.env == "DEVELOPMENT"
-console.log("is dev?", isDev)
 let db 
 if (isDev) {
   // I think don't need the cloud env vars? Just the credential set? 
@@ -91,7 +89,6 @@ const Helpers = {
 // `Authorization: Bearer <Firebase ID Token>`.
 // when decoded successfully, the ID Token content will be added as `req.user`.
   validateFirebaseIdToken: async (req, res, next) => {
-    console.log('Check if request is authorized with Firebase ID token');
 
     if ((!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) &&
         !(req.cookies && req.cookies.__session)) {
@@ -105,23 +102,19 @@ const Helpers = {
 
     let idToken;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-      console.log('Found "Authorization" header');
       // Read the ID Token from the Authorization header.
       idToken = req.headers.authorization.split('Bearer ')[1];
     } else if(req.cookies) {
-      console.log('Found "__session" cookie');
       // Read the ID Token from cookie.
       idToken = req.cookies.__session;
     } else {
       // No cookie
-      console.log('No bearer token or cookie');
       res.status(403).send('Unauthorized');
       return;
     }
 
     try {
       const decodedIdToken = await admin.auth().verifyIdToken(idToken);
-      console.log('ID Token correctly decoded');
       req.user = decodedIdToken;
 
       // NOTE right now don't care if email is verified
@@ -221,7 +214,6 @@ const Helpers = {
     // play it safe, just do long running if more than 600,000
     const base64 = requestPayload.audio.content
 
-    console.log("length", base64.length)
     return base64.length > 6*100*1000
   },
 
@@ -241,7 +233,6 @@ const Helpers = {
       //const [response] = await operation.promise();
       operation.promise()
         .then((final) => {
-          console.log("so what is this anyways?", final)
           const [response, longRunningRecognizeMetadata, responseData] = final
           
           return Helpers.handleTranscriptResults(data, response.results, responseData.name)
@@ -362,11 +353,13 @@ const Helpers = {
     try {
       const {filename, fileType, filePath } = data
   
-      console.log("try converting file", filename)
-		  if (fileType == "audio/flac") {
-		    console.log('Already a flac.');
+		  //if (fileType !== "audio/flac") {
+		  if (fileType !== "video/mp4") {
+        // only converting mp4's right now, but just change this and you can
+		    console.log('not converting to a flac.');
 		    return null;
 		  }
+      console.log("flacify it", filename)
 		  
 		  // Download file from bucket.
 		  //const bucket = gcs.bucket(fileBucket);
@@ -383,15 +376,26 @@ const Helpers = {
 		  
 		  let command = ffmpeg(tempFilePath)
 		    .setFfmpegPath(ffmpeg_static)
-		    .format('flac')
 		    .output(targetTempFilePath);
 
-      if (options.forceSingleChannel) {
-        // TODO untested
-		    command = command.audioChannels(1)
-		      .audioFrequency(16000) // not sure if necessary for anything, much less single channel, but google used in their example
+      if (fileType.includes("video/mp4")) {
+        // equivalent of doing -vn flag
+        command = command
+          .withNoVideo()
+          .audioCodec('flac') // equivalent of doing -acodec copy
+
+      } else {
+        // changing audio file to flac
+		    command = command.format('flac')
+
+        if (options.forceSingleChannel) {
+          // TODO untested
+		      command = command
+            .audioChannels(1)
+		        .audioFrequency(16000) // not sure if necessary for anything, much less single channel, but google used in their example
+        }
       }
-		  
+
 		  await Helpers.promisifyCommand(command);
 		  console.log('Output audio created at', targetTempFilePath);
 
