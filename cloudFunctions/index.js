@@ -12,7 +12,7 @@ const path = require('path');
 const {Helpers} = require("./helpers.js")
 // can do v1 or v1 beta...don't think there's an alpha yet
 const apis = ["v1", "v1p1beta"]
-const requestOptions = {
+const REQUEST_OPTIONS = {
   // maybe better to ask users to stop doing multiple channels, unless it actually helps
   multipleChannels: false, 
   api: apis[1],
@@ -49,18 +49,20 @@ app.post('/upload-audio', (req, res, next) => {
 
 // takes req object with keys: body: {}
 // TODO maybe don't be async since nothing is async anymore?
-async function main(data) {
-  await Helpers.makeItFlac(data)
+async function main(data, options = {}) {
+  if (!options.noFileConversion) {
+    await Helpers.makeItFlac(data)
+  }
 
-  const options = _.clone(requestOptions)
-  const requestData = Helpers.setupRequest(data, options)
+  const requestOptions = _.clone(REQUEST_OPTIONS)
+  const requestData = Helpers.setupRequest(data, requestOptions)
 
   // Detects speech in the audio file
   // For now, just always doing long requests, for simplicity in handling
 
   // not using await, to avoid timeout. Letting it run async
   console.log("starting long running recognize")
-  Helpers.requestLongRunningRecognize(requestData, data, options)
+  Helpers.requestLongRunningRecognize(requestData, data, requestOptions)
 
   // not doing anything with returned value
   return

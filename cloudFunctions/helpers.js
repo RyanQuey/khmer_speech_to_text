@@ -263,8 +263,9 @@ const Helpers = {
           console.log("trying again, but with multiple channel configuration.")
           options.multipleChannels = true
           console.log(`Attempt #: ${options.failedAttempts + 1}`)
-          const newRequestData = Helpers.setupRequest(data, options)
-          Helpers.requestLongRunningRecognize(newRequestData, data, options)
+          const newRequest = Helpers.setupRequest(data, options)
+          Helpers.requestLongRunningRecognize(newRequest, data, options)
+
         } else if (error.code == 13) {
           // this is internal error Error while doing a long-running request: Error: 13 INTERNAL
           // not tested TODO

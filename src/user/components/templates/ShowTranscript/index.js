@@ -25,9 +25,10 @@ class ShowTranscript extends Component {
     const { params } = this.props.match
     const { transcriptIdentifier } = params
     // TODO move all this into helper and thin into willreceiveProps so it updates on page change and when transcripts get loaded
-    const {filename, lastModified} = Helpers.getTranscriptDataFromParam(transcriptIdentifier)
+    const {encodedFileName, lastModified} = Helpers.getTranscriptDataFromParam(transcriptIdentifier)
+    console.log("filename", encodedFileName, lastModified)
     const { transcripts } = this.props
-    const matchingTranscripts = Helpers.matchingTranscripts(transcripts, filename, lastModified)
+    const matchingTranscripts = Helpers.matchingTranscripts(transcripts, encodedFileName, lastModified)
     // TODO will delete old records and select current one by transcactionId
     const currentTranscriptObj = matchingTranscripts.pop()
     console.log("tr", currentTranscriptObj, "mtchs", matchingTranscripts)

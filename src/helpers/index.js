@@ -115,10 +115,14 @@ let Helpers = {
   // If a single file has been uploaded multiple times, will eventually show a list of versions on the side somewhere, which the user can select, but just start by default by showing the last created transcript. TODO
   transcriptUrl: (transcript) => {
     // get rid of stuff react router doesn't like, ie., especially periods
-    const encodedFilename = encodeURIComponent(transcript.filename).replace(/\./g, '');
+    const encodedFilename = Helpers.getEncodedFilename(transcript)
 
     return `/transcripts/${encodedFilename}-lastModified${transcript.fileLastModified}`
   },
+
+  getEncodedFilename: (transcript) => (
+    encodeURIComponent(transcript.filename.replace(/\./g, ''))
+  ),
 
   // make a mock transcript object based on the file, selecting keys based on what the transcript will have
   transcriptUrlForFile: (file) => (
@@ -135,23 +139,18 @@ let Helpers = {
     // filename is param minus the lastModified suffix
     const encodedFileName = transcriptIdentifier.replace(lastModifiedMatch, "")
     // filename was encoded before being the url, so decode it now to get actual filename
-    let filename = decodeURIComponent(encodedFileName)
-    // add the period back in before fileextension
-    const extensionRegEx = new RegExp(`(${FILE_TYPES.join("|")})$`, 'i')
-    console.log("split", filename.split(extensionRegEx), "orig", filename, "regex", extensionRegEx)
-    filename = _.initial(filename.split(extensionRegEx)).join(".")
 
     const lastModified = lastModifiedMatch.replace("-lastModified", "")
-    console.log("name ", filename, "lm: ", lastModified)
+    console.log("name ", encodedFileName, "lm: ", lastModified)
 
-    return {lastModified, filename}
+    return {lastModified, encodedFileName}
   },
 
-  matchingTranscripts: (transcripts, filename, lastModified) => {
+  matchingTranscripts: (transcripts, encodedFileName, lastModified) => {
     const transcriptsArr = _.values(transcripts)
     const matches = transcriptsArr ? 
       transcriptsArr.filter(transcript => (
-        transcript.filename == filename && transcript.fileLastModified == lastModified
+        Helpers.getEncodedFilename(transcript) == encodedFileName && transcript.fileLastModified == lastModified
       ))
     : []
 
