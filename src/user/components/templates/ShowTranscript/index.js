@@ -9,6 +9,7 @@ import {
   withRouter,
 } from "react-router-dom";
 import { TranscriptPicker } from 'user/components/partials'
+import Transcript from 'models/Transcript'
 
 //shows up as buttons in mobile, or sidebar in browser?
 //used in channels and send
@@ -28,15 +29,17 @@ class ShowTranscript extends Component {
     const {encodedFileName, lastModified} = Helpers.getTranscriptDataFromParam(transcriptIdentifier)
     console.log("filename", encodedFileName, lastModified)
     const { transcripts } = this.props
+
     const matchingTranscripts = Helpers.matchingTranscripts(transcripts, encodedFileName, lastModified)
-    // TODO will delete old records and select current one by transcactionId
-    const currentTranscriptObj = matchingTranscripts.pop()
-    console.log("tr", currentTranscriptObj, "mtchs", matchingTranscripts)
-    if (!currentTranscriptObj) {
+
+    // TODO will hide old records and select current one by transcactionId, rather than array order which is unreliable
+    const transcript = matchingTranscripts.pop()
+    console.log("showing transcript: ", transcript, "but all matches include:", matchingTranscripts)
+    if (!transcript) {
       return <Spinner />
     }
-    //const transcript = Transcript.new(currentTranscriptObj)
-    const transcript = currentTranscriptObj
+
+    console.log("transcript", transcript)
 
     return (
       <Flexbox direction="column" >
@@ -45,7 +48,7 @@ class ShowTranscript extends Component {
           <div>
             <Flexbox direction="column" justify="center" className={classes.textEditor}>
               <div>
-                {false && Helpers.humanReadableTranscript(transcript)}
+                {false && transcript.humanReadableTranscription()}
                 {transcript.utterances.map(utterance => 
                   <div title={utterance.alternatives.length > 1 ? `Alternatively, perhaps should be: ${utterance.alternatives.slice(1).map(a => a.transcript).join(" OR POSSIBLY ")}` : "No alternatives provided"}>
                     {utterance.alternatives[0].transcript}
@@ -58,17 +61,14 @@ class ShowTranscript extends Component {
                 <h3>File Data:</h3>
                 
                 <div>
-                  Created At: {moment(transcript.createdAt, "YYYYMMDDHHMMss").tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))}
+                  Created At: {transcript.displayCreatedAt()}
                 </div>
                 <div>
-                  Last Modified: {moment(parseInt(transcript.fileLastModified)).tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))}
+                  Last Modified: {transcript.displayFileLastModified()}
                 </div>
                 <div>
-                  {(transcript.fileSize / 1048576).toFixed(2)} MB
+                  {transcript.displayFileSize()}
                 </div>
-                {false && <div>
-                  Base64 Starts with: {transcript.base64Start || ""}
-                </div>}
               </Flexbox>
             </Flexbox>
 

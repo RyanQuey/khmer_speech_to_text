@@ -10,6 +10,7 @@ import {
 import {
   newAlert
 } from 'shared/actions/alerts'
+import Transcript from 'models/Transcript'
 
 // TODO import from a constants file shared with cloud functions folder for consistency (?)
 const FILE_TYPES = ["flac", "mp3", "wav"] 
@@ -113,17 +114,6 @@ let Helpers = {
 
   // each transcript will be name spaced by file name and last modified date.
   // If a single file has been uploaded multiple times, will eventually show a list of versions on the side somewhere, which the user can select, but just start by default by showing the last created transcript. TODO
-  transcriptUrl: (transcript) => {
-    // get rid of stuff react router doesn't like, ie., especially periods
-    const encodedFilename = Helpers.getEncodedFilename(transcript)
-
-    return `/transcripts/${encodedFilename}-lastModified${transcript.fileLastModified}`
-  },
-
-  getEncodedFilename: (transcript) => (
-    encodeURIComponent(transcript.filename.replace(/\./g, ''))
-  ),
-
   // make a mock transcript object based on the file, selecting keys based on what the transcript will have
   transcriptUrlForFile: (file) => (
     Helpers.transcriptUrl({
@@ -141,44 +131,35 @@ let Helpers = {
     // filename was encoded before being the url, so decode it now to get actual filename
 
     const lastModified = lastModifiedMatch.replace("-lastModified", "")
-    console.log("name ", encodedFileName, "lm: ", lastModified)
 
     return {lastModified, encodedFileName}
   },
 
   // looks for match based on filename and file last modified time
   matchingTranscripts: (transcripts, encodedFileName, lastModified) => {
-    const transcriptsArr = _.values(transcripts)
+    const transcriptsArr = _.values(transcripts).map(t => new Transcript(t))
     console.log("looking for encoded file name", encodedFileName)
     console.log("and time", lastModified)
     const matches = transcriptsArr ? 
       transcriptsArr.filter(transcript => {
-        let encodedTranscriptFilename = Helpers.getEncodedFilename(transcript)
+        let encodedTranscriptFilename = transcript.encodedFilename()
+        console.log("is this a match?", transcript)
+        console.log(encodedTranscriptFilename, transcript.filename)
+        console.log("decoded is", decodeURIComponent(encodedTranscriptFilename))
+        console.log(transcript.fileLastModified)
 
         return (
           [
             encodedTranscriptFilename, 
             decodeURIComponent(encodedTranscriptFilename), // for when filename includes Khmer, this is required
           ].includes(encodedFileName)
-        ) && transcript.fileLastModified == lastModified
+        ) && transcript.fileLastModified == parseInt(lastModified)
       })
     : []
 
     return matches
   }, 
 
-  // joins all utterances together
-  humanReadableTranscript: (transcript) => {
-    const { utterances } = transcript
-    console.log("utterances: ", utterances)
-    const transcription = utterances
-      .map(utterance => utterance.alternatives[0].transcript)
-      .join('\n');
-    console.log(`Transcription: ${transcription}`);
-
-    return transcription
-  },
-  
 }
 
 // for adding more helper files to this one

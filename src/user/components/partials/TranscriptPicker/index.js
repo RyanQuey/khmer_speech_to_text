@@ -5,8 +5,7 @@ import { withRouter } from 'react-router-dom'
 import { userActions, errorActions } from 'shared/actions'
 import { Button, Flexbox, Input } from 'shared/components/elements'
 import { SET_CURRENT_TRANSCRIPT } from 'constants/actionTypes'
-
-
+import Transcript from 'models/Transcript'
 import classes from './style.scss'
 
 // TODO migrate over to cards, so is more mobile friendly by default and it's still easy to show lots of different kinds of information without being too crowded
@@ -19,11 +18,12 @@ class TranscriptPicker extends Component {
 
   viewTranscript (transcript, e) {
     this.props.setTranscript(transcript)
-    this.props.history.push(Helpers.transcriptUrl(transcript))
+    this.props.history.push(transcript.showViewUrl())
   }
 
   render() {
-    const { pickable, transcripts } = this.props
+    const { pickable } = this.props
+    const transcripts = _.values(this.props.transcripts).map(t => new Transcript(t))
 
     //TODO: set the title using props into the modal container
     return (
@@ -36,24 +36,20 @@ class TranscriptPicker extends Component {
           <th>File Size</th>
           <th></th>
         </tr>
-        {transcripts && Object.keys(transcripts).map((transcriptId) => {
-          const transcript = transcripts[transcriptId]
+        {transcripts.map((transcript) => {
           return (
-            <tr key={transcriptId}>
+            <tr key={transcript.transactionId}>
               <td>
                 {transcript.filename}
               </td>
               <td>
-                {transcript.createdAt.includes("Z") ? 
-                  moment.tz(parseInt(transcript.createdAt, "YYYYMMDDHHMMssZ").tz(moment.tz.guess()).format('MMMM Do YYYY, h:mm:ss a'))
-                  : moment(transcript.createdAt, "YYYYMMDDHHMMss").format('MMMM Do YYYY, h:mm:ss a')
-                }
+                {transcript.displayCreatedAt()}
               </td>
               <td>
-                {moment(parseInt(transcript.fileLastModified)).tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))}
+                {transcript.displayFileLastModified()}
               </td>
               <td>
-                {(transcript.fileSize / 1048576).toFixed(2)} MB
+                {transcript.displayFileSize()}
               </td>
               <td>
                 {pickable && <button onClick={this.viewTranscript.bind(this, transcript)}>View</button>}

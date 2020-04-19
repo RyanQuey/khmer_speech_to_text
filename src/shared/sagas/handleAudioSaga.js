@@ -160,7 +160,8 @@ async function _uploadToStorage(file) {
     const fileMetadata = { 
       filename: audioName,
       file_path: filePath,
-      uploaded_at: firebase.firestore.Timestamp.now(), // could also try snapshot.timeCreated (or something liek that, google attaches it but I'm not sure if it is file's created At or the upload time)
+      // format like this: "2020-04-19T06:16:20.840Z"
+      uploaded_at: snapshot.metadata.timeCreated, 
       file_last_modified: fileLastModified,
       content_type: contentType,
       file_size: file.size,
