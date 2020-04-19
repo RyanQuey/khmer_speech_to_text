@@ -25,9 +25,6 @@ class AccountSettings extends Component {
     this.updateUserSettings = this.updateUserSettings.bind(this)
   }
 
-  componentWillMount() {
-  }
-
   togglePending(value = !this.state.pending) {
     this.setState({pending: value})
   }

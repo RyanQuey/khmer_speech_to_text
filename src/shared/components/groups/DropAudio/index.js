@@ -13,7 +13,7 @@ class DropAudio extends Component {
 
     this.state = {
       pending: false,
-      maxSize: 10*1000*1000, // 10 MB ish// TODO what is good max?
+      maxSize: 100*1000*1000, // 10 MB ish// TODO what is good max?
     }
     this.styles = StyleSheet.create({
       dropzone: {
@@ -40,13 +40,14 @@ class DropAudio extends Component {
       
       let message
       if (rejectedFile.size > this.state.maxSize) { 
-        message = "Maximum file size is 10MB"
+        message = "Maximum file size is 100MB"
       } else if (!rejectedFile.type.includes("audio/")) {
         message = "File must be an audio"
       } else {
         message = "Unknown error"
       }
 
+      alertActions.closeAlerts() 
       alertActions.newAlert({
         title: "Failed to upload:",
         message: message,

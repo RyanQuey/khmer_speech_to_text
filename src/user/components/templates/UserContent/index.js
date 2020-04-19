@@ -20,8 +20,8 @@ class UserContent extends Component {
     return (
       <main>
         <Flexbox className={classes.rightColumn} direction="column">
-          {alerts && !modalOpen && alerts.map((alert) => {
-            return <Alert alert={alert} />
+          {alerts && !modalOpen && alerts.map((alert, i) => {
+            return <Alert alert={alert} key={i} />
           })}    
 
           <Switch>

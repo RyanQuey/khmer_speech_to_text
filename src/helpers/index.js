@@ -115,12 +115,13 @@ let Helpers = {
   // each transcript will be name spaced by file name and last modified date.
   // If a single file has been uploaded multiple times, will eventually show a list of versions on the side somewhere, which the user can select, but just start by default by showing the last created transcript. TODO
   // make a mock transcript object based on the file, selecting keys based on what the transcript will have
-  transcriptUrlForFile: (file) => (
-    Helpers.transcriptUrl({
+  transcriptUrlForFile: (file) => {
+    const t = new Transcript({
       filename: file.name, 
-      fileLastModified: file.lastModified
+      file_last_modified: file.lastModified
     })
-  ),
+    return t.showViewUrl()
+  },
 
   getTranscriptDataFromParam: (transcriptIdentifier) => {
     const lastModifiedRegex = /.+(-lastModified[0-9]+)$/

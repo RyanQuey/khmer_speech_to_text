@@ -49,6 +49,7 @@ function* uploadAudio(action) {
     console.log("moving on...!")
 
     yield put({type: UPLOAD_AUDIO_SUCCESS, payload: fileMetadata})
+    alertActions.closeAlerts()
     alertActions.newAlert({
       //title: response.data.transcription,
       title: "Now creating transcript, please wait",

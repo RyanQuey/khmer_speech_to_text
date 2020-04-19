@@ -14,7 +14,7 @@ import { errorActions, userActions } from 'shared/actions'
 
 class App extends Component {
   // make sure runs first, or login/signup currently will just do login, will never start at signup due to race conditions
-  componentWillMount() {
+  componentDidMount() {
     //extract the query string
     const query = this.props.location.search
     //right now, this is only returning user and provider
