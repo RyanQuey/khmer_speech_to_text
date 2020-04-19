@@ -82,6 +82,8 @@ exports.test = cloudFunctions.https.onRequest((req, res) => {
 });
 
 // for transcribing uploaded files
+// NOTE works ok, but stopped using it because too slow and hard to debug or do much with. Wanted a more robust api
+/* 
 exports.storageHook = cloudFunctions.storage.object().onFinalize(async (object) => {
   const fileBucket = object.bucket; // The Storage bucket that contains the file.
   const filePath = object.name; // File path in the bucket.
@@ -115,3 +117,4 @@ exports.storageHook = cloudFunctions.storage.object().onFinalize(async (object) 
 
   return "great job"
 })
+*/
