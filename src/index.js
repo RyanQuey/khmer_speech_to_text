@@ -9,7 +9,7 @@ import {
 } from 'react-router-dom'
 import watch from 'redux-watch'
 import _ from 'lodash'
-import moment from 'moment'
+import moment from 'moment-timezone'
 
 import firebase from 'firebase'
 require("firebase/firestore");
@@ -36,7 +36,9 @@ window.$ = jQuery
 
 // to hit the cloud func server
 // NOTE make sure that the local server isn't running on hostname that includes "khmer-speech-to-text" 
-window.endpoint = window.location.hostname.includes("khmer-speech-to-text") ? "https://us-central1-khmer-speech-to-text.cloudfunctions.net" : `http://${window.location.hostname}:5000/khmer-speech-to-text/us-central1`
+// window.endpoint = window.location.hostname.includes("khmer-speech-to-text") ? "https://us-central1-khmer-speech-to-text.cloudfunctions.net" : `http://${window.location.hostname}:5000/khmer-speech-to-text/us-central1`
+// For when using python api
+window.endpoint = window.location.hostname.includes("khmer-speech-to-text-api.herokuapp.com") ? "https://khmer-speech-to-text-api.herokuapp.com/" : `http://${window.location.hostname}:5000`
 const axiosInstance = axios.create({
   baseURL: endpoint,
   //timeout: 10*1000, // 10 sec. for longer operations, poll it instead of leaving it open

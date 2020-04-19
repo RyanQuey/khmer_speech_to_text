@@ -37,13 +37,18 @@ function* uploadAudio(action) {
 
     // NOTE No longer sending as base 64, since current quotas that if a file is over one minute, it needs to be uploaded as an entire file and sent in as a URI
     //const response = _sendBase64(file)
-    const response = _uploadToStorage(file)
-    const { data } = response
-        // will have to refresh this every hour or it expires, so call this before hitting cloud functions
+
+    // will have to refresh this every hour or it expires, so call this before hitting cloud functions
     // TODO haven't tested
     yield userActions.setBearerToken()
 
-    yield put({type: UPLOAD_AUDIO_SUCCESS, payload: data})
+    // TODO secure storage so requires bearer token
+    const fileMetadata = yield _uploadToStorage(file)
+    console.log("hit that endpoint!", fileMetadata)
+    yield axios.post("/request-transcribe/", fileMetadata)
+    console.log("moving on...!")
+
+    yield put({type: UPLOAD_AUDIO_SUCCESS, payload: fileMetadata})
     alertActions.newAlert({
       //title: response.data.transcription,
       title: "Now creating transcript, please wait",
@@ -132,27 +137,40 @@ async function _uploadToStorage(file) {
   try {
     const { user } = store.getState()
     const path = user.uid
+    const fileLastModified = file.lastModified
     const audioName = file.name
+    const contentType = file.type
     // Create file metadata including the content type
     var metadata = {
-      contentType: file.type,
-      customMetadata: {fileLastModified: file.lastModified}
+      contentType,
+      customMetadata: {fileLastModified}
     };
 
     const storageRef = firebase.storage().ref()
     // temporarily upload to storage, will remove once finished transcribing
-    const storagePath = storageRef.child(`audio/${path}/${audioName}`)
+    const filePath = `audio/${path}/${audioName}`
+    const storagePath = storageRef.child(filePath)
 
     const snapshot = await storagePath.put(file, metadata)
-    const url = snapshot.metadata.downloadURLs[0]
-    const docRef = db.collection('users').doc(user.uid).collection("untranscribedUploads")
-    const response = await docRef.add({ 
-      filename: audioName,
-      url,
-      uploadedAt: firebase.firestore.Timestamp.now() // could also try snapshot.timeCreated (or something liek that, google attaches it but I'm not sure if it is file's created At or the upload time)
-    })
 
-    return response
+    // TODO move this to api server, so it's all done at once
+    const docRef = db.collection('users').doc(user.uid).collection("untranscribedUploads")
+
+    // build out object to send for request to transcribe
+    const fileMetadata = { 
+      filename: audioName,
+      file_path: filePath,
+      uploaded_at: firebase.firestore.Timestamp.now(), // could also try snapshot.timeCreated (or something liek that, google attaches it but I'm not sure if it is file's created At or the upload time)
+      file_last_modified: fileLastModified,
+      content_type: contentType,
+      file_size: file.size,
+      user_id: user.uid,
+    }
+
+    const response = await docRef.add(fileMetadata)
+    console.log("response from adding to firestore:", response)
+
+    return fileMetadata
   
   } catch (err) {
     console.error('error uploading to storage: ', err)

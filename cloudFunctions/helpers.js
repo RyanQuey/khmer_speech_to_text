@@ -1,5 +1,5 @@
 const admin = require('firebase-admin');
-const moment = require("moment");
+const moment = require("moment-timezone");
 // Imports the Google Cloud client library
 // TODO consider hitting the api directly, might be able to do all in the browser
 const speech = require('@google-cloud/speech');
@@ -289,7 +289,8 @@ const Helpers = {
     const { user, filename, fileType, fileLastModified, fileSize, filePath, originalFilePath } = data
 
     // want sorted by filename so each file is easily grouped, but also timestamped so can support multiple uploads
-    data.createdAt = moment().format("YYYYMMDDHHMMss")
+    // set it and clearly but simply mark as UTC (single letter Z)
+    data.createdAt = moment.utc().format("YYYYMMDDHHMMss[Z]")
     // array of objects with single key: "alternatives" which is array as well
     // need to convert to objects or arrays only, can't do other custom types like "SpeechRecognitionResult"
     data.utterances = JSON.parse(JSON.stringify(results))
@@ -303,15 +304,17 @@ const Helpers = {
     // set results into firestore
     // lodash stuff removes empty keys , which firestore refuses to store
     await docRef.set(_.pickBy(data, _.identity));
-      
   
+    // Some logging stuff
     console.log("results: ", results)
     const transcription = results
       .map(result => result.alternatives[0].transcript)
       .join('\n');
     console.log(`Transcription: ${transcription}`);
 
-    console.log("delete?")
+    // cleanup storage and db records
+    // TODO add error handling if fail to delete, so that it is marked as not deleted. Perhaps a separate try/catch so we know this is what fails, and not something after.
+    // Or alternatively, something that tracks each step and marks the last completed step so we know where something stopped and can pick it up later/try again later
     if (filePath) {
       // delete file from cloud storage (bucket assigned in the admin initializeApp call)
       const storageRef = admin.storage().bucket()
@@ -327,6 +330,10 @@ const Helpers = {
       console.log("yes delete original too")
       await storageRef.file(originalFilePath).delete()
     }
+
+    // mark upload as finished transcribing
+    const untranscribedUploadsRef = db.collection('users').doc(user.uid).collection("untranscribedUploads")
+    const response = await untranscribedUploadsRef.delete()
 
     return
   }, 
@@ -350,6 +357,7 @@ const Helpers = {
   },
 
   // based on https://github.com/firebase/functions-samples/blob/master/ffmpeg-convert-audio/functions/index.js
+  // TODO might be better in the future, for more flexibility and ease of use, to just use ffmpeg-static and bash code rather than a wrapper, so can write exactly as it would be in the command line
   makeItFlac: async (data, options = {}) => {
     try {
       const {filename, fileType, filePath } = data

@@ -44,10 +44,13 @@ class TranscriptPicker extends Component {
                 {transcript.filename}
               </td>
               <td>
-                {moment(transcript.createdAt, "YYYYMMDDHHMMss").format()}
+                {transcript.createdAt.includes("Z") ? 
+                  moment.tz(parseInt(transcript.createdAt, "YYYYMMDDHHMMssZ").tz(moment.tz.guess()).format('MMMM Do YYYY, h:mm:ss a'))
+                  : moment(transcript.createdAt, "YYYYMMDDHHMMss").format('MMMM Do YYYY, h:mm:ss a')
+                }
               </td>
               <td>
-                {moment(parseInt(transcript.fileLastModified)).format()}
+                {moment(parseInt(transcript.fileLastModified)).tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))}
               </td>
               <td>
                 {(transcript.fileSize / 1048576).toFixed(2)} MB

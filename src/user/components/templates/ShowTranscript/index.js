@@ -58,20 +58,17 @@ class ShowTranscript extends Component {
                 <h3>File Data:</h3>
                 
                 <div>
-                  {transcript.filename}
+                  Created At: {moment(transcript.createdAt, "YYYYMMDDHHMMss").tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))}
                 </div>
                 <div>
-                  {moment(transcript.createdAt, "YYYYMMDDHHMMss").format()}
-                </div>
-                <div>
-                  {moment(parseInt(transcript.fileLastModified)).format()}
+                  Last Modified: {moment(parseInt(transcript.fileLastModified)).tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))}
                 </div>
                 <div>
                   {(transcript.fileSize / 1048576).toFixed(2)} MB
                 </div>
-                <div>
+                {false && <div>
                   Base64 Starts with: {transcript.base64Start || ""}
-                </div>
+                </div>}
               </Flexbox>
             </Flexbox>
 
