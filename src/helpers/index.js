@@ -146,12 +146,22 @@ let Helpers = {
     return {lastModified, encodedFileName}
   },
 
+  // looks for match based on filename and file last modified time
   matchingTranscripts: (transcripts, encodedFileName, lastModified) => {
     const transcriptsArr = _.values(transcripts)
+    console.log("looking for encoded file name", encodedFileName)
+    console.log("and time", lastModified)
     const matches = transcriptsArr ? 
-      transcriptsArr.filter(transcript => (
-        Helpers.getEncodedFilename(transcript) == encodedFileName && transcript.fileLastModified == lastModified
-      ))
+      transcriptsArr.filter(transcript => {
+        let encodedTranscriptFilename = Helpers.getEncodedFilename(transcript)
+
+        return (
+          [
+            encodedTranscriptFilename, 
+            decodeURIComponent(encodedTranscriptFilename), // for when filename includes Khmer, this is required
+          ].includes(encodedFileName)
+        ) && transcript.fileLastModified == lastModified
+      })
     : []
 
     return matches
