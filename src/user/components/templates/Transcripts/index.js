@@ -8,14 +8,14 @@ import { TranscriptPicker } from 'user/components/partials'
 
 class Transcripts extends Component {
   render() {
-    const { user } = this.props
+    const { user, transcripts } = this.props
     return (
       <div id="Transcript-ctn">
         <div className="menu-ctn">
           <h1>Transcripts</h1>
         </div>
         <TranscriptPicker 
-          transcripts={this.props.transcripts}
+          transcripts={transcripts}
           pickable={true}
         />
       </div>
@@ -31,7 +31,7 @@ Transcripts.propTypes = {
 const mapStateToProps = (state) => {
   return { 
     user: state.user,
-    transcripts: state.transcripts,
+    transcripts: _.values(state.transcripts).map(t => new Transcript(t)),
   }
 }
 

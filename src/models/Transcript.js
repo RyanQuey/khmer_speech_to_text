@@ -41,7 +41,7 @@ class Transcript {
   }
 
   displayCreatedAt () {
-    return moment(parseInt(this.createdAt), "YYYYMMDDHHMMssZ").tz(moment.tz.guess()).format('MMMM Do YYYY, h:mm:ss a') // moment(this.createdAt, "YYYYMMDDTHHMMss").tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))
+    return moment(this.createdAt, "YYYYMMDDTHHmmssZ").tz(moment.tz.guess()).format('MMMM Do YYYY, h:mm:ss a') // moment(this.createdAt, "YYYYMMDDTHHMMss").tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))
   }
   
   displayFileLastModified () {

@@ -79,7 +79,7 @@ class ShowTranscript extends Component {
           <Flexbox>
             <h2>Older transcripts for same file:</h2>
             <TranscriptPicker 
-              transcripts={matchingTranscripts.filter(t => (t !== currentTranscriptObj))}
+              transcripts={matchingTranscripts.filter(t => (t !== transcript))}
               pickable={false}
             />
           </Flexbox>

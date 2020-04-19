@@ -22,8 +22,7 @@ class TranscriptPicker extends Component {
   }
 
   render() {
-    const { pickable } = this.props
-    const transcripts = _.values(this.props.transcripts).map(t => new Transcript(t))
+    const { pickable, transcripts } = this.props
 
     //TODO: set the title using props into the modal container
     return (

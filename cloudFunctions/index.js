@@ -106,6 +106,8 @@ exports.storageHook = cloudFunctions.storage.object().onFinalize(async (object) 
     user: {uid: filePath.split("/")[1]} // from `audio/${uid}/${myfile.flac}`
   }
 
+  // TODO Instead of this will just send this info over to our other api
+  //
   main(data).catch((error) => {
     console.error("Error while requesting transcript for audio file in storage hook: ", error);
     return;
