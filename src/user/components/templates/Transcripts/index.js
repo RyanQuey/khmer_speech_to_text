@@ -5,6 +5,7 @@ import { SignIn } from 'shared/components/partials'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { TranscriptPicker } from 'user/components/partials'
+import Transcript from 'models/Transcript'
 
 class Transcripts extends Component {
   render() {

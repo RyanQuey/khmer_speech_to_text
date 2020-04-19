@@ -4,51 +4,22 @@ import {
   UPLOAD_AUDIO_FAILURE,
   UPLOAD_AUDIO_SUCCESS,
 }  from 'constants/actionTypes'
-//import { setupSession } from 'lib/socket' // Not using a socket
 import { errorActions, alertActions, userActions } from 'shared/actions'
 
-// using fetch
-async function postData(url = '', data = {}) {
-  // Default options are marked with *
-  const response = await fetch(url, {
-    method: 'POST', // *GET, POST, PUT, DELETE, etc.
-    mode: 'cors', // no-cors, *cors, same-origin
-    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-    //credentials: 'same-origin', // include, *same-origin, omit
-    headers: {
-      //'Content-Type': 'application/json'
-      //'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    redirect: 'follow', // manual, *follow, error
-    referrerPolicy: 'no-referrer', // no-referrer, *client
-    //body: JSON.stringify(data) // body data type must match "Content-Type" header
-    body: data // body data type must match "Content-Type" header
-  });
-  return await response.json(); // parses JSON response into native JavaScript objects
-}
-
-// TODO add something that automatically refreshes token or something every so often. Or find some solution for where that's not necessary
 function* uploadAudio(action) {
 
   try {
     const file = action.payload
-    // TODO since cloud functions are so slow, just don't wait for it, and return success
-    // NOTE cloud functions are so slow, not doing alerts, just send out HTTP request and wait for listener to detect results
-
-    // NOTE No longer sending as base 64, since current quotas that if a file is over one minute, it needs to be uploaded as an entire file and sent in as a URI
-    //const response = _sendBase64(file)
-
     // will have to refresh this every hour or it expires, so call this before hitting cloud functions
     // TODO haven't tested
     yield userActions.setBearerToken()
 
     // TODO secure storage so requires bearer token
     const fileMetadata = yield _uploadToStorage(file)
-    console.log("hit that endpoint!", fileMetadata)
     yield axios.post("/request-transcribe/", fileMetadata)
-    console.log("moving on...!")
 
     yield put({type: UPLOAD_AUDIO_SUCCESS, payload: fileMetadata})
+
     alertActions.closeAlerts()
     alertActions.newAlert({
       //title: response.data.transcription,
@@ -154,8 +125,10 @@ async function _uploadToStorage(file) {
 
     const snapshot = await storagePath.put(file, metadata)
 
+    const docName = Helpers.transcriptIdentifierForFile(file)
+
     // TODO move this to api server, so it's all done at once
-    const docRef = db.collection('users').doc(user.uid).collection("untranscribedUploads")
+    const docRef = db.collection('users').doc(user.uid).collection("untranscribedUploads").doc(docName)
 
     // build out object to send for request to transcribe
     const fileMetadata = { 
@@ -169,7 +142,7 @@ async function _uploadToStorage(file) {
       user_id: user.uid,
     }
 
-    const response = await docRef.add(fileMetadata)
+    const response = await docRef.set(fileMetadata)
     console.log("response from adding to firestore:", response)
 
     return fileMetadata

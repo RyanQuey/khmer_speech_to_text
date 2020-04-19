@@ -123,6 +123,15 @@ let Helpers = {
     return t.showViewUrl()
   },
 
+  // TODO make File class too, much better
+  transcriptIdentifierForFile: (file) => {
+    const t = new Transcript({
+      filename: file.name, 
+      file_last_modified: file.lastModified
+    })
+    return t.identifier()
+  },
+
   getTranscriptDataFromParam: (transcriptIdentifier) => {
     const lastModifiedRegex = /.+(-lastModified[0-9]+)$/
     const lastModifiedMatch = transcriptIdentifier.match(lastModifiedRegex)[1]

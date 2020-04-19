@@ -49,8 +49,8 @@ class ShowTranscript extends Component {
             <Flexbox direction="column" justify="center" className={classes.textEditor}>
               <div>
                 {false && transcript.humanReadableTranscription()}
-                {transcript.utterances.map(utterance => 
-                  <div title={utterance.alternatives.length > 1 ? `Alternatively, perhaps should be: ${utterance.alternatives.slice(1).map(a => a.transcript).join(" OR POSSIBLY ")}` : "No alternatives provided"}>
+                {transcript.utterances.map((utterance, i) => 
+                  <div key={i} title={utterance.alternatives.length > 1 ? `Alternatively, perhaps should be: ${utterance.alternatives.slice(1).map(a => a.transcript).join(" OR POSSIBLY ")}` : "No alternatives provided"}>
                     {utterance.alternatives[0].transcript}
                     <hr />
                   </div>
