@@ -5,17 +5,24 @@ import {
   UPLOAD_AUDIO_SUCCESS,
 }  from 'constants/actionTypes'
 import { errorActions, alertActions, userActions } from 'shared/actions'
+import UploadedFile from 'models/UploadedFile'
+
+// TODO rename to audioUploads instead
+// handles the requests to upload file, get untranscribed uploads, and also request transcripts for
+// untranscribed uploads
 
 function* uploadAudio(action) {
 
   try {
     const file = action.payload
-    // will have to refresh this every hour or it expires, so call this before hitting cloud functions
+    const uploadedFile = new UploadedFile({file})
+    // Have to refresh token every hour or it expires, so call this before hitting cloud functions
     // TODO haven't tested
     yield userActions.setBearerToken()
 
     // TODO secure storage so requires bearer token
-    const fileMetadata = yield _uploadToStorage(file)
+    const fileMetadata = yield uploadedFile.uploadToStorage()
+
     yield axios.post("/request-transcribe/", fileMetadata)
 
     yield put({type: UPLOAD_AUDIO_SUCCESS, payload: fileMetadata})
@@ -36,6 +43,7 @@ function* uploadAudio(action) {
     //these are codes from our api
     let errorCode = err && Helpers.safeDataPath(err, "response.data.originalError.code", 500)
     let errorMessage = err && Helpers.safeDataPath(err, "response.data.originalError.message", 500)
+    // TODO probably remove, since we are going to log it earlier in the failure chain
     console.error(errorCode, errorMessage, err && err.response && err.response.data || err);
 
     // TODO fix these (outdated)
@@ -47,26 +55,7 @@ function* uploadAudio(action) {
         options: {timer: false},
       })
 
-    } else if (errorCode === "unregistered-email" ){
-      //not in our api to be accepted
-      alertActions.newAlert({
-        title: "Your account has not been registered in our system: ",
-        message: "Please contact us at hello@growthramp.io to register and then try again.",
-        level: "DANGER",
-        options: {timer: false},
-      })
-
-      // TODO will be different error code at this point
-    } else if (errorCode == "23505" ){ //original error.constraint should be "users_email_unique". Works because there are no other unique constraints sent by this form
-      alertActions.newAlert({
-        title: "Email already exists: ",
-        message: "Please try logging in instead, or reset your password if you have forgotten it.",
-        level: "DANGER",
-        options: {timer: false},
-      })
-
     } else {
-      console.error('Error uploading audio', err)
       errorActions.handleErrors({
         templateName: "UploadAudio",
         templatePart: "form",
@@ -105,52 +94,6 @@ async function _sendBase64 (file) {
   return response
 };
 
-async function _uploadToStorage(file) {
-  try {
-    const { user } = store.getState()
-    const path = user.uid
-    const fileLastModified = file.lastModified
-    const audioName = file.name
-    const contentType = file.type
-    // Create file metadata including the content type
-    var metadata = {
-      contentType,
-      customMetadata: {fileLastModified}
-    };
-
-    const storageRef = firebase.storage().ref()
-    // temporarily upload to storage, will remove once finished transcribing
-    const filePath = `audio/${path}/${audioName}`
-    const storagePath = storageRef.child(filePath)
-
-    const snapshot = await storagePath.put(file, metadata)
-
-    const docName = Helpers.transcriptIdentifierForFile(file)
-
-    // TODO move this to api server, so it's all done at once
-    const docRef = db.collection('users').doc(user.uid).collection("untranscribedUploads").doc(docName)
-
-    // build out object to send for request to transcribe
-    const fileMetadata = { 
-      filename: audioName,
-      file_path: filePath,
-      // format like this: "2020-04-19T06:16:20.840Z"
-      uploaded_at: snapshot.metadata.timeCreated, 
-      file_last_modified: fileLastModified,
-      content_type: contentType,
-      file_size: file.size,
-      user_id: user.uid,
-    }
-
-    const response = await docRef.set(fileMetadata)
-    console.log("response from adding to firestore:", response)
-
-    return fileMetadata
-  
-  } catch (err) {
-    console.error('error uploading to storage: ', err)
-  }
-}
 
 ///////////////////////
 // EXPORTS

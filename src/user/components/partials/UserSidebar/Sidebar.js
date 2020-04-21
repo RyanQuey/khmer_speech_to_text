@@ -23,8 +23,9 @@ class Sidebar extends Component {
         <div className={classes.nav}>
           <ul className={classes.sidebarNav}>
             <MenuItem link="/upload" text="Upload" nav={true} exact={true} icon="bullhorn"/>
-            {false && <MenuItem link="/profile" text="Profile" nav={true} exact={true} icon="bullhorn"/>}
+            {false && <MenuItem link="/profile" text="Profile" nav={true} icon="bullhorn"/>}
             <MenuItem link="/transcripts" text="Transcripts" nav={true} exact={true} icon="bullhorn"/>
+            <MenuItem link="/unfinished-transcripts" text="Unfinished Transcripts" nav={true} icon="bullhorn"/>
           </ul>
         </div>
       </Flexbox>

@@ -18,6 +18,7 @@ import {
   SET_CURRENT_MODAL,
   UPDATE_USER_REQUEST,
   UPDATE_USER_SUCCESS,
+  FETCH_UNTRANSCRIBED_UPLOADS_SUCCESS, 
 }  from 'constants/actionTypes'
 import { USER_FIELDS_TO_PERSIST } from 'constants'
 //import { setupSession } from 'lib/socket' // Not using a socket
@@ -145,6 +146,7 @@ function* signIn(action) {
 }
 
 //for fetching other users
+//NOTE don't use this too much
 function* fetchUser(action, options = {}) {
   try {
     const userData = action.payload
@@ -168,6 +170,7 @@ function* fetchUser(action, options = {}) {
     yield Helpers.notifyOfAPIError(e)
   }
 }
+
 //should only be called on initial login, or retrieving from cookies, etc.
 function* fetchCurrentUser(action) {
   try {
@@ -194,20 +197,42 @@ function* fetchCurrentUser(action) {
     // const mappedTranscripts = transcriptsResult.docs.map(doc => doc.data())
 
     // setup listener so every change to transcripts in firestore is reflected
-    let first = true
     userTranscriptsRef.onSnapshot((snapshot) => { 
       console.log("foudn some transcripts for user", snapshot)
       const mappedTranscripts = snapshot.docs.map(doc => doc.data())
       store.dispatch({type: FETCH_TRANSCRIPTS_SUCCESS, payload: mappedTranscripts})
-      if (first) {
-        alertActions.newAlert({
-          title: "Transcript is ready",
-          level: "SUCCESS",
-          options: {}
-        })
-        first = false
-      }
     })
+
+    // setup listener so changes to uploads and transcriptions that are in process are always up to
+    // date
+    userRef.collection("untranscribedUploads").onSnapshot((snapshot) => { 
+      console.log("foudn some transcripts for user", snapshot)
+      // handle the transcripts themselves
+      const mappedTranscripts = snapshot.docs.map(doc => doc.data())
+      store.dispatch({type: FETCH_UNTRANSCRIBED_UPLOADS_SUCCESS, payload: mappedTranscripts})
+
+      const changes = snapshot.docChanges.map(doc => {
+        const docData = change.doc.data()
+				if (change.type === "added") {
+					console.log("File is uploaded (though that should be known already): ", docData.filename);
+				  // don't do anything yet
+				}
+
+				if (change.type === "modified") {
+					console.log("Status update for: ", docData.filename);
+					console.log("Now status: ", docData.status);
+				}
+
+				if (change.type === "removed") {
+          alertActions.newAlert({
+            title: "Transcript is ready",
+            level: "SUCCESS",
+            options: {}
+          })
+				}
+      })
+    })
+
 
     //no reason to restart the socket here; this event should only occur is already retrieving the user data from the cookie, which means that API token and headers already are set correctly.
     action.cb && action.cb(result.data)

@@ -1,7 +1,4 @@
 {
-  "database": {
-    "rules": "database.rules.json"
-  },
   "functions": {
     "source": "cloudFunctions"
   },
@@ -33,9 +30,6 @@
     },
     "firestore": {
       "port": 8080
-    },
-    "database": {
-      "port": 9000
     },
     "hosting": {
       "port": 3000

@@ -1,3 +1,5 @@
+import { TRANSCRIPTION_STATUSES} from "constants/transcript"
+
 // TODO create model class, with stuff for schema etc
 //class Transcript extends Model {
 // takes transcript from firestore record (uses underscored keys from the api) 
@@ -56,6 +58,7 @@ class Transcript {
   displayFileSize () {
     return `${(this.fileSize / 1048576).toFixed(2)} MB`
   }
+
 }
 
 export default Transcript

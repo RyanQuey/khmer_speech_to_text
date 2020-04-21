@@ -44,6 +44,8 @@ class App extends Component {
         //mostly only gets ran when reloading the page after already logged in
         if (!this.props.user) {
           const userData = Helpers.extractUserData(user)
+          // this gets ran whether just now logged in or logged in before and firebase found hte
+          // cookie, so put hooks for all users there
           this.props.fetchCurrentUserRequest(userData, {findOrCreate: true})
         }
       
