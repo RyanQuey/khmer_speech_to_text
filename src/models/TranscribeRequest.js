@@ -178,6 +178,12 @@ class TranscribeRequest {
     return `${(this.fileSize / 1048576).toFixed(2)} MB`
   }
 
+  // TODO need to make this a lot more robust, variable upon error, error status, last time
+  // transcribeRequest was updated, etc
+  requestable () {
+    return true
+    // return this.status.includes("error")
+  }
 }
 
 export default TranscribeRequest

@@ -24,7 +24,7 @@ class TranscribeRequestPicker extends Component {
   }
 
   render() {
-    const { pickable, transcribeRequests } = this.props
+    const { transcribeRequests } = this.props
 
     //TODO: set the title using props into the modal container
     return (
@@ -53,7 +53,7 @@ class TranscribeRequestPicker extends Component {
                 {transcribeRequest.displayFileSize()}
               </td>
               <td>
-                {pickable && <button onClick={this.requestTranscription.bind(this, transcribeRequest)}>View</button>}
+                {transcribeRequest.requestable() && <button onClick={this.requestTranscription.bind(this, transcribeRequest)}>Resume Transcribing File</button>}
               </td>
             </tr>
           )
