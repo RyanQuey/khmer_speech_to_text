@@ -9,7 +9,7 @@ import formsReducer from './forms'
 import userReducer from './user'
 import viewSettingsReducer from './viewSettings'
 import transcripts from './transcripts'
-import untranscribedUploads from './untranscribedUploads'
+import transcribeRequests from './transcribeRequests'
 
 const rootReducer = combineReducers({
   alerts: alertReducer,
@@ -19,7 +19,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   viewSettings: viewSettingsReducer,
   transcripts,
-  untranscribedUploads, 
+  transcribeRequests, 
 })
 
 const sagaMiddleware = createSagaMiddleware()

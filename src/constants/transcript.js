@@ -1,6 +1,10 @@
 export const TRANSCRIPTION_STATUSES = [
   // the first stage, before this no reason to bother even recording
   // client sets
+  "uploading",
+
+  // finished upload
+  // client sets
   "uploaded",
 
   // when request has been received and accepted by our server, and is processing the file

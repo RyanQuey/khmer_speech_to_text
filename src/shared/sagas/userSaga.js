@@ -18,7 +18,7 @@ import {
   SET_CURRENT_MODAL,
   UPDATE_USER_REQUEST,
   UPDATE_USER_SUCCESS,
-  FETCH_UNTRANSCRIBED_UPLOADS_SUCCESS, 
+  FETCH_TRANSCRIBE_REQUESTS_SUCCESS, 
 }  from 'constants/actionTypes'
 import { USER_FIELDS_TO_PERSIST } from 'constants'
 //import { setupSession } from 'lib/socket' // Not using a socket
@@ -205,13 +205,13 @@ function* fetchCurrentUser(action) {
 
     // setup listener so changes to uploads and transcriptions that are in process are always up to
     // date
-    userRef.collection("untranscribedUploads").onSnapshot((snapshot) => { 
-      console.log("foudn some transcripts for user", snapshot)
+    userRef.collection("transcribeRequests").onSnapshot((snapshot) => { 
+      console.log("foudn some transcribe requests for user", snapshot)
       // handle the transcripts themselves
       const mappedTranscripts = snapshot.docs.map(doc => doc.data())
-      store.dispatch({type: FETCH_UNTRANSCRIBED_UPLOADS_SUCCESS, payload: mappedTranscripts})
+      store.dispatch({type: FETCH_TRANSCRIBE_REQUESTS_SUCCESS, payload: mappedTranscripts})
 
-      const changes = snapshot.docChanges.map(doc => {
+      const changes = snapshot.docChanges.map(change => {
         const docData = change.doc.data()
 				if (change.type === "added") {
 					console.log("File is uploaded (though that should be known already): ", docData.filename);

@@ -13,6 +13,8 @@ import forbidAuthenticated from 'utils/forbidAuthenticated'
 import { connect } from 'react-redux'
 import classes from './style.scss'
 import { formActions } from 'shared/actions'
+import Transcript from 'models/Transcript'
+import TranscribeRequest from 'models/TranscribeRequest'
 
 class UploadAudioForm extends Component {
   constructor(props) {
@@ -21,8 +23,8 @@ class UploadAudioForm extends Component {
     this.cb = this.cb.bind(this)
   }
 
-  cb (file) {
-    this.props.history.push(Helpers.transcriptUrlForFile(file))
+  cb (transcribeRequest) {
+    this.props.history.push(transcribeRequest.transcriptUrl())
   }
 
   render() {

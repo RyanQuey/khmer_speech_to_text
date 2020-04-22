@@ -6,7 +6,7 @@ import {
   Switch,
 } from 'react-router-dom'
 import { Alert, Flexbox } from 'shared/components/elements'
-import { Home, Profile, Search, Transcripts, UploadAudio, ShowTranscript, UnfinishedTranscripts } from 'user/components/templates'
+import { Home, Profile, Search, Transcripts, UploadAudio, ShowTranscript, TranscribeRequestsIndex } from 'user/components/templates'
 import requireAuthenticated from 'utils/requireAuthenticated'
 import forbidAuthenticated from 'utils/forbidAuthenticated'
 import { connect } from 'react-redux'
@@ -30,7 +30,7 @@ class UserContent extends Component {
             <Route path="/profile" component={requireAuthenticated(Profile)} />
             <Route path="/transcripts/:transcriptIdentifier" component={requireAuthenticated(ShowTranscript)} />
             <Route path="/transcripts" component={requireAuthenticated(Transcripts)} />
-            <Route path="/unfinished-transcripts" component={requireAuthenticated(UnfinishedTranscripts)} />
+            <Route path="/unfinished-transcripts" component={requireAuthenticated(TranscribeRequestsIndex)} />
           </Switch>
         </Flexbox>
       </main>

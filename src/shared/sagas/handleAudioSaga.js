@@ -5,7 +5,7 @@ import {
   UPLOAD_AUDIO_SUCCESS,
 }  from 'constants/actionTypes'
 import { errorActions, alertActions, userActions } from 'shared/actions'
-import UploadedFile from 'models/UploadedFile'
+import TranscribeRequest from 'models/TranscribeRequest'
 
 // TODO rename to audioUploads instead
 // handles the requests to upload file, get untranscribed uploads, and also request transcripts for
@@ -15,13 +15,13 @@ function* uploadAudio(action) {
 
   try {
     const file = action.payload
-    const uploadedFile = new UploadedFile({file})
+    const transcribeRequest = new TranscribeRequest({file})
     // Have to refresh token every hour or it expires, so call this before hitting cloud functions
     // TODO haven't tested
     yield userActions.setBearerToken()
 
     // TODO secure storage so requires bearer token
-    const fileMetadata = yield uploadedFile.uploadToStorage()
+    const fileMetadata = yield transcribeRequest.uploadToStorage()
 
     yield axios.post("/request-transcribe/", fileMetadata)
 
@@ -35,7 +35,7 @@ function* uploadAudio(action) {
       options: {timer: false}
     })
 
-    action.cb && action.cb(file)
+    action.cb && action.cb(transcribeRequest)
 
   } catch (err) {
     yield put({type: UPLOAD_AUDIO_FAILURE})
