@@ -14,13 +14,14 @@ class TranscribeRequestPicker extends Component {
   constructor(props) {
     super(props)
 
-    // this.viewUntranscribedUpload = this.viewUntranscribedUpload.bind(this)
+    this.requestTranscription = this.requestTranscription.bind(this)
   }
 
-  // viewUntranscribedUpload (transcribeRequest, e) {
+  // requests server to try transcribing again
+  requestTranscription (transcribeRequest, e) {
   //   this.props.setUntranscribedUpload(transcribeRequest)
   //   this.props.history.push(transcribeRequest.showViewUrl())
-  // }
+  }
 
   render() {
     const { pickable, transcribeRequests } = this.props
@@ -52,7 +53,7 @@ class TranscribeRequestPicker extends Component {
                 {transcribeRequest.displayFileSize()}
               </td>
               <td>
-                {pickable && <button onClick={this.viewUntranscribedUpload.bind(this, transcribeRequest)}>View</button>}
+                {pickable && <button onClick={this.requestTranscription.bind(this, transcribeRequest)}>View</button>}
               </td>
             </tr>
           )
@@ -71,7 +72,7 @@ const mapDispatchToProps = (dispatch) => {
 
 const mapStateToProps = (state) => {
   return {
-    //transcribeRequests: state.transcribeRequests,
+    // transcribeRequests: state.transcribeRequests,
   }
 }
 

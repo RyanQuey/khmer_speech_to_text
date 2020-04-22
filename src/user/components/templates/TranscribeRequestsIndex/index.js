@@ -35,7 +35,7 @@ const mapStateToProps = (state) => {
   return { 
     user: state.user,
     transcribeRequests: _.values(state.transcribeRequests)
-      .map(u => new TranscribeRequest(u)),
+      .map(transcribeRequestRecord => new TranscribeRequest({transcribeRequestRecord})),
   }
 }
 

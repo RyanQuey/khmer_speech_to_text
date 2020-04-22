@@ -25,18 +25,26 @@ class TranscribeRequest {
       this.error = null // no error yet hopefully! but set this if there is one to know what to request next
       this.status = TRANSCRIPTION_STATUSES[0] // no error yet hopefully! but set this if there is one to know what to request next
       this.uploadedAt = null // not yet uploaded to cloud storage
+      this.receivedByServerAt = null 
+      this.beganTranscribingAt = null 
+      this.transcriptCompletedAt = null // not yet uploaded to cloud storage
+      this.transcriptProcessedAt = null // not yet uploaded to cloud storage
 
     } else if (obj.transcribeRequestRecord) {
-      let record = obj.uploadedFileRecord
+      let record = obj.transcribeRequestRecord
       this.file = null // if want it, need to go get it `this.getFile()`
       this.filename = record.filename
       this.contentType = record.content_type
 
       this.fileLastModified = record.file_last_modified
-      this.fileSize = this.file.size
+      this.fileSize = record.file_size
       this.status = record.status
-      this.fileSize = this.file.size
-      this.error = null // no error yet hopefully! but set this if there is one to know what to request next
+      this.error = record.error // no error yet hopefully! but set this if there is one to know what to request next
+      this.uploadedAt = record.uploaded_at // not yet uploaded to cloud storage
+      this.receivedByServerAt = record.received_by_server_at
+      this.beganTranscribingAt = record.began_transcribing_it
+      this.transcriptCompletedAt = record.transcript_completed_at // not yet uploaded to cloud storage
+      this.transcriptProcessedAt = record.transcript_processed_at // not yet uploaded to cloud storage
 
     } else if (obj.transcript) {
       // TODO don't have this setup, but should, if we originate from something other than the just
@@ -80,7 +88,7 @@ class TranscribeRequest {
   }
 
   transcriptIdentifier () {
-    const t = this.trancsript()
+    const t = this.transcript()
 
     return t.identifier()
   }
@@ -89,10 +97,14 @@ class TranscribeRequest {
     this.status == _.last(TRANSCRIPTION_STATUSES)
   }
 
+  displayFileLastModified () {
+    return moment(parseInt(this.fileLastModified)).tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))
+  }
+
   async uploadToStorage() {
     try {
       const snapshot = await this._upload()
-      const fileMetadata = await this.setTranscribeTransactionRecord(snapshot)
+      const fileMetadata = await this.updateRecord()
       return fileMetadata
     
     } catch (err) {
@@ -136,7 +148,7 @@ class TranscribeRequest {
       }
 
       const docName = this.transcriptIdentifier()
-      const docRef = db.collection('users').doc(user.uid).collection("uploadedFiles").doc(docName)
+      const docRef = db.collection('users').doc(user.uid).collection("transcribeRequests").doc(docName)
 
       // build out object to send for request to transcribe
       const fileMetadata = { 
@@ -160,6 +172,10 @@ class TranscribeRequest {
       // throw it up the chain
       throw err
     }
+  }
+
+  displayFileSize () {
+    return `${(this.fileSize / 1048576).toFixed(2)} MB`
   }
 
 }

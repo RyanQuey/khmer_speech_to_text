@@ -24,7 +24,8 @@ class UploadAudioForm extends Component {
   }
 
   cb (transcribeRequest) {
-    this.props.history.push(transcribeRequest.transcriptUrl())
+    this.props.history.push("/unfinished-transcripts")
+    //this.props.history.push(transcribeRequest.transcriptUrl())
   }
 
   render() {
