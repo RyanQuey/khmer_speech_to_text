@@ -35,9 +35,9 @@ class TranscriptPicker extends Component {
           <th>File Size</th>
           <th></th>
         </tr>
-        {transcripts.map((transcript) => {
+        {transcripts.map((transcript, index) => {
           return (
-            <tr key={transcript.transactionId}>
+            <tr key={index}>
               <td>
                 {transcript.filename}
               </td>

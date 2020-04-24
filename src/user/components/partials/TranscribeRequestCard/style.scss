@@ -1,0 +1,74 @@
+@import 'theme/_helpers';
+
+.small {
+  padding: 5px;
+  margin: 0 0px 0px 0px;
+  font-size: 12px;
+  min-height: 80px;
+  max-height: 80px;
+  max-width: 250px;
+  .contentSection {
+    //display: flex;
+    //.cardLabel{
+    //}
+
+    white-space: nowrap;
+    span.text {
+    //  white-space: nowrap;
+    //  text-overflow: ellipsis;
+    //  overflow: hidden;
+    //  display: inline-block;
+    //  width: 70%;
+    }
+  }
+  .smallHeader {
+    h2 {
+      @include rems(16);
+    }
+    padding-bottom: 0 !important;
+  }
+}
+.cardLabel{
+  font-weight: bold;
+}
+.content {
+  width: 100%;
+
+  .profilePic {
+    width: 50px;
+  }
+  .utms {
+    width: 100%;
+    .utmField {
+      width: 100%;
+    }
+
+  }
+}
+.imageLink {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  height: 75px;
+  width: 75px;
+  margin: 10px;
+  cursor: pointer;
+}
+.toUpdate {
+  border: blue solid 1.5px;
+  h5 {
+    color: blue;
+  }
+}
+.toCreate {
+  border: green solid 1.5px;
+  h5 {
+    color: green;
+  }
+}
+.toDelete {
+  border: red solid 1.5px;
+  h5 {
+    color: red;
+  }
+}

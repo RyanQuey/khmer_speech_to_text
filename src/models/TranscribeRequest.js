@@ -22,13 +22,9 @@ class TranscribeRequest {
       this.fileLastModified = this.file.lastModified
 
       this.fileSize = this.file.size
-      this.error = null // no error yet hopefully! but set this if there is one to know what to request next
       this.status = TRANSCRIPTION_STATUSES[0] // no error yet hopefully! but set this if there is one to know what to request next
-      this.uploadedAt = null // not yet uploaded to cloud storage
-      this.receivedByServerAt = null 
-      this.beganTranscribingAt = null 
-      this.transcriptCompletedAt = null // not yet uploaded to cloud storage
-      this.transcriptProcessedAt = null // not yet uploaded to cloud storage
+      this.uploadedAt = null // not yet uploaded to cloud storage, much less anything else
+      this.error = null // no error yet hopefully! but set this if there is one to know what to request next
 
     } else if (obj.transcribeRequestRecord) {
       let record = obj.transcribeRequestRecord
@@ -38,13 +34,21 @@ class TranscribeRequest {
 
       this.fileLastModified = record.file_last_modified
       this.fileSize = record.file_size
+      this.filePath = record.file_path
+      this.originalFilePath = record.original_file_path
+      this.transactionId = record.transaction_id
+      this.updatedAt = record.updated_at 
+
       this.status = record.status
-      this.error = record.error // no error yet hopefully! but set this if there is one to know what to request next
-      this.uploadedAt = record.uploaded_at // not yet uploaded to cloud storage
-      this.receivedByServerAt = record.received_by_server_at
-      this.beganTranscribingAt = record.began_transcribing_it
-      this.transcriptCompletedAt = record.transcript_completed_at // not yet uploaded to cloud storage
-      this.transcriptProcessedAt = record.transcript_processed_at // not yet uploaded to cloud storage
+      this.uploadedAt = record.uploaded_at 
+      this.serverReceivedAt = record.server_received_at
+      this.fileProcessedAt = record.file_processed_at
+      this.transcriptCompletedAt = record.transcript_completed_at 
+      this.transcriptProcessedAt = record.transcript_processed_at 
+
+      this.error = record.error // string
+      this.errored_while = record.errored_while // string
+      this.multipleErrors = record.multipleErrors // boolean
 
     } else if (obj.transcript) {
       // TODO don't have this setup, but should, if we originate from something other than the just
@@ -72,7 +76,7 @@ class TranscribeRequest {
   // set more
   transcript () {
     return new Transcript({
-      filename: this.file.name, 
+      filename: this.filename || this.file.name, 
       file_last_modified: this.fileLastModified,
     })
   }
@@ -97,10 +101,27 @@ class TranscribeRequest {
     this.status == _.last(TRANSCRIPTION_STATUSES)
   }
 
+  //////////////////////////
+  // display helpers
+  // ///////////////////
+  
   displayFileLastModified () {
     return moment(parseInt(this.fileLastModified)).tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))
   }
 
+  displayLastUpdated () {
+    return this.updatedAt ? 
+      moment(this.updatedAt, "YYYYMMDDTHHmmss[Z]").tz(moment.tz.guess()).format('MMMM Do YYYY, h:mm:ss a') // moment(this.createdAt, "YYYYMMDDTHHMMss").tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))
+      : "Not yet uploaded"
+  }
+
+  displayFileSize () {
+    return `${(this.fileSize / 1048576).toFixed(2)} MB`
+  }
+
+  // /////////////////////////
+  // Async stuff
+  // //////////////////////
   async uploadToStorage() {
     try {
       const snapshot = await this._upload()
@@ -137,18 +158,16 @@ class TranscribeRequest {
   }
   
   // creates/updates record to track status of the transcription transaction in Google cloud api
-  // NOTE only runs if file is untranscribed
   async updateRecord (){
     try {
       const { file, user, filename, fileLastModified, contentType, filePath, fileSize, status, uploadedAt } = this
 
-      if (this.transcriptionComplete()) {
-        console.log("not setting; transcription is already complete")
-        return
-      }
-
       const docName = this.transcriptIdentifier()
       const docRef = db.collection('users').doc(user.uid).collection("transcribeRequests").doc(docName)
+      this.updatedAt = moment.utc().format("YYYYMMDDTHHmmss[Z]")
+
+      console.log("updating record in firestore")
+      // NOTE maybe should persist more, can add later when we need to do that
 
       // build out object to send for request to transcribe
       const fileMetadata = { 
@@ -156,6 +175,8 @@ class TranscribeRequest {
         file_path: filePath,
         // format like this: "2020-04-19T06:16:20.840Z"
         uploaded_at: uploadedAt, 
+        // format like this: "20200419T016208Z"
+        updated_at: this.updatedAt,
         file_last_modified: fileLastModified,
         content_type: contentType,
         file_size: fileSize,
@@ -163,19 +184,16 @@ class TranscribeRequest {
         status, 
       }
 
-      await docRef.set(fileMetadata)
+      // sometimes only thing updated will be updated_at time
+      await docRef.set(fileMetadata, { merge: true })
 
       return fileMetadata
 
     } catch (err) {
-      console.error('error creating record of untranscribed upload to storage: ', err)
+      console.error('error creating record of transcribe request: ', err)
       // throw it up the chain
       throw err
     }
-  }
-
-  displayFileSize () {
-    return `${(this.fileSize / 1048576).toFixed(2)} MB`
   }
 
   // TODO need to make this a lot more robust, variable upon error, error status, last time

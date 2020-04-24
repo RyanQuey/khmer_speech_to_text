@@ -3,6 +3,9 @@ import {
   UPLOAD_AUDIO_REQUEST,
   UPLOAD_AUDIO_FAILURE,
   UPLOAD_AUDIO_SUCCESS,
+  RESUME_TRANSCRIBING_SUCCESS,
+  RESUME_TRANSCRIBING_REQUEST,
+  RESUME_TRANSCRIBING_FAILURE,
 }  from 'constants/actionTypes'
 import { errorActions, alertActions, userActions } from 'shared/actions'
 import TranscribeRequest from 'models/TranscribeRequest'
@@ -13,16 +16,42 @@ import TranscribeRequest from 'models/TranscribeRequest'
 
 function* uploadAudio(action) {
 
+  let transcribeRequest, fileMetadata
+
   try {
     const file = action.payload
-    const transcribeRequest = new TranscribeRequest({file})
+    transcribeRequest = new TranscribeRequest({file})
     // Have to refresh token every hour or it expires, so call this before hitting cloud functions
     // TODO haven't tested
     yield userActions.setBearerToken()
 
     // TODO secure storage so requires bearer token
-    const fileMetadata = yield transcribeRequest.uploadToStorage()
+    fileMetadata = yield transcribeRequest.uploadToStorage()
 
+  } catch (err) {
+    yield put({type: UPLOAD_AUDIO_FAILURE})
+    let httpStatus = err && Helpers.safeDataPath(err, "response.status", 500)
+    //these are codes from our api
+    let errorCode = err && Helpers.safeDataPath(err, "response.data.originalError.code", 500)
+    let errorMessage = err && Helpers.safeDataPath(err, "response.data.originalError.message", 500)
+    // TODO probably remove, since we are going to log it earlier in the failure chain
+    console.error(errorCode, errorMessage, err && err.response && err.response.data || err);
+
+    errorActions.handleErrors({
+      templateName: "UploadAudio",
+      templatePart: "form",
+      title: "Error Uploading Audio:",
+      message: "Please try again",
+      errorObject: err,
+      alert: true,
+    }, null, null, {
+      useInvalidAttributeMessage: true,
+    })
+    action.onFailure && action.onFailure(err)
+
+  }
+
+  try {
     yield axios.post("/request-transcribe/", fileMetadata)
 
     yield put({type: UPLOAD_AUDIO_SUCCESS, payload: fileMetadata})
@@ -46,29 +75,67 @@ function* uploadAudio(action) {
     // TODO probably remove, since we are going to log it earlier in the failure chain
     console.error(errorCode, errorMessage, err && err.response && err.response.data || err);
 
-    // TODO fix these (outdated)
-    if (httpStatus === 403) {
-      alertActions.newAlert({
-        title: "Invalid email or password",
-        message: "Please try again",
-        level: "WARNING",
-        options: {timer: false},
-      })
-
-    } else {
-      errorActions.handleErrors({
-        templateName: "UploadAudio",
-        templatePart: "form",
-        title: "Error Uploading Audio:",
-        errorObject: err,
-        alert: true,
-      }, null, null, {
-        useInvalidAttributeMessage: true,
-      })
-    }
+    errorActions.handleErrors({
+      templateName: "UploadAudio",
+      templatePart: "form",
+      title: "Error Transcribing Audio:",
+      message: "Please try again",
+      errorObject: err,
+      alert: true,
+    }, null, null, {
+      useInvalidAttributeMessage: true,
+    })
     action.onFailure && action.onFailure(err)
 
   }
+}
+
+function* requestResume(action) {
+  try {
+    const transcribeRequest = action.payload
+    // Have to refresh token every hour or it expires, so call this before hitting cloud functions
+    // TODO haven't tested
+    yield userActions.setBearerToken()
+
+    // fileMetadata only has some of the info, but the db will grab the record from firestore before
+    // continuing anyways, so it's enough
+    const fileMetadata = yield transcribeRequest.updateRecord()
+    yield axios.post("/resume-request/", fileMetadata)
+
+    yield put({type: RESUME_TRANSCRIBING_SUCCESS, payload: fileMetadata})
+
+    alertActions.closeAlerts()
+    alertActions.newAlert({
+      //title: response.data.transcription,
+      title: "Now resuming transcription, please wait",
+      level: "SUCCESS",
+      options: {timer: false}
+    })
+
+    action.cb && action.cb(transcribeRequest)
+
+  } catch (err) {
+    yield put({type: RESUME_TRANSCRIBING_FAILURE})
+    let httpStatus = err && Helpers.safeDataPath(err, "response.status", 500)
+    //these are codes from our api
+    let errorCode = err && Helpers.safeDataPath(err, "response.data.originalError.code", 500)
+    let errorMessage = err && Helpers.safeDataPath(err, "response.data.originalError.message", 500)
+    // TODO probably remove, since we are going to log it earlier in the failure chain
+    console.error(errorCode, errorMessage, err && err.response && err.response.data || err);
+
+    errorActions.handleErrors({
+      templateName: "UploadAudio",
+      templatePart: "form",
+      title: "Error Resuming Transcription:",
+      errorObject: err,
+      alert: true,
+    }, null, null, {
+      useInvalidAttributeMessage: true,
+    })
+
+    action.onFailure && action.onFailure(err)
+  }
+
 }
 
 //////////////////////////////
@@ -99,4 +166,5 @@ async function _sendBase64 (file) {
 // EXPORTS
 export default function* audioSaga() {
   yield takeLatest(UPLOAD_AUDIO_REQUEST, uploadAudio)
+  yield takeLatest(RESUME_TRANSCRIBING_REQUEST, requestResume)
 }

@@ -9,14 +9,14 @@ export const TRANSCRIPTION_STATUSES = [
 
   // when request has been received and accepted by our server, and is processing the file
   // server sets
-  "received-by-server", 
+  "processing-file", 
 
   // when Google has started the operation to transcribe the file, and is currently transcribing.   
   // server sets
   "transcribing", 
 
   // Google finished transcribing, but we haven't yet processed their transcription for whatever reason
-  "transcription-complete",
+  "processing-transcription",
 
   // we finished processing their transcription, and it is stored in firestore
   "transcription-processed",
