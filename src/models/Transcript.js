@@ -37,14 +37,15 @@ class Transcript {
     return encodeURIComponent(this.filename.replace(/\./g, ''))
   }
 
-  identifier () {
+  // transcript set for a file is identified by file last modified; each transcript request is identified by it's this.createdAt
+  fileIdentifier () {
     // get rid of stuff react router doesn't like, ie., especially periods
     return `${this.encodedFilename()}-lastModified${this.fileLastModified}`
   }
 
   showViewUrl () {
     // get rid of stuff react router doesn't like, ie., especially periods
-    return `/transcripts/${this.identifier()}`
+    return `/transcripts/${this.fileIdentifier()}`
   }
 
   displayCreatedAt () {

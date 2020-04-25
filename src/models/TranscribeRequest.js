@@ -13,6 +13,11 @@ class TranscribeRequest {
     // for when getting a just-now uploaded-to-browser of web File class 
     // (not yet uploaded to cloud storage, or if it is, make sure to override status)
     this.user = store.getState().user
+    this._setPropsFromObj(obj)
+    // TODO also have option if building this class from pulled down file from storage
+  }
+
+  _setPropsFromObj (obj) {
     if (obj.file) {
       this.file = obj.file
 
@@ -22,8 +27,8 @@ class TranscribeRequest {
       this.fileLastModified = this.file.lastModified
 
       this.fileSize = this.file.size
-      this.status = TRANSCRIPTION_STATUSES[0] // no error yet hopefully! but set this if there is one to know what to request next
-      this.uploadedAt = null // not yet uploaded to cloud storage, much less anything else
+      // uploading
+      this.logEvent(TRANSCRIPTION_STATUSES[0], {skipPersist: true})
       this.error = null // no error yet hopefully! but set this if there is one to know what to request next
 
     } else if (obj.transcribeRequestRecord) {
@@ -40,26 +45,25 @@ class TranscribeRequest {
       this.updatedAt = record.updated_at 
 
       this.status = record.status
-      this.uploadedAt = record.uploaded_at 
-      this.serverReceivedAt = record.server_received_at
-      this.fileProcessedAt = record.file_processed_at
-      this.transcriptCompletedAt = record.transcript_completed_at 
-      this.transcriptProcessedAt = record.transcript_processed_at 
-
-      this.error = record.error // string
-      this.errored_while = record.errored_while // string
-      this.multipleErrors = record.multipleErrors // boolean
+      this.id = record.id
 
     } else if (obj.transcript) {
       // TODO don't have this setup, but should, if we originate from something other than the just
       // now uploaded file
     }
+
     this.filePath = `audio/${this.user.uid}/${this.filename}`
-    // TODO also have option if building this class from pulled down file from storage
-
-
   }
 
+  //////////////////////////////
+  // getters/setters
+  // ////////////////////
+  async getEventLogs() {
+    const result = "TODO"
+    this.file = result
+  }
+
+  // for when contstructed from a non-file
   async getFile() {
     const result = "TODO"
     this.file = result
@@ -72,6 +76,11 @@ class TranscribeRequest {
     return storagePath
   }
 
+  docRef (options = {}) {
+    const collectionRef = db.collection('users').doc(this.user.uid).collection("transcribeRequests")
+
+    return collectionRef.doc(options.newDoc ? undefined : this.id)
+  }
   // for now just sending some info via an object.. later a more robust transcript, can definitely
   // set more
   transcript () {
@@ -81,6 +90,38 @@ class TranscribeRequest {
     })
   }
 
+  // event should be string
+  // can be async or syncrounous depending on options
+  logEvent (event, options = {}) {
+    const eventLog = {
+      event,
+      time: Helpers.timestamp(),
+    }
+    if (options.otherInEvent) {
+      Object.assign(eventLog, options.otherInEvent)
+    }
+
+    if (!this.eventLogs) {
+      this.eventLogs = []
+    }
+
+    // TODO set up setters so can't change eventLog without changing status, and vice versa
+    this.eventLogs.push(eventLog)
+    // since eventLogs is a separate collection, persist something on the local record as well for
+    // ease of access
+    this.status = event
+
+    // always skip persist if haven't created record in db yet, just save afterwards. Or if want to
+    // do synchronous
+    if (!options.skipPersist) {
+      // TODO wrap this in transaction, and make sure the updatedAt time is the same
+      const logsRef = this.docRef().collection("eventLogs")
+      this.updateRecord()
+
+      // NOTE returns a promise
+      return logsRef.add(eventLog)
+    }
+  }
 
   // each transcript will be name spaced by file name and last modified date.
   // If a single file has been uploaded multiple times, will eventually show a list of versions on the side somewhere, which the user can select, but just start by default by showing the last created transcript. TODO
@@ -98,7 +139,14 @@ class TranscribeRequest {
   }
 
   transcriptionComplete () {
-    this.status == _.last(TRANSCRIPTION_STATUSES)
+    return this.getStatus() == TRANSCRIPTION_STATUSES[5]
+  }
+
+  getStatus (options = {}) {
+    // NOTE need to retrieve eventLogs if haven't already
+    // TODO allow checking with eventlogs if an option is passed in, otherwise just trust the record
+    // return _.last(this.eventLogs || [])
+    return this.status
   }
 
   //////////////////////////
@@ -145,8 +193,9 @@ class TranscribeRequest {
       };
 
       const snapshot = await this.fileStorageRef().put(this.file, metadata)
-      this.uploadedAt = snapshot.metadata.timeCreated
-      this.status = TRANSCRIPTION_STATUSES[1] // uploaded
+      // could do it firestore way:
+      //but this way is consistent with our api
+      await this.logEvent(TRANSCRIPTION_STATUSES[1]) // uploaded
 
       return snapshot
 
@@ -160,31 +209,37 @@ class TranscribeRequest {
   // creates/updates record to track status of the transcription transaction in Google cloud api
   async updateRecord (){
     try {
-      const { file, user, filename, fileLastModified, contentType, filePath, fileSize, status, uploadedAt } = this
+      const { file, user, filename, fileLastModified, contentType, filePath, fileSize, id } = this
 
-      const docName = this.transcriptIdentifier()
-      const docRef = db.collection('users').doc(user.uid).collection("transcribeRequests").doc(docName)
       this.updatedAt = moment.utc().format("YYYYMMDDTHHmmss[Z]")
 
-      console.log("updating record in firestore")
-      // NOTE maybe should persist more, can add later when we need to do that
-
-      // build out object to send for request to transcribe
+      // TODO name "updates"
       const fileMetadata = { 
         filename,
         file_path: filePath,
-        // format like this: "2020-04-19T06:16:20.840Z"
-        uploaded_at: uploadedAt, 
         // format like this: "20200419T016208Z"
         updated_at: this.updatedAt,
         file_last_modified: fileLastModified,
         content_type: contentType,
         file_size: fileSize,
         user_id: user.uid,
-        status, 
+        status: this.getStatus(),
+        id,
       }
 
-      // sometimes only thing updated will be updated_at time
+      // if it's creating a record, get an id and keep it in browser and in firestore
+      let docRef
+      if (!id) {
+        // generates new id that we can then set and persist within the record too
+        docRef = this.docRef({newDoc: true})
+        this.id = docRef.id
+        fileMetadata.id = this.id
+
+      } else {
+        docRef = this.docRef()
+      }
+
+      console.log("updating record in firestore")
       await docRef.set(fileMetadata, { merge: true })
 
       return fileMetadata
@@ -200,7 +255,16 @@ class TranscribeRequest {
   // transcribeRequest was updated, etc
   requestable () {
     return true
-    // return this.status.includes("error")
+    // return this.getStatus().includes("error")
+  }
+
+  reload () {
+    // we are live reloading from fire store all the time, so all we need to do is find the record
+    // in our store and refresh from there
+    const { transcribeRequests } = store.getState()
+    const match = _.values(transcribeRequests).find((t) => (t.id == this.id))
+
+    this._setPropsFromObj({transcribeRequestRecord: match})
   }
 }
 

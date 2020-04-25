@@ -21,8 +21,17 @@ class UploadAudioForm extends Component {
     super(props)
 
     this.cb = this.cb.bind(this)
+    this.onFailure = this.onFailure.bind(this)
   }
 
+  onFailure (err) {
+    this.props.history.push("/unfinished-transcripts")
+    //this.props.history.push(transcribeRequest.transcriptUrl())
+  }
+
+
+  // will use if fail or succeed. Just go to the unfinished transcripts nad user can track the
+  // progress
   cb (transcribeRequest) {
     this.props.history.push("/unfinished-transcripts")
     //this.props.history.push(transcribeRequest.transcriptUrl())
@@ -45,6 +54,7 @@ class UploadAudioForm extends Component {
             height="70vh"
             width="100%"
             cb={this.cb}
+            onFailure={this.onFailure}
           />
         </Flexbox>
       </div>

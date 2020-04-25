@@ -50,12 +50,13 @@ const _getData = (file) => {
   })
 }
 
-export const uploadAudioFile = (file, cb) => {
+export const uploadAudioFile = (file, cb, onFailure) => {
   // TODO move the async stuff to saga, make thsi cleaner probabl
   store.dispatch({
     type: UPLOAD_AUDIO_REQUEST,
     payload: file,
     cb,
+    onFailure, 
   })
 }
 

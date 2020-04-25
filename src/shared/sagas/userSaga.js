@@ -24,6 +24,7 @@ import { USER_FIELDS_TO_PERSIST } from 'constants'
 //import { setupSession } from 'lib/socket' // Not using a socket
 import { errorActions, alertActions } from 'shared/actions'
 import firebaseApp from 'refire/firebase'
+import TranscribeRequest from 'models/TranscribeRequest'
 
 
 function* signIn(action) {
@@ -208,11 +209,11 @@ function* fetchCurrentUser(action) {
     userRef.collection("transcribeRequests").onSnapshot((snapshot) => { 
       console.log("foudn some transcribe requests for user", snapshot)
       // handle the transcripts themselves
-      const mappedTranscripts = snapshot.docs.map(doc => doc.data())
-      store.dispatch({type: FETCH_TRANSCRIBE_REQUESTS_SUCCESS, payload: mappedTranscripts})
 
       const changes = snapshot.docChanges.map(change => {
         const docData = change.doc.data()
+        const transcribeRequest = new TranscribeRequest({transcribeRequestRecord: docData})
+
 				if (change.type === "added") {
 					console.log("File is uploaded (though that should be known already): ", docData.filename);
 				  // don't do anything yet
@@ -221,6 +222,10 @@ function* fetchCurrentUser(action) {
 				if (change.type === "modified") {
 					console.log("Status update for: ", docData.filename);
 					console.log("Now status: ", docData.status);
+
+
+				  // refresh the event_log
+
 				}
 
 				if (change.type === "removed") {
@@ -231,6 +236,9 @@ function* fetchCurrentUser(action) {
           })
 				}
       })
+
+      const mappedTranscripts = snapshot.docs.map(doc => doc.data())
+      store.dispatch({type: FETCH_TRANSCRIBE_REQUESTS_SUCCESS, payload: mappedTranscripts})
     })
 
 

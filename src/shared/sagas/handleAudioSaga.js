@@ -7,6 +7,7 @@ import {
   RESUME_TRANSCRIBING_REQUEST,
   RESUME_TRANSCRIBING_FAILURE,
 }  from 'constants/actionTypes'
+import { TRANSCRIPTION_STATUSES} from "constants/transcript"
 import { errorActions, alertActions, userActions } from 'shared/actions'
 import TranscribeRequest from 'models/TranscribeRequest'
 
@@ -47,8 +48,9 @@ function* uploadAudio(action) {
     }, null, null, {
       useInvalidAttributeMessage: true,
     })
-    action.onFailure && action.onFailure(err)
 
+    _confirmErrorStatus(transcribeRequest, errorMessage)
+    action.onFailure && action.onFailure(err)
   }
 
   try {
@@ -85,14 +87,17 @@ function* uploadAudio(action) {
     }, null, null, {
       useInvalidAttributeMessage: true,
     })
+    
+    _confirmErrorStatus(transcribeRequest, errorMessage)
     action.onFailure && action.onFailure(err)
-
   }
 }
 
 function* requestResume(action) {
+  let transcribeRequest
+
   try {
-    const transcribeRequest = action.payload
+    transcribeRequest = action.payload
     // Have to refresh token every hour or it expires, so call this before hitting cloud functions
     // TODO haven't tested
     yield userActions.setBearerToken()
@@ -133,6 +138,7 @@ function* requestResume(action) {
       useInvalidAttributeMessage: true,
     })
 
+    _confirmErrorStatus(transcribeRequest, errorMessage)
     action.onFailure && action.onFailure(err)
   }
 
@@ -161,6 +167,22 @@ async function _sendBase64 (file) {
   return response
 };
 
+// make sure that this has the appropriate error set
+async function _confirmErrorStatus (transcribeRequest, errorMessage = "Unknown error") {
+  // TODO haven't defined
+  await transcribeRequest.reload()
+  console.log("current record is:", transcribeRequest)
+
+  console.log("does it have an error already?", !transcribeRequest.status.includes("error"))
+  if (!transcribeRequest.status.includes("error")) {
+    // if no error, then update status
+    console.log("Have to log this error, the server didn't get it")
+
+    await transcribeRequest.logEvent(TRANSCRIPTION_STATUSES[6], {
+      otherInEvent: {error: errorMessage}
+    }) // server-error
+  }
+}
 
 ///////////////////////
 // EXPORTS

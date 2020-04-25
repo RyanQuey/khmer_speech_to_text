@@ -21,7 +21,7 @@ class TranscribeRequestPicker extends Component {
     const { transcribeRequests } = this.props
 
     return (
-      <Flexbox>
+      <Flexbox direction="column">
         {transcribeRequests.map((t, i) => 
           <TranscribeRequestCard
             key={i}

@@ -150,6 +150,7 @@ let Helpers = {
     return matches
   }, 
 
+  timestamp: () => moment.utc().format("YYYYMMDDTHHmmss[Z]")
 }
 
 // for adding more helper files to this one
