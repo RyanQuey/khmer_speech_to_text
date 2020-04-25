@@ -32,7 +32,8 @@ class TranscribeRequestCard extends Component {
 
         {[
           ["status", "Status"],
-          ["error", "Last Error"],
+          // not yet implemented
+          ["currentError", "Last Error"],
           [transcribeRequest.displayLastUpdated(), "Last Updated", {customValue: true}],
         ].map((set, index) => {
           let stringKey = typeof set[0] == "string" && (!set[2] || !set[2].customValue)

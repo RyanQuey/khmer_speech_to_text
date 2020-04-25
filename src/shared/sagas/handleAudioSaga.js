@@ -6,6 +6,9 @@ import {
   RESUME_TRANSCRIBING_SUCCESS,
   RESUME_TRANSCRIBING_REQUEST,
   RESUME_TRANSCRIBING_FAILURE,
+  CHECK_TRANSCRIBING_PROGRESS_REQUEST,
+  CHECK_TRANSCRIBING_PROGRESS_SUCCESS,
+  CHECK_TRANSCRIBING_PROGRESS_FAILURE,
 }  from 'constants/actionTypes'
 import { TRANSCRIPTION_STATUSES} from "constants/transcript"
 import { errorActions, alertActions, userActions } from 'shared/actions'
@@ -28,6 +31,7 @@ function* uploadAudio(action) {
 
     // TODO secure storage so requires bearer token
     fileMetadata = yield transcribeRequest.uploadToStorage()
+    console.log("metadata", fileMetadata)
 
   } catch (err) {
     yield put({type: UPLOAD_AUDIO_FAILURE})
@@ -51,9 +55,15 @@ function* uploadAudio(action) {
 
     _confirmErrorStatus(transcribeRequest, errorMessage)
     action.onFailure && action.onFailure(err)
+    return
   }
 
   try {
+    if (!fileMetadata) {
+      console.log("where is the metadata!?!?")
+      return
+    }
+    console.log("do we still get here...?;")
     yield axios.post("/request-transcribe/", fileMetadata)
 
     yield put({type: UPLOAD_AUDIO_SUCCESS, payload: fileMetadata})
@@ -104,6 +114,7 @@ function* requestResume(action) {
 
     // fileMetadata only has some of the info, but the db will grab the record from firestore before
     // continuing anyways, so it's enough
+    // TODO don't update, just do a get from firestore
     const fileMetadata = yield transcribeRequest.updateRecord()
     yield axios.post("/resume-request/", fileMetadata)
 
@@ -142,9 +153,59 @@ function* requestResume(action) {
     _confirmErrorStatus(transcribeRequest, errorMessage)
     action.onFailure && action.onFailure(err)
   }
-
 }
 
+function* checkStatus(action) {
+  let transcribeRequest
+
+  try {
+    transcribeRequest = action.payload
+    // Have to refresh token every hour or it expires, so call this before hitting cloud functions
+    // TODO haven't tested
+    yield userActions.setBearerToken()
+
+    // fileMetadata only has some of the info, but the db will grab the record from firestore before
+    // continuing anyways, so it's enough
+    // TODO don't update, just do a get from firestore
+    const fileMetadata = yield transcribeRequest.updateRecord()
+    const result = yield axios.post("/check-status/", fileMetadata)
+
+    yield put({type: CHECK_TRANSCRIBING_PROGRESS_SUCCESS, payload: result})
+
+    alertActions.closeAlerts()
+    alertActions.newAlert({
+      //title: response.data.transcription,
+      title: "finished checking status of transcription",
+      level: "SUCCESS",
+      options: {timer: false}
+    })
+
+    action.cb && action.cb(transcribeRequest)
+
+  } catch (err) {
+    yield put({type: CHECK_TRANSCRIBING_PROGRESS_FAILURE})
+    let httpStatus = err && Helpers.safeDataPath(err, "response.status", 500)
+    //these are codes from our api
+    let errorCode = err && Helpers.safeDataPath(err, "response.data.originalError.code", 500)
+    let errorMessage = err && Helpers.safeDataPath(err, "response.data.originalError.message", 500)
+    // TODO probably remove, since we are going to log it earlier in the failure chain
+    console.error(errorCode, errorMessage, err && err.response && err.response.data || err);
+
+    errorActions.handleErrors({
+      templateName: "UploadAudio",
+      templatePart: "form",
+      title: "Error Resuming Transcription:",
+      message: "Please try again",
+      errorObject: err,
+      alert: true,
+    }, null, null, {
+      useInvalidAttributeMessage: true,
+    })
+
+    _confirmErrorStatus(transcribeRequest, errorMessage)
+    action.onFailure && action.onFailure(err)
+  }
+}
 //////////////////////////////
 // HELPERS 
 // takes a file with File web api, converts it to base 64, and sends the base 64 to our cloud functions server which will send it to the Google speech to text API
@@ -190,4 +251,5 @@ async function _confirmErrorStatus (transcribeRequest, errorMessage = "Unknown e
 export default function* audioSaga() {
   yield takeLatest(UPLOAD_AUDIO_REQUEST, uploadAudio)
   yield takeLatest(RESUME_TRANSCRIBING_REQUEST, requestResume)
+  yield takeLatest(CHECK_TRANSCRIBING_PROGRESS_REQUEST, checkStatus)
 }

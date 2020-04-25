@@ -19,8 +19,10 @@ import {
   UPDATE_USER_REQUEST,
   UPDATE_USER_SUCCESS,
   FETCH_TRANSCRIBE_REQUESTS_SUCCESS, 
+  CHECK_TRANSCRIBING_PROGRESS_REQUEST, 
 }  from 'constants/actionTypes'
 import { USER_FIELDS_TO_PERSIST } from 'constants'
+import { TRANSCRIPTION_STATUSES} from "constants/transcript"
 //import { setupSession } from 'lib/socket' // Not using a socket
 import { errorActions, alertActions } from 'shared/actions'
 import firebaseApp from 'refire/firebase'
@@ -222,23 +224,28 @@ function* fetchCurrentUser(action) {
 				if (change.type === "modified") {
 					console.log("Status update for: ", docData.filename);
 					console.log("Now status: ", docData.status);
-
-
 				  // refresh the event_log
 
 				}
 
 				if (change.type === "removed") {
-          alertActions.newAlert({
-            title: "Transcript is ready",
-            level: "SUCCESS",
-            options: {}
-          })
+				  // shouldn't happen anymore
 				}
       })
 
-      const mappedTranscripts = snapshot.docs.map(doc => doc.data())
-      store.dispatch({type: FETCH_TRANSCRIBE_REQUESTS_SUCCESS, payload: mappedTranscripts})
+      const mappedTranscriptRequests = snapshot.docs.map(doc => doc.data())
+      // if any are transcribing, poll our server until it's finished
+      mappedTranscriptRequests.forEach(t => {
+        // when get response from a poll, will setup timer to poll again there, rather than setting
+        // up a while loop and a store to manage it or something like that. Just simpler this way
+        const transcribeRequest = new TranscribeRequest({transcribeRequestRecord: t})
+        if (transcribeRequest.status == TRANSCRIPTION_STATUSES[3]) { // transcribing
+          store.dispatch({type: CHECK_TRANSCRIBING_PROGRESS_REQUEST, payload: transcribeRequest})
+        }
+
+      })
+
+      store.dispatch({type: FETCH_TRANSCRIBE_REQUESTS_SUCCESS, payload: mappedTranscriptRequests})
     })
 
 
