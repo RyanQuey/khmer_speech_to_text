@@ -132,6 +132,7 @@ function* requestResume(action) {
       templateName: "UploadAudio",
       templatePart: "form",
       title: "Error Resuming Transcription:",
+      message: "Please try again",
       errorObject: err,
       alert: true,
     }, null, null, {
