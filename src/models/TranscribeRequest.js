@@ -1,7 +1,12 @@
 import { TRANSCRIPTION_STATUSES} from "constants/transcript"
+import { 
+  UPDATE_TRANSCRIBE_REQUEST_STATUS_REQUEST,
+  UPDATE_TRANSCRIBE_REQUEST_STATUS_SUCCESS,
+} from "constants/actionTypes"
 import Transcript from 'models/Transcript'
 
 // TODO create model class, with stuff for schema etc
+// TODO use REDUX with more throughout the transcription lifecycle
 //class File extends Model {
 // takes transcript from firestore record (uses underscored keys from the api) 
 class TranscribeRequest {
@@ -22,7 +27,7 @@ class TranscribeRequest {
       this.file = obj.file
 
       this.filename = this.file.name
-      this.contentType = this.file.type
+      this.fileType = this.file.type
 
       this.fileLastModified = this.file.lastModified
 
@@ -34,7 +39,7 @@ class TranscribeRequest {
       let record = obj.transcribeRequestRecord
       this.file = null // if want it, need to go get it `this.getFile()`
       this.filename = record.filename
-      this.contentType = record.content_type
+      this.fileType = record.file_type
 
       this.fileLastModified = record.file_last_modified
       this.fileSize = record.file_size
@@ -86,6 +91,8 @@ class TranscribeRequest {
       console.log("get id", this.id, docRef)
 
     } else {
+
+      console.log("doc with id", this.id)
       docRef = collectionRef.doc(this.id)
     }
 
@@ -125,11 +132,24 @@ class TranscribeRequest {
     // do synchronous
     if (!options.skipPersist) {
       // TODO wrap this in transaction, and make sure the updatedAt time is the same
+      console.log("logging new status", eventLog)
+      store.dispatch({
+        type: UPDATE_TRANSCRIBE_REQUEST_STATUS_REQUEST, 
+        payload: event,
+      })
+      
+      // NOTE returns a promise that finishes when both are done
       const logsRef = this.docRef().collection("eventLogs")
-      this.updateRecord()
 
-      // NOTE returns a promise
-      return logsRef.add(eventLog)
+      return Promise.all([
+        logsRef.add(eventLog), 
+        this.updateRecord()
+      ]).then(r => {
+        store.dispatch({
+          type: UPDATE_TRANSCRIBE_REQUEST_STATUS_SUCCESS, 
+          payload: event,
+        })
+      })
     }
   }
 
@@ -161,13 +181,13 @@ class TranscribeRequest {
 
   // for requests for firestore AND to our own API, this is the essential data we are sending
   getRequestPayload () {
-    const { file, user, filename, fileLastModified, contentType, filePath, fileSize, id } = this
+    const { file, user, filename, fileLastModified, fileType, filePath, fileSize, id } = this
     const fileMetadata = { 
       filename,
       file_path: filePath,
       // format like this: "20200419T016208Z"
       file_last_modified: fileLastModified,
-      content_type: contentType,
+      file_type: fileType,
       file_size: fileSize,
       user_id: user.uid,
       // most of the time this is the only thing that gets changed in all this. 
@@ -220,9 +240,9 @@ class TranscribeRequest {
   // possible in the google storage api
   async _upload (){
     try {
-      const { file, fileLastModified, contentType } = this
+      const { file, fileLastModified, fileType } = this
       const metadata = {
-        contentType,
+        contentType: fileType,
         customMetadata: {fileLastModified}
       };
 
@@ -243,8 +263,6 @@ class TranscribeRequest {
   // creates/updates record to track status of the transcription transaction in Google cloud api
   async updateRecord (){
     try {
-      const { file, user, filename, fileLastModified, contentType, filePath, fileSize } = this
-
       this.updatedAt = moment.utc().format("YYYYMMDDTHHmmss[Z]")
 
       // should have all the things we might possibly want to update
@@ -256,8 +274,9 @@ class TranscribeRequest {
       // if it's creating a record, get an id and keep it in browser and in firestore
 
 
-      console.log("updating record in firestore")
+      console.log("updating record in firestore", docRef)
       await docRef.set(updates, { merge: true })
+      console.log("got it", docRef)
 
       return updates
 

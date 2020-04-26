@@ -115,10 +115,10 @@ function* requestResume(action) {
     // fileMetadata only has some of the info, but the db will grab the record from firestore before
     // continuing anyways, so it's enough
     // TODO don't update, just do a get from firestore
-    const fileMetadata = yield transcribeRequest.updateRecord()
-    yield axios.post("/resume-request/", fileMetadata)
+    const fileMetadata = yield transcribeRequest.getRequestPayload()
+    const result = yield axios.post("/resume-request/", fileMetadata)
 
-    yield put({type: RESUME_TRANSCRIBING_SUCCESS, payload: fileMetadata})
+    yield put({type: RESUME_TRANSCRIBING_SUCCESS, payload: result.data})
 
     alertActions.closeAlerts()
     alertActions.newAlert({
@@ -137,6 +137,7 @@ function* requestResume(action) {
     let errorCode = err && Helpers.safeDataPath(err, "response.data.originalError.code", 500)
     let errorMessage = err && Helpers.safeDataPath(err, "response.data.originalError.message", 500)
     // TODO probably remove, since we are going to log it earlier in the failure chain
+    console.error("failed to resume transcription");
     console.error(errorCode, errorMessage, err && err.response && err.response.data || err);
 
     errorActions.handleErrors({
@@ -167,7 +168,7 @@ function* checkStatus(action) {
     // fileMetadata only has some of the info, but the db will grab the record from firestore before
     // continuing anyways, so it's enough
     // TODO don't update, just do a get from firestore
-    const fileMetadata = yield transcribeRequest.updateRecord()
+    const fileMetadata = yield transcribeRequest.getRequestPayload()
     const result = yield axios.post("/check-status/", fileMetadata)
 
     yield put({type: CHECK_TRANSCRIBING_PROGRESS_SUCCESS, payload: result})
@@ -238,7 +239,7 @@ async function _confirmErrorStatus (transcribeRequest, errorMessage = "Unknown e
   console.log("does it have an error already?", !transcribeRequest.status.includes("error"))
   if (!transcribeRequest.status.includes("error")) {
     // if no error, then update status
-    console.log("Have to log this error, the server didn't get it")
+    console.error("Have to log this error, the server didn't get it")
 
     await transcribeRequest.logEvent(TRANSCRIPTION_STATUSES[6], {
       otherInEvent: {error: errorMessage}

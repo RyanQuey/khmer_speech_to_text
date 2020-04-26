@@ -10,7 +10,7 @@ class Transcript {
     // assign keys and values from transcript to this
 
     this.fileLastModified = transcriptData.file_last_modified
-    this.createdAt = transcriptData.created_at
+    this.createdAt = transcriptData.transcript_metadata.last_updated_at
     this.filePath = transcriptData.file_path
     this.fileSize = transcriptData.file_size
     this.fileType = transcriptData.content_type
@@ -40,7 +40,7 @@ class Transcript {
   // transcript set for a file is identified by file last modified; each transcript request is identified by it's this.createdAt
   fileIdentifier () {
     // get rid of stuff react router doesn't like, ie., especially periods
-    return `${this.encodedFilename()}-lastModified${this.fileLastModified}`
+    return `${this.encodedFilename()}-lastModified${this.transcriptMetadata.last_updated_at}`
   }
 
   showViewUrl () {
