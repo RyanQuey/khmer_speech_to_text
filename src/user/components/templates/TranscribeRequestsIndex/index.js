@@ -7,6 +7,7 @@ import { withRouter } from 'react-router-dom'
 import { TranscribeRequestPicker } from 'user/components/partials'
 import Transcript from 'models/Transcript'
 import TranscribeRequest from 'models/TranscribeRequest'
+import { TRANSCRIPTION_STATUSES} from "constants/transcript"
 
 // AKA untranscribed uploads
 class TranscribeRequestsIndex extends Component {
@@ -35,7 +36,8 @@ const mapStateToProps = (state) => {
   return { 
     user: state.user,
     transcribeRequests: _.values(state.transcribeRequests)
-      .map(transcribeRequestRecord => new TranscribeRequest({transcribeRequestRecord})),
+      .map(transcribeRequestRecord => new TranscribeRequest({transcribeRequestRecord}))
+      .filter(t => !t.transcriptionComplete()),
   }
 }
 

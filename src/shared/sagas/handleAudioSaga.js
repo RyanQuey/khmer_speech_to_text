@@ -174,11 +174,15 @@ function* checkStatus(action) {
     yield put({type: CHECK_TRANSCRIBING_PROGRESS_SUCCESS, payload: result})
 
     if (Helpers.safeDataPath(result, "data.current_request_data.status") == "transcribing") {
+      // TODO make sure this NEVER overlaps with another request to our server, so don't get a
+      // single record all mixed up
       console.log("not finished so try again")
       // try again
       setTimeout(function(){ 
+        console.log("trying again NOW")
         store.dispatch({type: CHECK_TRANSCRIBING_PROGRESS_REQUEST, payload: action.payload})
-      }, 500);
+      }, 750);
+
     } else {
       console.log("what was the result?", Helpers.safeDataPath(result, "data.current_request_data.status") == "transcribing", result)
     }
