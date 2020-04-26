@@ -173,6 +173,16 @@ function* checkStatus(action) {
 
     yield put({type: CHECK_TRANSCRIBING_PROGRESS_SUCCESS, payload: result})
 
+    if (Helpers.safeDataPath(result, "data.current_request_data.status") == "transcribing") {
+      console.log("not finished so try again")
+      // try again
+      setTimeout(function(){ 
+        store.dispatch({type: CHECK_TRANSCRIBING_PROGRESS_REQUEST, payload: action.payload})
+      }, 500);
+    } else {
+      console.log("what was the result?", Helpers.safeDataPath(result, "data.current_request_data.status") == "transcribing", result)
+    }
+
     alertActions.closeAlerts()
     alertActions.newAlert({
       //title: response.data.transcription,

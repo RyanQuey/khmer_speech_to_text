@@ -113,7 +113,7 @@ let Helpers = {
   },
 
   getTranscriptDataFromParam: (transcriptIdentifier) => {
-    const lastModifiedRegex = /.+(-lastModified[0-9]+)$/
+    const lastModifiedRegex = /.+(-lastModified[0-9]+T?[0-9]+Z?)$/
     const lastModifiedMatch = transcriptIdentifier.match(lastModifiedRegex)[1]
 
     // filename is param minus the lastModified suffix

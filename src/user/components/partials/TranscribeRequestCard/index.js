@@ -19,8 +19,6 @@ class TranscribeRequestCard extends Component {
     const { transcribeRequest, selected, onClick, height, maxWidth, className, subtitle, small, wrapperClass, smallIcon} = this.props
     if (!transcribeRequest) {return null} //shouldn't happen, but whatever
 
-    console.log(transcribeRequest)
-
     return (
       <Card selected={selected} onClick={onClick} height={height} maxWidth={maxWidth} wrapperClass={wrapperClass} className={`${className} ${classes[status]} ${small ? classes.small : ""}`}>
         <CardHeader className={small ? classes.smallHeader : ""} title={transcribeRequest.filename} subtitle={subtitle || transcribeRequest.contentType} icon={"icon"} iconColor={"blue"}/>

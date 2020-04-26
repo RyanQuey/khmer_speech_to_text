@@ -15,7 +15,7 @@ class TranscribeRequestsIndex extends Component {
     return (
       <div id="unfinished-transcript-ctn">
         <div className="menu-ctn">
-          <h1>Unfinished Transcripts</h1>
+          <h1>Transcript Request History</h1>
         </div>
         <TranscribeRequestPicker 
           transcribeRequests={transcribeRequests}
