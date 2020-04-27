@@ -10,7 +10,7 @@ class Transcript {
     // assign keys and values from transcript to this
 
     this.fileLastModified = transcriptData.file_last_modified
-    this.createdAt = transcriptData.transcript_metadata.last_updated_at
+    this.createdAt = Helpers.safeDataPath(transcriptData, "transcript_metadata.last_updated_at")
     this.filePath = transcriptData.file_path
     this.fileSize = transcriptData.file_size
     this.fileType = transcriptData.content_type

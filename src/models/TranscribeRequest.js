@@ -82,17 +82,13 @@ class TranscribeRequest {
 
   docRef (options = {}) {
     const collectionRef = db.collection("users").doc(this.user.uid).collection("transcribeRequests")
-    console.log("Options", options)
     let docRef
     if (options.newDoc) {
-      console.log("getting new doc")
       docRef = collectionRef.doc()
       this.id = docRef.id
-      console.log("get id", this.id, docRef)
 
     } else {
 
-      console.log("doc with id", this.id)
       docRef = collectionRef.doc(this.id)
     }
 
@@ -132,7 +128,6 @@ class TranscribeRequest {
     // do synchronous
     if (!options.skipPersist) {
       // TODO wrap this in transaction, and make sure the updatedAt time is the same
-      console.log("logging new status", eventLog)
       store.dispatch({
         type: UPDATE_TRANSCRIBE_REQUEST_STATUS_REQUEST, 
         payload: event,
@@ -157,7 +152,7 @@ class TranscribeRequest {
   // If a single file has been uploaded multiple times, will eventually show a list of versions on the side somewhere, which the user can select, but just start by default by showing the last crea transcriptted transcript. TODO
   // make a mock transcript object based on the file, selecting keys based on what the transcript will have
   transcriptUrl () {
-    const t = this.trancsript()
+    const t = this.transcript()
 
     return t.showViewUrl()
   }
@@ -166,6 +161,14 @@ class TranscribeRequest {
     const t = this.transcript()
 
     return t.identifier()
+  }
+
+  transcribing () {
+    return this.getStatus() == TRANSCRIPTION_STATUSES[3]
+  }
+
+  processing () {
+    return this.getStatus() == TRANSCRIPTION_STATUSES[4]
   }
 
   transcriptionComplete () {
@@ -177,7 +180,7 @@ class TranscribeRequest {
     // TODO allow checking with eventlogs if an option is passed in, otherwise just trust the record
     // return _.last(this.eventLogs || [])
     return this.status
-  } transcript
+  } 
 
   // for requests for firestore AND to our own API, this is the essential data we are sending
   getRequestPayload () {
@@ -221,9 +224,7 @@ class TranscribeRequest {
   async uploadToStorage() {
     try {
       // set to status uploading, and persist for the first time
-      console.log("about to log event")
       this.logEvent(TRANSCRIPTION_STATUSES[0], {skipPersist: true}) // uploading
-      console.log("about to persist record with the first time")
       await this.updateRecord()
 
       const snapshot = await this._upload()
@@ -254,7 +255,7 @@ class TranscribeRequest {
       return snapshot
 
     } catch (err) {
-      console.log('error uploading to storage: ', err)
+      console.error('error uploading to storage: ', err)
       // throw it up the chain
       throw err
     }
@@ -274,9 +275,7 @@ class TranscribeRequest {
       // if it's creating a record, get an id and keep it in browser and in firestore
 
 
-      console.log("updating record in firestore", docRef)
       await docRef.set(updates, { merge: true })
-      console.log("got it", docRef)
 
       return updates
 

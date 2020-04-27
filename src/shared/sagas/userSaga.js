@@ -27,6 +27,7 @@ import { TRANSCRIPTION_STATUSES} from "constants/transcript"
 import { errorActions, alertActions } from 'shared/actions'
 import firebaseApp from 'refire/firebase'
 import TranscribeRequest from 'models/TranscribeRequest'
+import { Link } from 'react-router-dom'
 
 
 function* signIn(action) {
@@ -71,7 +72,6 @@ function* signIn(action) {
         // break
     }
 
-    console.log("login result", result)
     let user = result
 
     if (user) {
@@ -88,7 +88,7 @@ function* signIn(action) {
     } else {
       //no user found
       //TODO: make a separate action for the error
-      console.log("no user or error returned...");
+      console.error("no user or error returned...");
       yield put({type: SIGN_IN_FAILURE})
       errorActions.handleErrors({
         templateName: "Login",
@@ -153,7 +153,6 @@ function* signIn(action) {
 function* fetchUser(action, options = {}) {
   try {
     const userData = action.payload
-    console.log("userData", action.payload)
     const ref = db.collection("users").doc(userData.uid)
 
     let returnedUser
@@ -195,56 +194,60 @@ function* fetchCurrentUser(action) {
 
     yield put({type: SET_CURRENT_USER, payload: returnedUser})
 
+    // TODO move these hooks to hook saga, to keep things cleaner
     const userTranscriptsRef = userRef.collection("transcripts")
     // const transcriptsResult = yield userTranscriptsRef.get()
     // const mappedTranscripts = transcriptsResult.docs.map(doc => doc.data())
 
     // setup listener so every change to transcripts in firestore is reflected
     userTranscriptsRef.onSnapshot((snapshot) => { 
-      console.log("foudn some transcripts for user", snapshot)
       const mappedTranscripts = snapshot.docs.map(doc => doc.data())
       store.dispatch({type: FETCH_TRANSCRIPTS_SUCCESS, payload: mappedTranscripts})
     })
 
-    // setup listener so changes to uploads and transcriptions that are in process are always up to
-    // date
-    userRef.collection("transcribeRequests").onSnapshot((snapshot) => { 
-      console.log("foudn some transcribe requests for user", snapshot)
-      // handle the transcripts themselves
+    const userTranscribeRequestsRef = userRef.collection("transcribeRequests")
+
+    // setup listener so changes to uploads and transcriptions that are in process are always up to date
+    userTranscribeRequestsRef.onSnapshot((snapshot) => {
+      const currentRecords = _.values(store.getState().transcribeRequests || [])
 
       const changes = snapshot.docChanges.map(change => {
         const docData = change.doc.data()
         const transcribeRequest = new TranscribeRequest({transcribeRequestRecord: docData})
+        // or better, oldRecord
+        const currentRecord = currentRecords.find(t => t.id == transcribeRequest.id)
 
+
+        // things to do only one time, at the start, or when new records are added
 				if (change.type === "added") {
-					console.log("File is uploaded (though that should be known already): ", docData.filename);
-				  // don't do anything yet
-				}
+          // all of this runs on the first time the snapshot is received
+          if (transcribeRequest.transcribing()) { 
+            store.dispatch({type: CHECK_TRANSCRIBING_PROGRESS_REQUEST, payload: transcribeRequest})
+          }
 
-				if (change.type === "modified") {
-					console.log("Status update for: ", docData.filename);
-					console.log("Now status: ", docData.status);
+				} else if (change.type === "modified") {
+
+          if (transcribeRequest.transcriptionComplete()) {
+					  // check if it wasn't complete before, and if so, alert user that a new transcript is
+					  // ready
+            if (transcribeRequest.status != currentRecord.status) {
+              alertActions.newAlert({
+                title: `Transcript ${transcribeRequest.filename} complete!`,
+                message: <Link to={transcribeRequest.transcriptUrl()}>View here</Link>,
+                level: "SUCCESS",
+                options: {timer: false}
+              })
+            }
+          }
 				  // refresh the event_log
 
-				}
-
-				if (change.type === "removed") {
+				} else if (change.type === "removed") {
 				  // shouldn't happen anymore
 				}
       })
 
+      // update the store
       const mappedTranscriptRequests = snapshot.docs.map(doc => doc.data())
-      // if any are transcribing, poll our server until it's finished
-      mappedTranscriptRequests.forEach(t => {
-        // when get response from a poll, will setup timer to poll again there, rather than setting
-        // up a while loop and a store to manage it or something like that. Just simpler this way
-        const transcribeRequest = new TranscribeRequest({transcribeRequestRecord: t})
-        if (transcribeRequest.status == TRANSCRIPTION_STATUSES[3]) { // transcribing
-          store.dispatch({type: CHECK_TRANSCRIBING_PROGRESS_REQUEST, payload: transcribeRequest})
-        }
-
-      })
-
       store.dispatch({type: FETCH_TRANSCRIBE_REQUESTS_SUCCESS, payload: mappedTranscriptRequests})
     })
 
@@ -279,7 +282,7 @@ function* signUserOut() {
     yield axios.get(`/api/users/signOut`)
 
   } catch (err) {
-    console.log('There was an error in the signUserOut:', err.message)
+    console.error('There was an error in the signUserOut:', err.message)
     errorActions.handleErrors({
       templateName: "Login",
       templatePart: "signout",

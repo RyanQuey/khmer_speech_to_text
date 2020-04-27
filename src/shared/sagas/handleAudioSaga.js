@@ -31,7 +31,6 @@ function* uploadAudio(action) {
 
     // TODO secure storage so requires bearer token
     fileMetadata = yield transcribeRequest.uploadToStorage()
-    console.log("metadata", fileMetadata)
 
   } catch (err) {
     yield put({type: UPLOAD_AUDIO_FAILURE})
@@ -59,14 +58,19 @@ function* uploadAudio(action) {
   }
 
   try {
-    if (!fileMetadata) {
-      console.log("where is the metadata!?!?")
-      return
-    }
-    console.log("do we still get here...?;")
     yield axios.post("/request-transcribe/", fileMetadata)
 
     yield put({type: UPLOAD_AUDIO_SUCCESS, payload: fileMetadata})
+
+    // if transcribing, start polling our server
+    const transcribeRequest = new TranscribeRequest({transcribeRequestRecord: fileMetadata})
+    // fileMetadata didn't have all the properties attached, so reload first
+    transcribeRequest.reload()
+    if (transcribeRequest.transcribing()) {
+      console.log("should now begin check request polling")
+      yield put({type: CHECK_TRANSCRIBING_PROGRESS_REQUEST, payload: transcribeRequest})
+    }
+
 
     alertActions.closeAlerts()
     alertActions.newAlert({
@@ -106,26 +110,44 @@ function* uploadAudio(action) {
 function* requestResume(action) {
   let transcribeRequest
 
+
   try {
     transcribeRequest = action.payload
     // Have to refresh token every hour or it expires, so call this before hitting cloud functions
     // TODO haven't tested
     yield userActions.setBearerToken()
 
-    // fileMetadata only has some of the info, but the db will grab the record from firestore before
+    // fileMetadata only has some of the info, but the server will grab the record from firestore before
     // continuing anyways, so it's enough
     // TODO don't update, just do a get from firestore
     const fileMetadata = yield transcribeRequest.getRequestPayload()
+      // result tends to just have a message, that's it
     const result = yield axios.post("/resume-request/", fileMetadata)
 
     yield put({type: RESUME_TRANSCRIBING_SUCCESS, payload: result.data})
 
+    // if transcribing, start polling our server
+    // start by reloading to the store (which should also be current state of firestore)
+    transcribeRequest.reload()
+
+    let message
+    if (transcribeRequest.transcribing()) {
+      console.log("should now begin check request polling")
+      message = "Now continuing transcription process, please wait"
+      yield put({type: CHECK_TRANSCRIBING_PROGRESS_REQUEST, payload: transcribeRequest})
+
+    } else {
+      // TODO more descriptive messages for user
+      message = "Resuming"
+    }
+
     alertActions.closeAlerts()
     alertActions.newAlert({
       //title: response.data.transcription,
-      title: "Now resuming transcription, please wait",
+      title: "Success",
+      message,
       level: "SUCCESS",
-      options: {timer: false}
+      options: {timer: true}
     })
 
     action.cb && action.cb(transcribeRequest)
@@ -183,17 +205,7 @@ function* checkStatus(action) {
         store.dispatch({type: CHECK_TRANSCRIBING_PROGRESS_REQUEST, payload: action.payload})
       }, 750);
 
-    } else {
-      console.log("what was the result?", Helpers.safeDataPath(result, "data.current_request_data.status") == "transcribing", result)
     }
-
-    alertActions.closeAlerts()
-    alertActions.newAlert({
-      //title: response.data.transcription,
-      title: "finished checking status of transcription",
-      level: "SUCCESS",
-      options: {timer: false}
-    })
 
     action.cb && action.cb(transcribeRequest)
 
@@ -248,9 +260,7 @@ async function _sendBase64 (file) {
 async function _confirmErrorStatus (transcribeRequest, errorMessage = "Unknown error") {
   // TODO haven't defined
   await transcribeRequest.reload()
-  console.log("current record is:", transcribeRequest)
 
-  console.log("does it have an error already?", !transcribeRequest.status.includes("error"))
   if (!transcribeRequest.status.includes("error")) {
     // if no error, then update status
     console.error("Have to log this error, the server didn't get it")
