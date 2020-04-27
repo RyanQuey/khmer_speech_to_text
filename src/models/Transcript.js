@@ -1,4 +1,5 @@
 import { TRANSCRIPTION_STATUSES} from "constants/transcript"
+import TranscribeRequest from 'models/TranscribeRequest'
 
 // TODO create model class, with stuff for schema etc
 //class Transcript extends Model {
@@ -18,7 +19,9 @@ class Transcript {
     this.userId = transcriptData.user_id
     this.filename = transcriptData.filename
     this.utterances = transcriptData.utterances
-    this.uploaded_at = transcriptData.uploaded_at
+    this.uploadedAt = transcriptData.uploaded_at
+    // TODO need to persist this on the transcript not as id, but transcribe_request_id...
+    this.transcribeRequestId = transcriptData.id
   }
 
   // no bells and whistles, just thir 
@@ -60,6 +63,20 @@ class Transcript {
     return `${(this.fileSize / 1048576).toFixed(2)} MB`
   }
 
+  async hideTranscribeRequest () {
+    let tr = this.getTranscribeRequest()
+    if (tr && !tr.hidden) {
+      await tr.markAsHidden()
+    }
+  }
+
+  getTranscribeRequest () { 
+    const trs = _.values(store.getState().transcribeRequests)
+
+    const match = trs.find(tr => tr.id == this.transcribeRequestId)
+    console.log("Match", match)
+    return match && new TranscribeRequest({transcribeRequestRecord: match})
+  }
 }
 
 export default Transcript

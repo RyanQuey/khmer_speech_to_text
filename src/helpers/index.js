@@ -128,15 +128,9 @@ let Helpers = {
   // looks for match based on filename and file last modified time
   matchingTranscripts: (transcripts, encodedFileName, lastModified) => {
     const transcriptsArr = _.values(transcripts).map(t => new Transcript(t))
-    console.log("looking for encoded file name", encodedFileName)
-    console.log("and time", lastModified)
     const matches = transcriptsArr ? 
       transcriptsArr.filter(transcript => {
         let encodedTranscriptFilename = transcript.encodedFilename()
-        console.log("is this a match?", transcript)
-        console.log(encodedTranscriptFilename, transcript.filename)
-        console.log("decoded is", decodeURIComponent(encodedTranscriptFilename))
-        console.log(transcript.fileLastModified)
 
         return (
           [

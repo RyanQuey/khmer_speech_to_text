@@ -17,23 +17,41 @@ class ShowTranscript extends Component {
   constructor(props) {
     super(props)
 
-
-    this.state = {
-    }
+    this.findTranscript = this.findTranscript.bind(this)
   }
 
-  render() {
-    const { params } = this.props.match
+  componentDidMount() {
+    const { transcript } = this.findTranscript()
+    // (async side effect)
+    // after showing once, stop showing the request in the transcribe request show view
+    console.log("MOUNTING trying to hide transcript", transcript)
+    transcript && transcript.hideTranscribeRequest()
+  }
+
+  componentDidUpdate() {
+    const { transcript } = this.findTranscript()
+    // (async side effect)
+    // after showing once, stop showing the request in the transcribe request show view
+    console.log("UPDATING trying to hide transcript", transcript)
+    transcript && transcript.hideTranscribeRequest()
+  }
+
+  findTranscript () {
+    const { transcripts, match } = this.props
+    const { params } = match
     const { transcriptIdentifier } = params
-    // TODO move all this into helper and thin into willreceiveProps so it updates on page change and when transcripts get loaded
+
     const {encodedFileName, lastModified} = Helpers.getTranscriptDataFromParam(transcriptIdentifier)
     console.log("filename", encodedFileName, lastModified)
-    const { transcripts } = this.props
 
     const matchingTranscripts = Helpers.matchingTranscripts(transcripts, encodedFileName, lastModified)
 
-    // TODO will hide old records and select current one by transcactionId, rather than array order which is unreliable
     const transcript = matchingTranscripts.pop()
+    return {matchingTranscripts, transcript}
+  }
+
+  render() {
+    const { transcript, matchingTranscripts} = this.findTranscript()
     console.log("showing transcript: ", transcript, "but all matches include:", matchingTranscripts)
     if (!transcript) {
       return <Spinner />

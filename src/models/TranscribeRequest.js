@@ -50,6 +50,7 @@ class TranscribeRequest {
       this.updatedAt = record.updated_at 
 
       this.status = record.status
+      this.hidden = record.hidden
       this.error = record.error
 
     } else if (obj.transcript) {
@@ -214,6 +215,10 @@ class TranscribeRequest {
       {
         estimatedTime: 2 + this.sizeInMB() * .3,
       },
+      // processed. doesn't take time at all, we're done!
+      {
+        estimatedTime: 0,
+      },
     ]
 
     const weightsReducer = (acc, stage) => acc + stage.estimatedTime
@@ -297,6 +302,9 @@ class TranscribeRequest {
       }
 
       
+    } else if (this.transcriptionComplete()) {
+      return "already-complete"
+
     } else if (this.lastRequestHasStopped()) {
       console.log("last request has stopped")
       // if no errored,  make sure that they wait long enough
@@ -378,10 +386,16 @@ class TranscribeRequest {
       "unretryable-error": "Unknown Error: Cannot handle this file for unknown reasons",
       "can-retry": "Press to request transcript",
       "please-wait": "We are still processing your file, please wait",
+      "already-complete": "Finished transcribing, click here to view!",
     }
 
     return obj[message]
   }
+  // alias
+  displayNextStepMessage () {
+    return this.displayCanRetryMessage()
+  }
+
   // /////////////////////////
   // Async stuff
   // //////////////////////
@@ -426,7 +440,7 @@ class TranscribeRequest {
   }
   
   // creates/updates record to track status of the transcription transaction in Google cloud api
-  async updateRecord (){
+  async updateRecord (extraParams = {}){
     try {
       this.updatedAt = moment.utc().format("YYYYMMDDTHHmmss[Z]")
 
@@ -435,7 +449,7 @@ class TranscribeRequest {
       let docRef = this.docRef({newDoc: !this.id})
 
       // make sure to request docRef first, in case we need to set the id
-      const updates = this.getRequestPayload()
+      const updates = Object.assign(this.getRequestPayload(), extraParams)
       // if it's creating a record, get an id and keep it in browser and in firestore
 
 
@@ -488,6 +502,11 @@ class TranscribeRequest {
         })
       })
     }
+  }
+
+  async markAsHidden () {
+    this.hidden = true
+    await this.updateRecord({hidden: true})
   }
 
   reload () {

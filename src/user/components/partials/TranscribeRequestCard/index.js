@@ -4,6 +4,7 @@ import { PROVIDERS } from 'constants/providers'
 import { FAKE } from 'constants/actionTypes'
 import {
   withRouter,
+  Link
 } from 'react-router-dom'
 import { Card, CardHeader, Flexbox, Button, Icon } from 'shared/components/elements'
 import { SET_CURRENT_TRANSCRIPT, RESUME_TRANSCRIBING_REQUEST } from 'constants/actionTypes'
@@ -27,13 +28,12 @@ class TranscribeRequestCard extends Component {
   }
 
   componentDidMount() {
-    console.log("displaying transcribed request:", this.props.transcribeRequest)
     this.intervalID = setInterval(() => {
       this.tick()
 
       // if there is an error, want to update status to 0 one time, and then stop watching, unless
       // they start new request
-      if (this.props.transcribeRequest.hasError()) {
+      if (this.props.transcribeRequest.hasError() || this.props.transcribeRequest.transcriptionComplete()) {
         clearInterval(this.intervalID);
       }
     }, 500);
@@ -87,14 +87,25 @@ class TranscribeRequestCard extends Component {
           </Flexbox>
         </Flexbox>
 
-        {transcribeRequest.canRetry() ? (
-          <button 
+        {transcribeRequest.canRetry() && (
+          <Button 
             title={transcribeRequest.displayCanRetryMessage()} 
             onClick={this.props.requestResume.bind(this, transcribeRequest)}
           >
             Resume Transcribing File
-          </button>
-        ) : (
+          </Button>
+        )}
+        {transcribeRequest.transcriptionComplete() && (
+          <Button 
+            title={transcribeRequest.displayNextStepMessage()} 
+          >
+          <Link to={transcribeRequest.transcriptUrl()}>
+            {transcribeRequest.displayNextStepMessage()}
+          </Link>
+            
+          </Button>
+        )}
+        {!transcribeRequest.canRetry && !transcribeRequest.transcriptionComplete() && (
           <div>
             <hr />
             {transcribeRequest.displayCanRetryMessage()}
