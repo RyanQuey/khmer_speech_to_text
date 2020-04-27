@@ -194,8 +194,8 @@ function* fetchCurrentUser(action) {
 
     yield put({type: SET_CURRENT_USER, payload: returnedUser})
 
-    // TODO move these hooks to hook saga, to keep things cleaner
-    const userTranscriptsRef = userRef.collection("transcripts")
+    // TODO move these hooks to hook saga (?), to keep things cleaner
+    const userTranscriptsRef = userRef.collection("transcripts").orderBy("updated_at")
     // const transcriptsResult = yield userTranscriptsRef.get()
     // const mappedTranscripts = transcriptsResult.docs.map(doc => doc.data())
 

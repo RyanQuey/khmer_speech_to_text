@@ -10,13 +10,14 @@ import Transcript from 'models/Transcript'
 class Transcripts extends Component {
   render() {
     const { user, transcripts } = this.props
+    const transcriptsToShow = _.uniqBy(transcripts, (t) => t.fileIdentifier())
     return (
       <div id="Transcript-ctn">
         <div className="menu-ctn">
           <h1>Transcripts</h1>
         </div>
         <TranscriptPicker 
-          transcripts={transcripts}
+          transcripts={transcriptsToShow}
           pickable={true}
         />
       </div>
