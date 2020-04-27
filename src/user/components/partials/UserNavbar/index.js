@@ -44,7 +44,9 @@ class UserNavbar extends Component {
 
         <Flexbox className={classes.mainNav} justify="space-between">
           <Flexbox className={classes.leftNav} align="center" justify="space-between">
-            <a href="#" onClick={this.nothing}>Fake link</a>
+            <Link to="/transcripts">
+              Transcripts
+            </Link>
           </Flexbox>
 
           <Flexbox className={classes.rightNav} align="center" justify="space-between">

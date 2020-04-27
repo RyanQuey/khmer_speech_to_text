@@ -5,8 +5,8 @@
   height: 50px;
   z-index: 2;
   color: $white;
+  padding: 10px;
   background-color: $header-bg; //unless it's overridden in the component
-  border-bottom:  $primary solid 1px;
 
   img {
     height: 100%;
