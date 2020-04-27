@@ -195,7 +195,7 @@ function* fetchCurrentUser(action) {
     yield put({type: SET_CURRENT_USER, payload: returnedUser})
 
     // TODO move these hooks to hook saga (?), to keep things cleaner
-    const userTranscriptsRef = userRef.collection("transcripts").orderBy("updated_at")
+    const userTranscriptsRef = userRef.collection("transcripts").orderBy("updated_at", "desc")
     // const transcriptsResult = yield userTranscriptsRef.get()
     // const mappedTranscripts = transcriptsResult.docs.map(doc => doc.data())
 
@@ -205,7 +205,7 @@ function* fetchCurrentUser(action) {
       store.dispatch({type: FETCH_TRANSCRIPTS_SUCCESS, payload: mappedTranscripts})
     })
 
-    const userTranscribeRequestsRef = userRef.collection("transcribeRequests")
+    const userTranscribeRequestsRef = userRef.collection("transcribeRequests").orderBy("updated_at", "desc")
 
     // setup listener so changes to uploads and transcriptions that are in process are always up to date
     userTranscribeRequestsRef.onSnapshot((snapshot) => {

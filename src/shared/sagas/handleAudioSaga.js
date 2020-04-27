@@ -66,6 +66,8 @@ function* uploadAudio(action) {
     const transcribeRequest = new TranscribeRequest({transcribeRequestRecord: fileMetadata})
     // fileMetadata didn't have all the properties attached, so reload first
     transcribeRequest.reload()
+    console.log("what is current status?", transcribeRequest)
+    // in reality, unless it errored here, I think it should always start polling
     if (transcribeRequest.transcribing()) {
       console.log("should now begin check request polling")
       yield put({type: CHECK_TRANSCRIBING_PROGRESS_REQUEST, payload: transcribeRequest})
@@ -77,7 +79,7 @@ function* uploadAudio(action) {
       //title: response.data.transcription,
       title: "Now creating transcript, please wait",
       level: "SUCCESS",
-      options: {timer: false}
+      options: {timer: true}
     })
 
     action.cb && action.cb(transcribeRequest)
