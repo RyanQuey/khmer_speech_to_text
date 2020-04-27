@@ -3,8 +3,12 @@
   margin: 1rem;
   border: 1px solid transparent;
   border-radius: .5rem;
-  opacity: 1;
+  opacity: .9;
   transition: opacity .15s linear;
+  z-index: 1000;
+  position: absolute;
+  top: 0;
+  align-self: center;
 }
 .alert-success {
   color: #155724;

@@ -114,7 +114,7 @@ class TranscribeRequest {
 
   // returns latest first
   logsRef () {
-    return this.docRef().collection("eventLogs").orderBy("time", "desc")
+    return this.docRef().collection("eventLogs")
   }
   // for requests for firestore AND to our own API, this is the essential data we are sending
   getRequestPayload () {
@@ -140,8 +140,9 @@ class TranscribeRequest {
     return parseFloat(this.fileSize) / 1048576
   }
 
+  // in seconds
   elapsedSinceLastEvent() {
-    const updatedAt = moment(this.updatedAt, "YYYYMMDDTHHmmss[Z]")
+    const updatedAt = moment.utc(this.updatedAt, "YYYYMMDDTHHmmss[Z]")
     const now = moment()
 
     const elapsedTime = now.diff(updatedAt, "seconds")
@@ -153,7 +154,7 @@ class TranscribeRequest {
   // to not confuse things
   // TODO make separate model for event logs in order to be able to interact with them
   async getEventLogs () {
-    const logs = await this.logsRef().get()
+    const logs = await this.logsRef().orderBy("time", "desc").get()
 
     return logs
   }
@@ -166,47 +167,73 @@ class TranscribeRequest {
     return _.last(errorLogs)
   }
   ///////////////////////////////////
-  // reading/setting/interacting with status
+  // status helpers (for reading status)
   ////////////////////////////////
   
-  // event should be string
-  // can be async or syncrounous depending on options
-  logEvent (event, options = {}) {
-    const eventLog = Object.assign({
-      event,
-      time: Helpers.timestamp(),
-    }, options.otherInEvent)
+  canRetry () {
+    return ["can-retry"].includes(this.canRetryMessage())
+  }
 
-    if (Helpers.safeDataPath(options, "otherInEvent.error")) {
-      this.error = options.otherInEvent.error
-    } else {
-      this.error = ""
+
+  // not a real percentage, but just for display mostly
+  progressPercentage () {
+    if (this.hasError()) {
+      return 0
     }
 
-    // since eventLogs is a separate collection, persisting status on the local record as well for ease of access
-    this.status = event
+    // NOTE want to estimate high, so when finish it leaps some, rather than estimating low and they
+    // think it stopped. But not too high or they'll despair, at the slow progress
+    const weights = [
+      // uploading
+      { 
+        // in sec
+        // assuming 0.5 MB/s upload time
+        estimatedTime: this.sizeInMB()*2,
+      },
+      // uploaded 
+        // (i.e,. to send request to our api server, should be very fast)
+      {
+        estimatedTime: 0.3,
+      },
+        // processing file
+        // Since not converting file yet, also very fast. But requires a round trip
+        // to the google api and waits for their response too, so one 315kb file at least took 3 seconds.
+        // Maybe slower for larger files though since Google has to download and look at it as well?
+      {
+        estimatedTime: 3,
+      },
+        // transcribing
+        // one 315KB file took 6 seconds
+        // Includes server > client (respond to original request) > server again (client begins
+        // polling) > Google > server
+      {
+        estimatedTime: 11 + this.sizeInMB() * 3,
+      },
+        // processing transcript. Should be very fast
+        // one 315 KB file took one second
+      {
+        estimatedTime: 2 + this.sizeInMB() * .3,
+      },
+    ]
 
-    // always skip persist if haven't created record in db yet, just save afterwards. Or if want to
-    // do synchronous
-    if (!options.skipPersist) {
-      // TODO wrap this in transaction, and make sure the updatedAt time is the same
-      store.dispatch({
-        type: UPDATE_TRANSCRIBE_REQUEST_STATUS_REQUEST, 
-        payload: event,
-      })
-      
-      // NOTE returns a promise that finishes when both are done
+    const weightsReducer = (acc, stage) => acc + stage.estimatedTime
+    const totalEstimatedTime = _.values(weights).reduce(weightsReducer, 0)
+    const currentStageIndex = TRANSCRIPTION_STATUSES.findIndex(s => s == this.getStatus())
+    console.log("current stage:", TRANSCRIPTION_STATUSES[currentStageIndex], currentStageIndex)
 
-      return Promise.all([
-        this.logsRef().add(eventLog), 
-        this.updateRecord()
-      ]).then(r => {
-        store.dispatch({
-          type: UPDATE_TRANSCRIBE_REQUEST_STATUS_SUCCESS, 
-          payload: event,
-        })
-      })
-    }
+      // add time passed for stages that are finished
+    let stagesFinished = weights.slice(0, currentStageIndex) 
+    let estimatedElapsedTime = stagesFinished.reduce(weightsReducer, 0)
+
+    // add elapsed time since last stage, maximum being 90% of estimated time for current stage
+    const currentStage = weights[currentStageIndex] 
+    console.log("time elapsed:", this.elapsedSinceLastEvent())
+    console.log("current state estimated time", currentStage.estimatedTime*0.9)
+    estimatedElapsedTime += Math.min(this.elapsedSinceLastEvent(), currentStage.estimatedTime*0.9)
+
+    console.log("percent", estimatedElapsedTime / totalEstimatedTime * 100)
+
+    return estimatedElapsedTime / totalEstimatedTime * 100
   }
 
   // each transcript will be name spaced by file name and last modified date.
@@ -258,7 +285,7 @@ class TranscribeRequest {
         // if for no other reason than to get that error property set...
         return "can-retry"
 
-      } else if (this.error && this.error.includes("404 No such object")) {
+      } else if (this.error && String(this.error).includes("404 No such object")) {
         console.log("file is missing")
       // E.g., "404 No such object: khmer-speech-to-text.appspot.com/audio/rBBGZxzo3EOUtTJOFkARSf2qxd73/temp-audio.flac"
         // TODO for these, include a button to reupload, and then attach it to current transcribe
@@ -286,6 +313,9 @@ class TranscribeRequest {
     // see notes in server for why these times
     const status = this.status
     const elapsedTime = this.elapsedSinceLastEvent()
+    // TODO right now, these are numbers used in python server, which is not actually seconds, so
+    // when change that, change this as well. This means we're making user wait longer than the
+    // server, by quite a bit actually
     if (status == TRANSCRIPTION_STATUSES[0]) { // uploading
         // assumes at least 1/5 MB / sec internet connection (except for that 100 = 1 min...)
         return elapsedTime > this.sizeInMB() * 5
@@ -384,7 +414,7 @@ class TranscribeRequest {
       const snapshot = await this.fileStorageRef().put(this.file, metadata)
       // could do it firestore way:
       //but this way is consistent with our api
-      this.logEvent(TRANSCRIPTION_STATUSES[1], {skipPersist: true}) // uploaded
+      await this.logEvent(TRANSCRIPTION_STATUSES[1]) // uploaded
 
       return snapshot
 
@@ -420,8 +450,44 @@ class TranscribeRequest {
     }
   }
 
-  canRetry () {
-    return ["can-retry"].includes(this.canRetryMessage())
+  // eventdshould be string
+  // can be async or syncrounous depending on options
+  logEvent (event, options = {}) {
+    const eventLog = Object.assign({
+      event,
+      time: Helpers.timestamp(),
+    }, options.otherInEvent)
+
+    if (Helpers.safeDataPath(options, "otherInEvent.error")) {
+      this.error = options.otherInEvent.error
+    } else {
+      this.error = ""
+    }
+
+    // since eventLogs is a separate collection, persisting status on the local record as well for ease of access
+    this.status = event
+
+    // always skip persist if haven't created record in db yet, just save afterwards. Or if want to
+    // do synchronous
+    if (!options.skipPersist) {
+      // TODO wrap this in transaction, and make sure the updatedAt time is the same
+      store.dispatch({
+        type: UPDATE_TRANSCRIBE_REQUEST_STATUS_REQUEST, 
+        payload: event,
+      })
+      
+      // NOTE returns a promise that finishes when both are done
+
+      return Promise.all([
+        this.logsRef().add(eventLog), 
+        this.updateRecord()
+      ]).then(r => {
+        store.dispatch({
+          type: UPDATE_TRANSCRIBE_REQUEST_STATUS_SUCCESS, 
+          payload: event,
+        })
+      })
+    }
   }
 
   reload () {

@@ -81,6 +81,7 @@
     "prop-types": "^15.5.10",
     "querystring": "^0.2.0",
     "react": "^16.13.1",
+    "react-circular-progressbar": "^2.0.3",
     "react-dom": "^16.13.1",
     "react-dropzone": "^3.13.4",
     "react-modal": "^3.11.2",

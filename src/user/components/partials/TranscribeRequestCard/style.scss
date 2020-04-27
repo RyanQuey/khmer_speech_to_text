@@ -8,6 +8,7 @@
   max-height: 80px;
   max-width: 250px;
   .contentSection {
+    word-break: break-all;
     //display: flex;
     //.cardLabel{
     //}
@@ -37,13 +38,6 @@
   .profilePic {
     width: 50px;
   }
-  .utms {
-    width: 100%;
-    .utmField {
-      width: 100%;
-    }
-
-  }
 }
 .imageLink {
   background-repeat: no-repeat;
@@ -54,21 +48,21 @@
   margin: 10px;
   cursor: pointer;
 }
-.toUpdate {
-  border: blue solid 1.5px;
-  h5 {
-    color: blue;
-  }
+.progressCircleContainer {
+  width: 20%;
+  max-width: 150px;
+  padding: 1rem;
 }
-.toCreate {
-  border: green solid 1.5px;
-  h5 {
-    color: green;
-  }
+.infoContainer {
+  width: 80%;
 }
-.toDelete {
-  border: red solid 1.5px;
-  h5 {
-    color: red;
+.request-card {
+  padding: 2rem;
+  max-width: 450px;
+  &.error {
+
+  }
+  &.transcribing {
+
   }
 }
