@@ -70,18 +70,30 @@ function* uploadAudio(action) {
     if (transcribeRequest.transcribing()) {
       console.log("should now begin check request polling")
       yield put({type: CHECK_TRANSCRIBING_PROGRESS_REQUEST, payload: transcribeRequest})
+      alertActions.closeAlerts()
+      alertActions.newAlert({
+        //title: response.data.transcription,
+        title: "Now creating transcript, please wait",
+        level: "SUCCESS",
+        options: {timer: true}
+      })
+
+      action.cb && action.cb(transcribeRequest)
+    } else {
+      // this means that there is an error
+
+      errorActions.handleErrors({
+        templateName: "UploadAudio",
+        templatePart: "form",
+        title: "Error Transcribing Audio:",
+        // TODO get and parse error message, maybe they need to change what they're sending 
+        message: "Please try again", 
+        errorObject: err,
+        alert: true,
+      }, null, null, {
+        useInvalidAttributeMessage: true,
+      })
     }
-
-
-    alertActions.closeAlerts()
-    alertActions.newAlert({
-      //title: response.data.transcription,
-      title: "Now creating transcript, please wait",
-      level: "SUCCESS",
-      options: {timer: true}
-    })
-
-    action.cb && action.cb(transcribeRequest)
 
   } catch (err) {
     yield put({type: UPLOAD_AUDIO_FAILURE})

@@ -18,6 +18,7 @@ class TranscribeRequestCard extends Component {
   render () {
     const { transcribeRequest, selected, onClick, height, maxWidth, className, subtitle, small, wrapperClass, smallIcon} = this.props
     if (!transcribeRequest) {return null} //shouldn't happen, but whatever
+    console.log("displaying transcribed request:", transcribeRequest)
 
     return (
       <Card selected={selected} onClick={onClick} height={height} maxWidth={maxWidth} wrapperClass={wrapperClass} className={`${className} ${classes[status]} ${small ? classes.small : ""}`}>
@@ -29,10 +30,10 @@ class TranscribeRequestCard extends Component {
         <br />
 
         {[
+          [transcribeRequest.displayLastUpdated(), "Last Updated", {customValue: true}],
           ["status", "Status"],
           // not yet implemented
-          ["currentError", "Last Error"],
-          [transcribeRequest.displayLastUpdated(), "Last Updated", {customValue: true}],
+          ["error", "Last Error"],
         ].map((set, index) => {
           let stringKey = typeof set[0] == "string" && (!set[2] || !set[2].customValue)
           let label = set[1]
@@ -52,7 +53,19 @@ class TranscribeRequestCard extends Component {
             </div>
           </Flexbox>
         })}
-        {transcribeRequest.requestable() && <button onClick={this.props.requestResume.bind(this, transcribeRequest)}>Resume Transcribing File</button>}
+        {transcribeRequest.canRetry() ? (
+          <button 
+            title={transcribeRequest.displayCanRetryMessage()} 
+            onClick={this.props.requestResume.bind(this, transcribeRequest)}
+          >
+            Resume Transcribing File
+          </button>
+        ) : (
+          <div>
+            <hr />
+            {transcribeRequest.displayCanRetryMessage()}
+          </div>
+        )}
       </Card>
     )
   }
