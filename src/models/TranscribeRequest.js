@@ -117,9 +117,12 @@ class TranscribeRequest {
   logsRef () {
     return this.docRef().collection("eventLogs")
   }
+
+  // TODO change its name to show that we're just mapping to format we want to persist in db / send
+  // to our server (which should be same format)
   // for requests for firestore AND to our own API, this is the essential data we are sending
   getRequestPayload () {
-    const { id, error, user, filename, fileLastModified, fileType, filePath, fileSize } = this
+    const { id, error, user, filename, fileLastModified, fileType, filePath, fileSize, updatedAt } = this
     const fileMetadata = { 
       id,
       filename,
@@ -130,6 +133,7 @@ class TranscribeRequest {
       file_size: fileSize,
       user_id: user.uid,
       // most of the time this is the only thing that gets changed in all this. 
+      updated_at: updatedAt,
       status: this.getStatus(),
       error,
     }
@@ -188,8 +192,10 @@ class TranscribeRequest {
       // uploading
       { 
         // in sec
-        // assuming 0.5 MB/s upload time
-        estimatedTime: this.sizeInMB()*2,
+        // assuming 0.5 MB/s upload time for our wild estimate
+        // Even if we have Google's percentages, add a second since we have to do our own roundtrips
+        // with Google before we confirm and continue
+        estimatedTime: this.uploadProgress ? this.elapsedSinceLastEvent() / this.uploadProgress + 1 : this.sizeInMB()*2,
       },
       // uploaded 
         // (i.e,. to send request to our api server, should be very fast)
@@ -208,7 +214,7 @@ class TranscribeRequest {
         // Includes server > client (respond to original request) > server again (client begins
         // polling) > Google > server
       {
-        estimatedTime: 11 + this.sizeInMB() * 3,
+        estimatedTime: 20 + this.sizeInMB() * 3,
       },
         // processing transcript. Should be very fast
         // one 315 KB file took one second
@@ -224,19 +230,30 @@ class TranscribeRequest {
     const weightsReducer = (acc, stage) => acc + stage.estimatedTime
     const totalEstimatedTime = _.values(weights).reduce(weightsReducer, 0)
     const currentStageIndex = TRANSCRIPTION_STATUSES.findIndex(s => s == this.getStatus())
-    console.log("current stage:", TRANSCRIPTION_STATUSES[currentStageIndex], currentStageIndex)
-
+    // console.log("current stage:", TRANSCRIPTION_STATUSES[currentStageIndex], currentStageIndex) 
       // add time passed for stages that are finished
     let stagesFinished = weights.slice(0, currentStageIndex) 
     let estimatedElapsedTime = stagesFinished.reduce(weightsReducer, 0)
 
-    // add elapsed time since last stage, maximum being 90% of estimated time for current stage
-    const currentStage = weights[currentStageIndex] 
-    console.log("time elapsed:", this.elapsedSinceLastEvent())
-    console.log("current state estimated time", currentStage.estimatedTime*0.9)
-    estimatedElapsedTime += Math.min(this.elapsedSinceLastEvent(), currentStage.estimatedTime*0.9)
 
-    console.log("percent", estimatedElapsedTime / totalEstimatedTime * 100)
+    // add elapsed time since last stage, maximum being 90% of estimated time for current stage
+    let bestGuess
+    if (this.status == TRANSCRIPTION_STATUSES[0]) {
+      // we have better way of tracking how much is done
+      bestGuess = this.elapsedSinceLastEvent()
+
+    } else {
+      const currentStage = weights[currentStageIndex] 
+      // console.log("time elapsed:", this.elapsedSinceLastEvent())
+      // console.log("current state estimated time", currentStage.estimatedTime*0.9)
+
+      // don't want us looking like we went further than is possible! So don't allow beyond 90% of
+      // our estimate
+      bestGuess = Math.min(this.elapsedSinceLastEvent(), currentStage.estimatedTime*0.9)
+    }
+    estimatedElapsedTime += bestGuess
+
+    // console.log("percent", estimatedElapsedTime / totalEstimatedTime * 100)
 
     return estimatedElapsedTime / totalEstimatedTime * 100
   }
@@ -296,6 +313,10 @@ class TranscribeRequest {
         // TODO for these, include a button to reupload, and then attach it to current transcribe
         // request (rather than creating a new one)
         return "file-missing"
+
+      } else if (this.error && String(this.error).includes("Presumably a client error")) {
+        return "can-retry"
+
       } else {
         // TODO add more retryable errors
         return "unretryable-error"
@@ -306,7 +327,6 @@ class TranscribeRequest {
       return "already-complete"
 
     } else if (this.lastRequestHasStopped()) {
-      console.log("last request has stopped")
       // if no errored,  make sure that they wait long enough
       return "can-retry"
 
@@ -316,6 +336,7 @@ class TranscribeRequest {
   }
 
   // NOTE this is just a reasonable guess based on time passed, for use with retrying
+  // TODO make these times a function of constant that relates to teh percentage builder
   lastRequestHasStopped () {
     // copying what we have in server, so user doesn't ask for something we aren't going to handle anyway
     // see notes in server for why these times
@@ -399,13 +420,18 @@ class TranscribeRequest {
   // /////////////////////////
   // Async stuff
   // //////////////////////
-  async uploadToStorage() {
+
+  // note that hooks also has the file object on it, but we are not using it here for that
+  async uploadToStorage(hooks = {}) {
+    const {onStartUploading} = hooks
+  console.log("start uploading hook", onStartUploading)
     try {
       // set to status uploading, and persist for the first time
       this.logEvent(TRANSCRIPTION_STATUSES[0], {skipPersist: true}) // uploading
       await this.updateRecord()
+      onStartUploading && onStartUploading(this)
 
-      const snapshot = await this._upload()
+      await this._upload()
       const fileMetadata = this.getRequestPayload()
       return fileMetadata
     
@@ -425,12 +451,10 @@ class TranscribeRequest {
         customMetadata: {fileLastModified}
       };
 
-      const snapshot = await this.fileStorageRef().put(this.file, metadata)
       // could do it firestore way:
       //but this way is consistent with our api
       await this.logEvent(TRANSCRIPTION_STATUSES[1]) // uploaded
-
-      return snapshot
+      await this._sendAndTrackFile(file, metadata)
 
     } catch (err) {
       console.error('error uploading to storage: ', err)
@@ -439,21 +463,55 @@ class TranscribeRequest {
     }
   }
   
+  // track progress
+  // https://firebase.google.com/docs/storage/web/upload-files#monitor_upload_progress
+  // NOTE could just await the `put()` call, but then can't track progress
+  _sendAndTrackFile (file, metadata) {
+    return new Promise((resolve, reject) => {
+      const uploadTask = this.fileStorageRef().put(file, metadata)
+
+			uploadTask.on('state_changed', function(snapshot){
+				// Observe state change events such as progress, pause, and resume
+				// Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+				// is a % estimated by Google
+				this.uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes);
+				console.log('Upload is ' + this.uploadProgress*100 + '% done and currently ' + snapshot.state);
+			}, function(error) {
+				// Handle unsuccessful uploads
+			  return reject(error)
+
+			}, function() {
+				// Handle successful uploads on complete
+				this.uploadProgress = 1 // aka 100%
+			  return resolve()
+			});
+    })
+  }
+
   // creates/updates record to track status of the transcription transaction in Google cloud api
+  //
   async updateRecord (extraParams = {}){
     try {
       this.updatedAt = moment.utc().format("YYYYMMDDTHHmmss[Z]")
 
       // should have all the things we might possibly want to update
       // TODO maybe better for func to just accept a payload obj, so don't have to persist so much.
+      const creatingRecord = !this.id
       let docRef = this.docRef({newDoc: !this.id})
 
       // make sure to request docRef first, in case we need to set the id
       const updates = Object.assign(this.getRequestPayload(), extraParams)
       // if it's creating a record, get an id and keep it in browser and in firestore
 
+      // if updating (ie not creating), make sure to merge
+      await docRef.set(updates, { merge: !creatingRecord })
 
-      await docRef.set(updates, { merge: true })
+      if (creatingRecord) {
+        // status should have been initialized by now
+        // creating record, so basically am logging the initial status
+        const eventLog = this.makeEventLog(TRANSCRIPTION_STATUSES[0])
+        await this.logsRef().add(eventLog)
+      }
 
       return updates
 
@@ -464,13 +522,17 @@ class TranscribeRequest {
     }
   }
 
+  makeEventLog (event, otherInEvent = {}) {
+    return Object.assign({
+      event,
+      time: Helpers.timestamp(),
+    }, otherInEvent)
+  }
+
   // eventdshould be string
   // can be async or syncrounous depending on options
   logEvent (event, options = {}) {
-    const eventLog = Object.assign({
-      event,
-      time: Helpers.timestamp(),
-    }, options.otherInEvent)
+    const eventLog = this.makeEventLog(event, options.otherInEvent)
 
     if (Helpers.safeDataPath(options, "otherInEvent.error")) {
       this.error = options.otherInEvent.error

@@ -17,7 +17,7 @@ class TranscribeRequestCard extends Component {
     super(props)
 
     this.state = {
-      progressPercentage: props.transcribeRequest.progressPercentage(),
+      progressPercentage: parseFloat(props.transcribeRequest.progressPercentage()),
     }
 
     this.tick = this.tick.bind(this)
@@ -55,7 +55,7 @@ class TranscribeRequestCard extends Component {
 
         <Flexbox>
           <Flexbox className={classes.progressCircleContainer}>
-            <CircularProgressbar value={this.state.progressPercentage} text={`${String(this.state.progressPercentage).slice(0, 5)}%`} />
+            <CircularProgressbar value={this.state.progressPercentage} text={`${this.state.progressPercentage.toFixed(2)}%`} />
           </Flexbox>
 
           <Flexbox className={classes.infoContainer} direction="column">
@@ -96,16 +96,15 @@ class TranscribeRequestCard extends Component {
           </Button>
         )}
         {transcribeRequest.transcriptionComplete() && (
-          <Button 
-            title={transcribeRequest.displayNextStepMessage()} 
-          >
           <Link to={transcribeRequest.transcriptUrl()}>
-            {transcribeRequest.displayNextStepMessage()}
+            <Button 
+              title={transcribeRequest.displayNextStepMessage()} 
+            >
+              {transcribeRequest.displayNextStepMessage()}
+            </Button>
           </Link>
-            
-          </Button>
         )}
-        {!transcribeRequest.canRetry && !transcribeRequest.transcriptionComplete() && (
+        {!transcribeRequest.canRetry() && !transcribeRequest.transcriptionComplete() && (
           <div>
             <hr />
             {transcribeRequest.displayCanRetryMessage()}

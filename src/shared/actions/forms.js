@@ -50,13 +50,14 @@ const _getData = (file) => {
   })
 }
 
-export const uploadAudioFile = (file, cb, onFailure) => {
+export const uploadAudioFile = (file, cb, onFailure, onStartUploading) => {
   // TODO move the async stuff to saga, make thsi cleaner probabl
   store.dispatch({
     type: UPLOAD_AUDIO_REQUEST,
     payload: file,
     cb,
     onFailure, 
+    onStartUploading, 
   })
 }
 
@@ -73,7 +74,6 @@ export const uploadFile = (file) => {
       if (sendAsFormData) {
         const formData = new FormData()
         formData.append("file", data)
-        console.log("sending to cloud funct", data, "was sent to cloud func")
         payload = formData
       } else if (sendAsJSON) {
         payload = {base64: data}

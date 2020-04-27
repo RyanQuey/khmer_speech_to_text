@@ -22,6 +22,7 @@ class UploadAudioForm extends Component {
 
     this.cb = this.cb.bind(this)
     this.onFailure = this.onFailure.bind(this)
+    this.onStartUploading = this.onStartUploading.bind(this)
   }
 
   onFailure (err) {
@@ -35,6 +36,11 @@ class UploadAudioForm extends Component {
   cb (transcribeRequest) {
     this.props.history.push("/unfinished-transcripts")
     //this.props.history.push(transcribeRequest.transcriptUrl())
+  }
+
+  onStartUploading (transcribeRequest) {
+    console.log("Moving to request view now")
+    this.props.history.push("/unfinished-transcripts")
   }
 
   render() {
@@ -55,6 +61,7 @@ class UploadAudioForm extends Component {
             width="100%"
             cb={this.cb}
             onFailure={this.onFailure}
+            onStartUploading={this.onStartUploading}
           />
         </Flexbox>
       </div>

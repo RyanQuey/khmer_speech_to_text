@@ -30,14 +30,17 @@ function* uploadAudio(action) {
     yield userActions.setBearerToken()
 
     // TODO secure storage so requires bearer token
-    fileMetadata = yield transcribeRequest.uploadToStorage()
+    fileMetadata = yield transcribeRequest.uploadToStorage(action)
 
   } catch (err) {
     yield put({type: UPLOAD_AUDIO_FAILURE})
     let httpStatus = err && Helpers.safeDataPath(err, "response.status", 500)
     //these are codes from our api
     let errorCode = err && Helpers.safeDataPath(err, "response.data.originalError.code", 500)
-    let errorMessage = err && Helpers.safeDataPath(err, "response.data.originalError.message", 500)
+    let errorMessage = err && Helpers.safeDataPath(err, 
+      "response.data.originalError.message",
+      "Presumably a client error"
+    )
     // TODO probably remove, since we are going to log it earlier in the failure chain
     console.error(errorCode, errorMessage, err && err.response && err.response.data || err);
 
@@ -88,7 +91,7 @@ function* uploadAudio(action) {
         title: "Error Transcribing Audio:",
         // TODO get and parse error message, maybe they need to change what they're sending 
         message: "Please try again", 
-        errorObject: err,
+        errorObject: new Error("Didn't start transcribing"),
         alert: true,
       }, null, null, {
         useInvalidAttributeMessage: true,

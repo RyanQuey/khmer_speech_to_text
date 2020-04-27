@@ -55,10 +55,11 @@ class DropAudio extends Component {
       })
 
     } else {
+      console.log("beginning upload")
       this.setState({pending: true})
       this.props.onStart && this.props.onStart(acceptedFile, rejectedFile)
 
-      formActions.uploadAudioFile(acceptedFile, this.props.cb, this.props.onFailure)
+      formActions.uploadAudioFile(acceptedFile, this.props.cb, this.props.onFailure, this.props.onStartUploading)
 
       //clear url from browser memory to avoid memory leak
       //TODO might not need; disabling preview
@@ -78,7 +79,6 @@ class DropAudio extends Component {
         <Dropzone
           activeClassName={classes.draggingOver}
           disabled={this.state.pending}
-          disablePreview={true}
           className={`${css(this.styles.dropzone)} ${classes.dropzone}`}
           multiple={false}
           onDrop={this.onDrop}

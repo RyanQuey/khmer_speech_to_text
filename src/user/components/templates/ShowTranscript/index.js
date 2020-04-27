@@ -18,22 +18,23 @@ class ShowTranscript extends Component {
     super(props)
 
     this.findTranscript = this.findTranscript.bind(this)
+    this.hideTranscribeRequests = this.hideTranscribeRequests.bind(this)
   }
 
   componentDidMount() {
-    const { transcript } = this.findTranscript()
-    // (async side effect)
-    // after showing once, stop showing the request in the transcribe request show view
-    console.log("MOUNTING trying to hide transcript", transcript)
-    transcript && transcript.hideTranscribeRequest()
+    this.hideTranscribeRequests()
   }
 
   componentDidUpdate() {
-    const { transcript } = this.findTranscript()
+    this.hideTranscribeRequests()
+  }
+
+  hideTranscribeRequests () {
+    const { transcript, matchingTranscripts } = this.findTranscript()
     // (async side effect)
     // after showing once, stop showing the request in the transcribe request show view
-    console.log("UPDATING trying to hide transcript", transcript)
-    transcript && transcript.hideTranscribeRequest()
+    // console.log("UPDATING trying to hide transcript", transcript)
+    matchingTranscripts.concat(transcript).forEach(t => t.hideTranscribeRequest())
   }
 
   findTranscript () {

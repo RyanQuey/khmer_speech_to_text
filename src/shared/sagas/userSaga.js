@@ -25,7 +25,6 @@ import { USER_FIELDS_TO_PERSIST } from 'constants'
 import { TRANSCRIPTION_STATUSES} from "constants/transcript"
 //import { setupSession } from 'lib/socket' // Not using a socket
 import { errorActions, alertActions } from 'shared/actions'
-import firebaseApp from 'refire/firebase'
 import TranscribeRequest from 'models/TranscribeRequest'
 import { Link } from 'react-router-dom'
 

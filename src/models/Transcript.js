@@ -67,14 +67,13 @@ class Transcript {
     let tr = this.getTranscribeRequest()
     if (tr && !tr.hidden) {
       await tr.markAsHidden()
-    }
+    } 
   }
 
   getTranscribeRequest () { 
     const trs = _.values(store.getState().transcribeRequests)
-
     const match = trs.find(tr => tr.id == this.transcribeRequestId)
-    console.log("Match", match)
+
     return match && new TranscribeRequest({transcribeRequestRecord: match})
   }
 }
