@@ -50,7 +50,7 @@ class TranscribeRequestCard extends Component {
     const status = transcribeRequest.hasError() ? "error" : "transcribing"
 
     return (
-      <Card selected={selected} onClick={onClick} height={250} maxWidth={450} wrapperClass={wrapperClass} className={`${className} ${classes[status]} ${small ? classes.small : ""}`}>
+      <Card selected={selected} onClick={onClick} height={265} maxWidth={450} wrapperClass={wrapperClass} className={`${className} ${classes[status]} ${small ? classes.small : ""}`}>
         <CardHeader className={small ? classes.smallHeader : ""} title={transcribeRequest.filename} subtitle={subtitle || transcribeRequest.contentType} icon={"icon"} iconColor={"blue"}/>
 
         <Flexbox>

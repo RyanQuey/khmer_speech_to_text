@@ -195,7 +195,7 @@ class TranscribeRequest {
         // assuming 0.5 MB/s upload time for our wild estimate
         // Even if we have Google's percentages, add a second since we have to do our own roundtrips
         // with Google before we confirm and continue
-        estimatedTime: this.uploadProgress ? this.elapsedSinceLastEvent() / this.uploadProgress + 1 : this.sizeInMB()*2,
+        estimatedTime: this.uploadProgress ? (this.elapsedSinceLastEvent() / this.uploadProgress) + 1 : this.sizeInMB()*2,
       },
       // uploaded 
         // (i.e,. to send request to our api server, should be very fast)
@@ -237,10 +237,15 @@ class TranscribeRequest {
 
 
     // add elapsed time since last stage, maximum being 90% of estimated time for current stage
+
+    const currentStage = weights[currentStageIndex] 
+    // console.log("time elapsed:", this.elapsedSinceLastEvent())
+    // console.log("current state estimated time", currentStage.estimatedTime*0.9)
     let bestGuess
     if (this.status == TRANSCRIPTION_STATUSES[0]) {
-      // we have better way of tracking how much is done
-      bestGuess = this.elapsedSinceLastEvent()
+      // we have better way of tracking how much is done, ...but in case we get error while
+      // uploading, don't go over 100%...
+      bestGuess = Math.min(this.elapsedSinceLastEvent(), currentStage.estimatedTime)
 
     } else {
       const currentStage = weights[currentStageIndex] 
@@ -251,6 +256,7 @@ class TranscribeRequest {
       // our estimate
       bestGuess = Math.min(this.elapsedSinceLastEvent(), currentStage.estimatedTime*0.9)
     }
+
     estimatedElapsedTime += bestGuess
 
     // console.log("percent", estimatedElapsedTime / totalEstimatedTime * 100)
@@ -386,7 +392,7 @@ class TranscribeRequest {
   // ///////////////////
   
   displayFileLastModified () {
-    return moment(parseInt(this.fileLastModified)).tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))
+    return moment(parseInt(this.fileLastModified)).tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm a'))
   }
 
   displayLastUpdated () {
@@ -453,8 +459,8 @@ class TranscribeRequest {
 
       // could do it firestore way:
       //but this way is consistent with our api
-      await this.logEvent(TRANSCRIPTION_STATUSES[1]) // uploaded
       await this._sendAndTrackFile(file, metadata)
+      await this.logEvent(TRANSCRIPTION_STATUSES[1]) // uploaded
 
     } catch (err) {
       console.error('error uploading to storage: ', err)
@@ -470,19 +476,25 @@ class TranscribeRequest {
     return new Promise((resolve, reject) => {
       const uploadTask = this.fileStorageRef().put(file, metadata)
 
-			uploadTask.on('state_changed', function(snapshot){
+      uploadTask.on('state_changed', (snapshot) => {
 				// Observe state change events such as progress, pause, and resume
 				// Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
 				// is a % estimated by Google
 				this.uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes);
+        // make sure not to update updatedAt or else the percentages get thrown off when using
+        // current calculations
+        // NOTE watch out if this instance is different from instance of this class
+        // used in the React component, so just persist it so everything is in sync
+        //this.docRef({upload_progress: this.uploadProgress}, { merge: true})
+        // but for right now, don't need to set
+
 				console.log('Upload is ' + this.uploadProgress*100 + '% done and currently ' + snapshot.state);
-			}, function(error) {
+      }, (error) => {
 				// Handle unsuccessful uploads
 			  return reject(error)
 
-			}, function() {
+      }, () => {
 				// Handle successful uploads on complete
-				this.uploadProgress = 1 // aka 100%
 			  return resolve()
 			});
     })

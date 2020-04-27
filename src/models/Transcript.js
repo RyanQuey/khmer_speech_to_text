@@ -56,7 +56,7 @@ class Transcript {
   }
   
   displayFileLastModified () {
-    return moment(parseInt(this.fileLastModified)).tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm:ss a'))
+    return moment(parseInt(this.fileLastModified)).tz(moment.tz.guess()).format(('MMMM Do YYYY, h:mm a'))
   }
 
   displayFileSize () {
