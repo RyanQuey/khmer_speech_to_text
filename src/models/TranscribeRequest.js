@@ -366,7 +366,7 @@ class TranscribeRequest {
         return elapsedTime > (100 + this.sizeInMB() * 10)
 
       } else {
-        return 100
+        return elapsedTime > 100
       }
 
     } else if (status == TRANSCRIPTION_STATUSES[3]) { // transcribing
