@@ -195,7 +195,7 @@ class TranscribeRequest {
         // assuming 0.5 MB/s upload time for our wild estimate
         // Even if we have Google's percentages, add a second since we have to do our own roundtrips
         // with Google before we confirm and continue
-        estimatedTime: this.uploadProgress ? (this.elapsedSinceLastEvent() / this.uploadProgress) + 1 : this.sizeInMB()*2,
+        estimatedTime: this.uploadProgress ? (this.elapsedSinceLastEvent() / this.uploadProgress) + 2 : this.sizeInMB()*2,
       },
       // uploaded 
         // (i.e,. to send request to our api server, should be very fast)

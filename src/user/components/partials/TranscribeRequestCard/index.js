@@ -36,7 +36,7 @@ class TranscribeRequestCard extends Component {
       if (this.props.transcribeRequest.hasError() || this.props.transcribeRequest.transcriptionComplete()) {
         clearInterval(this.intervalID);
       }
-    }, 500);
+    }, 400);
     
   }
 
@@ -45,12 +45,12 @@ class TranscribeRequestCard extends Component {
   }
 
   render () {
-    const { transcribeRequest, selected, onClick, className = "request-card", subtitle, small, wrapperClass, smallIcon} = this.props
+    const { transcribeRequest, selected, onClick, className = classes["request-card"], subtitle, small, wrapperClass, smallIcon} = this.props
 
     const status = transcribeRequest.hasError() ? "error" : "transcribing"
 
     return (
-      <Card selected={selected} onClick={onClick} height={265} maxWidth={450} wrapperClass={wrapperClass} className={`${className} ${classes[status]} ${small ? classes.small : ""}`}>
+      <Card selected={selected} onClick={onClick} wrapperClass={wrapperClass} className={`${className} ${classes[status]} ${small ? classes.small : ""}`}>
         <CardHeader className={small ? classes.smallHeader : ""} title={transcribeRequest.filename} subtitle={subtitle || transcribeRequest.contentType} icon={"icon"} iconColor={"blue"}/>
 
         <Flexbox>

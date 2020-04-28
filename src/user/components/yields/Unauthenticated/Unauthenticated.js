@@ -29,7 +29,9 @@ class Unauthenticated extends Component {
             <Flexbox>
               <UserSidebar />
       
-              <h1>Login to Upload your audio file</h1>
+              <div className={classes.mainContainer}>
+                <h1>Login to get started!</h1>
+              </div>
             </Flexbox>
           </Flexbox>
 

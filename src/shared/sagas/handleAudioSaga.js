@@ -71,19 +71,11 @@ function* uploadAudio(action) {
     transcribeRequest.reload()
     // in reality, unless it errored here, I think it should always start polling
     if (transcribeRequest.transcribing()) {
-      console.log("should now begin check request polling")
       yield put({type: CHECK_TRANSCRIBING_PROGRESS_REQUEST, payload: transcribeRequest})
-      alertActions.closeAlerts()
-      alertActions.newAlert({
-        //title: response.data.transcription,
-        title: "Now creating transcript, please wait",
-        level: "SUCCESS",
-        options: {timer: true}
-      })
 
       action.cb && action.cb(transcribeRequest)
     } else {
-      // this means that there is an error
+      // this means that there is an error, we failed to start transcribing 
 
       errorActions.handleErrors({
         templateName: "UploadAudio",

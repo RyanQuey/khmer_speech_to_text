@@ -22,34 +22,34 @@ class TranscriptPicker extends Component {
   }
 
   render() {
-    const { pickable, transcripts } = this.props
+    const { pickable, transcripts, summaryOnly } = this.props
 
     //TODO: set the title using props into the modal container
     return (
       <table >
         <tbody>
         <tr>
-          <th>Filename</th>
+          {!summaryOnly && <th>Filename</th>}
           <th>Transcript Created At</th>
-          <th>File Last Modified</th>
-          <th>File Size</th>
+          {!summaryOnly && <th>File Last Modified</th>}
+          {!summaryOnly && <th>File Size</th>}
           <th></th>
         </tr>
         {transcripts.map((transcript, index) => {
           return (
             <tr key={index}>
-              <td>
+              {!summaryOnly && <td>
                 {transcript.filename}
-              </td>
+              </td>}
               <td>
                 {transcript.displayCreatedAt()}
               </td>
-              <td>
+              {!summaryOnly && <td>
                 {transcript.displayFileLastModified()}
-              </td>
-              <td>
+              </td>}
+              {!summaryOnly && <td>
                 {transcript.displayFileSize()}
-              </td>
+              </td>}
               <td>
                 {pickable && <button onClick={this.viewTranscript.bind(this, transcript)}>View</button>}
               </td>

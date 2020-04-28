@@ -1,7 +1,8 @@
 @import 'theme/_helpers';
 
 .mainContainer {
-  min-width: 100%;
-  min-height: 100vh;
+  min-width: calc(100% - 250px);
+  min-height: calc(100vh - 50px);
   background: $light-gray-bg;
+  text-align: center;
 }

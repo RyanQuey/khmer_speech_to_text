@@ -33,8 +33,10 @@ class ShowTranscript extends Component {
     const { transcript, matchingTranscripts } = this.findTranscript()
     // (async side effect)
     // after showing once, stop showing the request in the transcribe request show view
-    // console.log("UPDATING trying to hide transcript", transcript)
-    matchingTranscripts.concat(transcript).forEach(t => t.hideTranscribeRequest())
+
+    // add transcript back in, since we popped it to get it
+    const all = transcript ? matchingTranscripts.concat(transcript) : matchingTranscripts
+    all.forEach(t => t.hideTranscribeRequest())
   }
 
   findTranscript () {
@@ -61,45 +63,47 @@ class ShowTranscript extends Component {
     console.log("transcript", transcript)
 
     return (
-      <Flexbox direction="column" >
+      <Flexbox className={classes.main} direction="column" >
         <h2>{transcript.filename}</h2>
         <div className={classes.transcriptFields}>
           <div>
-            <Flexbox direction="column" justify="center" className={classes.textEditor}>
-              <div>
+            <Flexbox justify="flex-start" className={classes.fileData}>
+              <Flexbox className={classes.fileDataItems} align="center" justify="flex-start">
+                <Flexbox className={classes.fileDataItem}>
+                  <div className={classes.label}>Created At:</div> {transcript.displayCreatedAt()}
+                </Flexbox>
+                <Flexbox className={classes.fileDataItem}>
+                  <div className={classes.label}>Size:</div>{transcript.displayFileSize()}
+                </Flexbox>
+              </Flexbox>
+            </Flexbox>
+
+            <Flexbox direction="column" justify="center" className={classes.transcriptText}>
+              <Flexbox direction="column">
                 {false && transcript.humanReadableTranscription()}
                 {transcript.utterances.map((utterance, i) => 
-                  <div key={i} title={utterance.alternatives.length > 1 ? `Alternatively, perhaps should be: ${utterance.alternatives.slice(1).map(a => a.transcript).join(" OR POSSIBLY ")}` : "No alternatives provided"}>
+                  <div 
+                    key={i} 
+                    className={classes.utterance} 
+                    title={utterance.alternatives.length > 1 ? `Alternatively, perhaps should be: ${utterance.alternatives.slice(1).map(a => a.transcript).join(" OR POSSIBLY ")}` : "No alternatives provided"}
+                  >
                     {utterance.alternatives[0].transcript}
-                    <hr />
                   </div>
                 )}
-              </div>
-              <hr />
-              <Flexbox>
-                <h3>File Data:</h3>
-                
-                <div>
-                  Created At: {transcript.displayCreatedAt()}
-                </div>
-                <div>
-                  Last Modified: {transcript.displayFileLastModified()}
-                </div>
-                <div>
-                  {transcript.displayFileSize()}
-                </div>
               </Flexbox>
+              <hr />
             </Flexbox>
 
           </div>
         </div>
 
         {matchingTranscripts.length > 1 && 
-          <Flexbox>
-            <h2>Older transcripts for same file:</h2>
+          <Flexbox direction="column">
+            <h3>Older transcripts for same file:</h3>
             <TranscriptPicker 
               transcripts={matchingTranscripts.filter(t => (t !== transcript))}
               pickable={false}
+              summaryOnly={true}
             />
           </Flexbox>
         }

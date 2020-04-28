@@ -18,7 +18,7 @@ class UserContent extends Component {
     const modalOpen = this.props.currentModal
 
     return (
-      <main>
+      <main className={classes.userContent}>
         <Flexbox className={classes.rightColumn} direction="column">
           {alerts && !modalOpen && alerts.map((alert, i) => {
             return <Alert alert={alert} key={i} />

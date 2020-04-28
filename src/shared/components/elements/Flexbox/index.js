@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { StyleSheet, css } from 'aphrodite'
 import theme from 'theme'
 
-const Flexbox = ({ align, background, className, direction, justify, flexWrap, children, name, color, onClick }) => {
+const Flexbox = ({ align, background, className, direction, justify, flexWrap, wrap, children, name, color, onClick }) => {
   const styles = StyleSheet.create({
     flex: {
       backgroundColor: theme.color[background] || background,
@@ -11,7 +11,7 @@ const Flexbox = ({ align, background, className, direction, justify, flexWrap, c
       flexDirection: direction,
       justifyContent: justify,
       alignItems: align,
-      flexWrap: flexWrap,
+      flexWrap: flexWrap || wrap,
       color: theme.color[color] || color,
     },
   })
@@ -22,7 +22,7 @@ const Flexbox = ({ align, background, className, direction, justify, flexWrap, c
 
 Flexbox.defaultProps = {
   direction: 'row',
-  flexWrap: 'nowrap',
+  wrap: 'nowrap',
 }
 
 Flexbox.propTypes = {

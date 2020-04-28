@@ -1,7 +1,7 @@
 @import 'theme/_helpers';
 
 .sidebar {
-  min-height: 100vh;
+  min-height: calc(100vh - 50px);
   min-width: 250px;
   width: 250px;
   box-sizing: border-box;

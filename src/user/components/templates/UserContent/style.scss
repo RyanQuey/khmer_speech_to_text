@@ -1,28 +1,23 @@
 @import 'theme/_helpers';
 
 
-main {
-  width: 960px;
-  background: $white;
+main.userContent {
+  width: 100%;
+  position: relative;
+  background: $user-content-bg;
+  //padding: 0 10px 30px 0 ;
+  border-left: 1px solid $primary;
+
+}
+
+.rightColumn {
+  position: relative;
+  max-width: 960px;
+  padding: 10px 30px 30px 30px;
   text-align: center;
+  margin: 0 auto;
   h1 {
-    @include rems(45);
-  }
-  h4 {
-    @include rems(18);
-    margin: 2rem 0 1rem 0;
-  }
-  h5 {
-    @include rems(12);
-    text-align: center;
-    margin: 1rem 0;
-  }
-  input {
-    width: 90%;
-    color: $text;
-    margin: 0;
-  }
-  button {
-    width: 90%;
+    @include rems(36)
   }
 }
+

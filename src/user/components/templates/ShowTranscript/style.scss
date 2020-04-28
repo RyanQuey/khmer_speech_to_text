@@ -1,49 +1,26 @@
 @import 'theme/_helpers';
+.main {
 
-.postMenu {
-  @include mq(xs) {
-    @include cols(12)
-  }
-  @include mq(sm) {
-    @include cols(3)
-  }
 }
 
-.postFields {
-  .textEditor {
-    textarea {
-      resize: none;
-      height: 150px;
-      width: 300px;
-    }
-
-    .dropImage {
-      height: 125px;
-      width: 125px;
-      margin: 10px;
-      cursor: pointer;
+.fileData {
+  padding: 1rem 0;
+  .fileDataItems {
+    .fileDataItem {
+      padding: 0 1rem;
+      .label {
+        font-weight: bold;
+        padding-right: 1rem;
+      }
     }
   }
 }
 
-.utms {
-  width: 100%;
-  .utmHeader {
-    margin: .5rem;
-  }
-  .utmField {
-    @include mq(xs) {
-      @include cols(6)
-    }
-    @include mq(sm) {
-      @include cols(3)
-    }
-  }
-
+.transcriptText {
+  background-color: $white;
+  padding: 1rem;
+  text-align: left;
 }
-.dropImage {
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
+.utterance {
+  padding-bottom: 1rem;
 }
-
