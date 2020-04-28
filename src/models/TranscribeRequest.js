@@ -58,6 +58,7 @@ class TranscribeRequest {
       // now uploaded file
     }
 
+    this.fileExtension = this.fileType.replace("audio/", "")
     this.filePath = `audio/${this.user.uid}/${this.filename}`
   }
 
@@ -155,6 +156,10 @@ class TranscribeRequest {
     return elapsedTime
   }
 
+  isMP3 () {
+    return ["mp3", "mpeg"].includes(this.fileExtension != "flac")
+  }
+
   // low level thing, don't call directly much. Don't want to set eventLogs to this record in order
   // to not confuse things
   // TODO make separate model for event logs in order to be able to interact with them
@@ -200,7 +205,7 @@ class TranscribeRequest {
       // uploaded 
         // (i.e,. to send request to our api server, should be very fast)
       {
-        estimatedTime: 0.3,
+        estimatedTime: 1,
       },
         // processing file
         // Since not converting file yet, also very fast. But requires a round trip
@@ -213,8 +218,9 @@ class TranscribeRequest {
         // one 315KB file took 6 seconds
         // Includes server > client (respond to original request) > server again (client begins
         // polling) > Google > server
+      // TODO filetype mp3s will have smaller files but longer transcribing
       {
-        estimatedTime: 20 + this.sizeInMB() * 3,
+        estimatedTime: this.isMP3() ? 20 + this.sizeInMB()*30 : 20 + this.sizeInMB()*3,
       },
         // processing transcript. Should be very fast
         // one 315 KB file took one second
@@ -343,24 +349,20 @@ class TranscribeRequest {
 
   // NOTE this is just a reasonable guess based on time passed, for use with retrying
   // TODO make these times a function of constant that relates to teh percentage builder
+  // TODO make more consistent with python server
   lastRequestHasStopped () {
-    // copying what we have in server, so user doesn't ask for something we aren't going to handle anyway
-    // see notes in server for why these times
     const status = this.status
     const elapsedTime = this.elapsedSinceLastEvent()
-    // TODO right now, these are numbers used in python server, which is not actually seconds, so
-    // when change that, change this as well. This means we're making user wait longer than the
-    // server, by quite a bit actually
     if (status == TRANSCRIPTION_STATUSES[0]) { // uploading
         // assumes at least 1/5 MB / sec internet connection (except for that 100 = 1 min...)
-        return elapsedTime > this.sizeInMB() * 5
+        return elapsedTime > this.sizeInMB() * 100
 
     } else if (status == TRANSCRIPTION_STATUSES[1]) { // uploaded
         return elapsedTime > 200
 
     } else if (status == TRANSCRIPTION_STATUSES[2]) { // processing-file (aka server has received)
-        // takes longer if have to transcode from whatever > flac. Otherwise, only have some quick variable setting (much less than 1 sec), some firestore calls, and a quick roundtrip request to Google's API that confirms they started the transcript, and we should be marking as transcribing
-      if (this.file_extension != "flac") {
+        // TODO takes longer if have to transcode from whatever > flac. Otherwise, only have some quick variable setting (much less than 1 sec), some firestore calls, and a quick roundtrip request to Google's API that confirms they started the transcript, and we should be marking as transcribing
+      if (this.fileExtension != "flac") {
         return elapsedTime > (100 + this.sizeInMB() * 10)
 
       } else {
@@ -369,11 +371,16 @@ class TranscribeRequest {
 
     } else if (status == TRANSCRIPTION_STATUSES[3]) { // transcribing
         // could take awhile. But a 25 MB sized file should not take 7 min (which would be 100 + size * 25) so doubling that should be plenty
+      if (this.isMP3()) {
+        return elapsedTime > (100 + this.sizeInMB() * 500)
+
+      } else {
         return elapsedTime > (100 + this.sizeInMB() * 50)
+      }
 
     } else if (status == TRANSCRIPTION_STATUSES[4]) { // "processing-transcription" (means that transcription is complete)
         // should be pretty fast, just iterate over transcript, some var setting, set to firestore a few times, and ret
-        return elapsedTime > (100 + this.sizeInMB() * 1)
+        return elapsedTime > (100 + this.sizeInMB() * 10)
 
     } else if (status == TRANSCRIPTION_STATUSES[5]) { // "transcription-processed"
         // stopped because done
