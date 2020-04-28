@@ -215,12 +215,15 @@ class TranscribeRequest {
         estimatedTime: 3,
       },
         // transcribing
-        // one 315KB file took 6 seconds
+        // one 315KB (flac?) file took 6 seconds
+      // one 25 MB flac file took 3m:43s (163 s) 
+        // 
         // Includes server > client (respond to original request) > server again (client begins
         // polling) > Google > server
       // TODO filetype mp3s will have smaller files but longer transcribing
+      // also slower in prod since it's a hobby one
       {
-        estimatedTime: this.isMP3() ? 20 + this.sizeInMB()*30 : 20 + this.sizeInMB()*3,
+        estimatedTime: this.isMP3() ? 20 + this.sizeInMB()*32 : 20 + this.sizeInMB()*8,
       },
         // processing transcript. Should be very fast
         // one 315 KB file took one second
