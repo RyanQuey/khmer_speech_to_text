@@ -7,9 +7,9 @@ service cloud.firestore {
         return request.auth.token.email;
       }
 
-      // require users to have a record in whitelist to continue
+      // require users to have a record in whitelist (see firestore db) or variations on my own email to continue
       function isWhitelisted() {
-        return exists(/databases/$(database)/documents/whitelistedUsers/$(email()));
+        return email().matches('rlquey2.*@gmail[.]com') == true || exists(/databases/$(database)/documents/whitelistedUsers/$(email()));
       }
 
       allow read: if isWhitelisted();
