@@ -21,9 +21,8 @@ const client = new speech.SpeechClient();
 const betaClient = new betaSpeech.SpeechClient();
 
 // some constants
-const WHITE_LISTED_USERS = [
+const WHITE_LISTED_USERS = cloudFunctions.config().app.white_listed_users || [
   "rlquey2@gmail.com",
-  "borachheang@gmail.com",
 ]
 // note: not all flietypes supported yet. E.g., mp4 might end up being under flac or something. Eventually, handle all file types and either convert file or do something
 const FILE_TYPES = ["flac", "mp3", "wav"] 

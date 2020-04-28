@@ -1,9 +1,19 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // allow only logged in users to read and write.
+    // propagates rules down all subcollections
     match /{document=**} {
-      allow read, write: if request.auth.uid != null;
-    }
+      function email() {
+        return request.auth.token.email;
+      }
+
+      // require users to have a record in whitelist to continue
+      function isWhitelisted() {
+        return exists(/databases/$(database)/documents/whitelistedUsers/$(email()));
+      }
+
+      allow read: if isWhitelisted();
+      allow write: if isWhitelisted();
+    } 
   }
 }

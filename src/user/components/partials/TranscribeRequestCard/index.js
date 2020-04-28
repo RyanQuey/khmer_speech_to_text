@@ -36,7 +36,7 @@ class TranscribeRequestCard extends Component {
       if (this.props.transcribeRequest.hasError() || this.props.transcribeRequest.transcriptionComplete()) {
         clearInterval(this.intervalID);
       }
-    }, 400);
+    }, 300);
     
   }
 
@@ -55,7 +55,7 @@ class TranscribeRequestCard extends Component {
 
         <Flexbox>
           <Flexbox className={classes.progressCircleContainer}>
-            <CircularProgressbar value={this.state.progressPercentage} text={`${this.state.progressPercentage.toFixed(2)}%`} />
+            <CircularProgressbar value={this.state.progressPercentage} text={`${this.state.progressPercentage.toFixed(1)}%`} />
           </Flexbox>
 
           <Flexbox className={classes.infoContainer} direction="column">
