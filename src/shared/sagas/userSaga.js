@@ -74,7 +74,7 @@ function* signIn(action) {
     let user = result
 
     if (user) {
-      yield put({type: FETCH_CURRENT_USER_REQUEST, payload: user})
+      yield put({type: FETCH_CURRENT_USER_REQUEST, payload: user, options: findOrCreate})
       yield put({type: SIGN_IN_SUCCESS, payload: user})
       alertActions.newAlert({
         title: "Welcome!",
@@ -149,8 +149,9 @@ function* signIn(action) {
 
 //for fetching other users
 //NOTE don't use this too much
-function* fetchUser(action, options = {}) {
+function* fetchUser(action) {
   try {
+    const options = action.options || {}
     const userData = action.payload
     const ref = db.collection("users").doc(userData.uid)
 
@@ -184,10 +185,12 @@ function* fetchCurrentUser(action) {
     const result = yield userRef.get()
     if (result.exists) {
       returnedUser = result.data()
+      console.log("the returned user", returnedUser)
     
     } else if (options.findOrCreate) {
       // e.g., if data gets corrupted sometimes and just want it to work
       returnedUser = userData
+      console.log("creating the returned user", returnedUser)
       userRef.set(JSON.parse(JSON.stringify(userData)))
     }
 
