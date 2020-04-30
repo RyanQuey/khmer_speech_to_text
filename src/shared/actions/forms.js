@@ -101,6 +101,24 @@ export const uploadFile = (file) => {
   })
 }
 
+// workaround for when using Heroku Hobby dyno, to wake it up when we're about to hit it
+export const pingHobbyServer = () => {
+  return axios.post("/wake-up/", {"please-wake-up": "thanks"}, {
+    headers: {
+      'Content-Type': sendAsJSON ? 'application/json' : 'x-www-form-urlencoded',
+    }
+  })
+  .then((result) => {
+    console.log("should be awake now...");
+
+    return result
+  })
+  .catch((err) => {
+    // swallow error...this would be a terrible thing to break things over
+    console.error("fail ping hobby heroku dyno");
+    console.error(err);
+  })
+}
 
 //makes it not dirty anymore
 export const formPersisted = (component, form) => {

@@ -4,6 +4,7 @@ import {
   UPDATE_TRANSCRIBE_REQUEST_STATUS_SUCCESS,
 } from "constants/actionTypes"
 import Transcript from 'models/Transcript'
+import { formActions } from 'shared/actions'
 
 // TODO create model class, with stuff for schema etc
 // TODO use REDUX with more throughout the transcription lifecycle
@@ -193,6 +194,8 @@ class TranscribeRequest {
 
     // NOTE want to estimate high, so when finish it leaps some, rather than estimating low and they
     // think it stopped. But not too high or they'll despair, at the slow progress
+    // Give extra margin for uploading and transcribing, since that will take longest, so want to
+    // show progress and not have it stop too long on those stages.
     const weights = [
       // uploading
       { 
@@ -200,7 +203,7 @@ class TranscribeRequest {
         // assuming 0.5 MB/s upload time for our wild estimate
         // Even if we have Google's percentages, add a second since we have to do our own roundtrips
         // with Google before we confirm and continue
-        estimatedTime: this.uploadProgress ? (this.elapsedSinceLastEvent() / this.uploadProgress) + 2 : this.sizeInMB()*2,
+        estimatedTime: this.uploadProgress ? (this.elapsedSinceLastEvent() / this.uploadProgress) + 7 : this.sizeInMB()*10 + 7,
       },
       // uploaded 
         // (i.e,. to send request to our api server, should be very fast)
@@ -357,7 +360,8 @@ class TranscribeRequest {
     const status = this.status
     const elapsedTime = this.elapsedSinceLastEvent()
     if (status == TRANSCRIPTION_STATUSES[0]) { // uploading
-        // assumes at least 1/5 MB / sec internet connection (except for that 100 = 1 min...)
+        // assumes at least 1/5 MB / sec internet connection, and then also some more stuff we do
+      // afterwards
         return elapsedTime > this.sizeInMB() * 100
 
     } else if (status == TRANSCRIPTION_STATUSES[1]) { // uploaded
@@ -440,8 +444,14 @@ class TranscribeRequest {
   // note that hooks also has the file object on it, but we are not using it here for that
   async uploadToStorage(hooks = {}) {
     const {onStartUploading} = hooks
-  console.log("start uploading hook", onStartUploading)
+
     try {
+      // for as long as we are uploading, keep pinging our server every 25 minutes so it stays awake
+      // (sleeps after 30 minutes)
+      // (hopefully we upload faster than 25 minutes, but assuming large files and slow internet)
+      formActions.pingHobbyServer() 
+      this.wakeupInterval = setInterval(formActions.pingHobbyServer(), 25*60*1000)
+
       // set to status uploading, and persist for the first time
       this.logEvent(TRANSCRIPTION_STATUSES[0], {skipPersist: true}) // uploading
       await this.updateRecord()
@@ -454,6 +464,10 @@ class TranscribeRequest {
     } catch (err) {
       console.error(`Failed uploading file ${this.filename} to cloud storage`, err)
       throw err
+
+    } finally {
+      // stop pinging server
+      clearInterval(this.wakeInterval)
     }
   }
   

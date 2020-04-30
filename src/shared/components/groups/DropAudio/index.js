@@ -55,7 +55,6 @@ class DropAudio extends Component {
       })
 
     } else {
-      console.log("beginning upload")
       this.setState({pending: true})
       this.props.onStart && this.props.onStart(acceptedFile, rejectedFile)
 

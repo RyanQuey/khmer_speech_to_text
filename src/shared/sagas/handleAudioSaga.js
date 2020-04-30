@@ -18,9 +18,11 @@ import TranscribeRequest from 'models/TranscribeRequest'
 // handles the requests to upload file, get untranscribed uploads, and also request transcripts for
 // untranscribed uploads
 
+// upload audio from browser > Google Storage
 function* uploadAudio(action) {
 
   let transcribeRequest, fileMetadata
+console.log("hello")
 
   try {
     const file = action.payload
@@ -33,16 +35,16 @@ function* uploadAudio(action) {
     fileMetadata = yield transcribeRequest.uploadToStorage(action)
 
   } catch (err) {
-    yield put({type: UPLOAD_AUDIO_FAILURE})
-    let httpStatus = err && Helpers.safeDataPath(err, "response.status", 500)
+    yield put({type: UPLOAD_AUDIO_FAILURE, error: err})
+    let httpStatus = Helpers.safeDataPath(err, "response.status", 500)
     //these are codes from our api
-    let errorCode = err && Helpers.safeDataPath(err, "response.data.originalError.code", 500)
-    let errorMessage = err && Helpers.safeDataPath(err, 
+    let errorCode = Helpers.safeDataPath(err, "response.data.originalError.code", "maybe-client-error")
+    let errorMessage = Helpers.safeDataPath(err, 
       "response.data.originalError.message",
       "Presumably a client error"
     )
     // TODO probably remove, since we are going to log it earlier in the failure chain
-    console.error(errorCode, errorMessage, err && err.response && err.response.data || err);
+    console.error(errorCode, errorMessage, Helpers.safeDataPath(err, "err.response.data", err));
 
     errorActions.handleErrors({
       templateName: "UploadAudio",
@@ -84,7 +86,7 @@ function* uploadAudio(action) {
         // TODO get and parse error message, maybe they need to change what they're sending 
         message: "Please try again", 
         errorObject: new Error("Didn't start transcribing"),
-        alert: true,
+        alert: true
       }, null, null, {
         useInvalidAttributeMessage: true,
       })
@@ -92,10 +94,10 @@ function* uploadAudio(action) {
 
   } catch (err) {
     yield put({type: UPLOAD_AUDIO_FAILURE})
-    let httpStatus = err && Helpers.safeDataPath(err, "response.status", 500)
+    let httpStatus = Helpers.safeDataPath(err, "response.status", 500)
     //these are codes from our api
-    let errorCode = err && Helpers.safeDataPath(err, "response.data.originalError.code", 500)
-    let errorMessage = err && Helpers.safeDataPath(err, "response.data.originalError.message", 500)
+    let errorCode = Helpers.safeDataPath(err, "response.data.originalError.code", "maybe-client-error")
+    let errorMessage = Helpers.safeDataPath(err, "response.data.originalError.message", "Presumably a client error")
     // TODO probably remove, since we are going to log it earlier in the failure chain
     console.error(errorCode, errorMessage, err && err.response && err.response.data || err);
 
