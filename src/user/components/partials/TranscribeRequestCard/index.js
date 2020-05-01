@@ -89,10 +89,10 @@ class TranscribeRequestCard extends Component {
 
         {transcribeRequest.canRetry() && (
           <Button 
-            title={transcribeRequest.displayCanRetryMessage()} 
+            title={"Click to try again"} 
             onClick={this.props.requestResume.bind(this, transcribeRequest)}
           >
-            Resume Transcribing File
+            {transcribeRequest.displayCanRetryMessage()}
           </Button>
         )}
         {transcribeRequest.transcriptionComplete() && (

@@ -182,7 +182,7 @@ class TranscribeRequest {
   ////////////////////////////////
   
   canRetry () {
-    return ["can-retry"].includes(this.canRetryMessage())
+    return ["can-retry-unknown-error", "can-retry"].includes(this.canRetryMessage())
   }
 
 
@@ -337,7 +337,7 @@ class TranscribeRequest {
 
       } else {
         // TODO add more retryable errors
-        return "unretryable-error"
+        return "can-retry-unknown-error"
       }
 
       
@@ -424,9 +424,10 @@ class TranscribeRequest {
     const message = this.canRetryMessage()
     const obj = {
       "file-missing": "File can no longer be found in storage; please upload file again and start over",
-      "unretryable-error": "Unknown Error: Cannot handle this file for unknown reasons",
-      "can-retry": "Press to request transcript",
-      "please-wait": "We are still processing your file, please wait",
+      "unretryable-error": "Cannot handle this file for other reasons", // probably unknown reasons
+      "can-retry": "Resume Transcribing File",
+      "can-retry-unknown-error": "Retry...but we're not sure why it failed the first time and it might fail again",
+      "please-wait": "We are processing your file, please wait",
       "already-complete": "Finished transcribing, click here to view!",
     }
 
