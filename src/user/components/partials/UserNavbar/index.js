@@ -2,7 +2,7 @@ import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Button, Navbar, NavbarBrand, Flexbox } from 'shared/components/elements'
+import { Icon, Button, Navbar, NavbarBrand, Flexbox } from 'shared/components/elements'
 import { AccountMenu } from 'shared/components/partials'
 import { viewSettingActions } from 'shared/actions'
 import { StyleSheet, css } from 'aphrodite'
@@ -42,7 +42,7 @@ class UserNavbar extends Component {
           <NavbarBrand/>
         </Flexbox>
 
-        <Flexbox className={classes.mainNav} justify="space-between">
+        <div className={classes.mainNav}>
           <Flexbox className={classes.leftNav} align="center" justify="space-between">
             <Link to="/transcripts">
               Transcripts
@@ -60,7 +60,21 @@ class UserNavbar extends Component {
               <a href="#" onClick={this.openLoginModal}>Login</a>
             )}
           </Flexbox>
-        </Flexbox>
+        </div>
+
+        <div className={classes.mobileNav}>
+          <Flexbox className={classes.rightNav} align="center" justify="space-between">
+          
+            {user ? (
+              <div>
+                <AccountMenu />
+                <Icon name="bars" onClick={this.props.toggleSidebar}/> 
+              </div>
+            ) : (
+              <a href="#" onClick={this.openLoginModal}>Login</a>
+            )}
+          </Flexbox>
+        </div>
       </Navbar>
     )
   }

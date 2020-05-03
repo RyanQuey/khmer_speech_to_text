@@ -10,18 +10,33 @@ import { withRouter } from 'react-router-dom'
 
 
 class Authenticated extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      showSidebarInMobile: false,  // only applicable for mobile
+    }
+    this.toggleSidebar = this.toggleSidebar.bind(this)
+  }
+
+
+  toggleSidebar () {
+    console.log("now toggling")
+    this.setState({showSidebarInMobile: !this.state.showSidebarInMobile})
+  }
 
   render() {
     const { children } = this.props
+    const { showSidebarInMobile } = this.state
     const alerts = _.values(this.props.alerts)
     const modalOpen = this.props.currentModal
     
     return (
       <Flexbox direction="column">
-        <UserNavbar />
+        <UserNavbar toggleSidebar={this.toggleSidebar}/>
   
         <Flexbox>
-          <UserSidebar />
+          <UserSidebar show={showSidebarInMobile}/>
   
           <UserContent />
         </Flexbox>

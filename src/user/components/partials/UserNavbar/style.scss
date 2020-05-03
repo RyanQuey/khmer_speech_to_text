@@ -6,5 +6,15 @@
   color: black;
 }
 .mainNav {
-  width: 100%;
+  display: none;
+  @include mq(m) {
+    display: flex ;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+.mobileNav {
+  @include mq(m) {
+    display: none !important;
+  }
 }

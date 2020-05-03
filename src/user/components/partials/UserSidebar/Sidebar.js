@@ -17,18 +17,20 @@ class Sidebar extends Component {
   }
 
   render() {
+    console.log("can show", this.props.show)
+
     return (
-      <Flexbox className={classes.sidebar} direction="column" background="black">
+      <div className={`${classes.sidebar} ${this.props.show ? classes.show : ""}`}>
 
         <div className={classes.nav}>
           <ul className={classes.sidebarNav}>
-            <MenuItem link="/upload" text="Upload" nav={true} exact={true} icon="bullhorn"/>
+            <MenuItem link="/upload" text="Upload" nav={true} exact={true} icon="upload"/>
             {false && <MenuItem link="/profile" text="Profile" nav={true} icon="bullhorn"/>}
-            <MenuItem link="/transcripts" text="Transcripts" nav={true} exact={true} icon="bullhorn"/>
-            <MenuItem link="/unfinished-transcripts" text="Unfinished Transcripts" nav={true} icon="bullhorn"/>
+            <MenuItem link="/transcripts" text="Transcripts" nav={true} exact={true} icon="file-alt"/>
+            <MenuItem link="/unfinished-transcripts" text="Unfinished Transcripts" nav={true} icon="cogs"/>
           </ul>
         </div>
-      </Flexbox>
+      </div>
     )
   }
 }

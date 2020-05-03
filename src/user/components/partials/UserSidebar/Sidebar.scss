@@ -8,6 +8,18 @@
   background: $sidebar;
   color: $white;
   padding: 40px 20px;
+  display: none; // don't show until they click on something
+  position: absolute !important;
+  flex-direction: column;
+
+  &.show {
+    display: flex;
+    z-index: 9999;
+  }
+  @include mq(m) {
+    display: flex;
+    position: absolute !important;
+  }
 }
 
 .statusCtn {
