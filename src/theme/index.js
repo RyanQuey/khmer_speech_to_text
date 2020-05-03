@@ -1,6 +1,6 @@
 export default {
   color: {
-    primary: 'rgb(23, 195, 169)',
+    primary: '#cf4c28', // mildly dark red
     active: 'rgb(23, 195, 169)',
     secondary: 'rgb(0, 125, 125)',
     accent1: 'rgb(155, 155, 155)',

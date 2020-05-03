@@ -86,7 +86,7 @@ class ShowTranscript extends Component {
 
     const copyButton = (
       <div>
-        <Button onClick={this.copy} small={true}>
+        <Button onClick={this.copy} small={true} style="inverted">
           Copy Text
         </Button>
       </div>
