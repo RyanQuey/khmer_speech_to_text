@@ -30,9 +30,9 @@ class TranscriptPicker extends Component {
         <tbody>
         <tr>
           {!summaryOnly && <th>Filename</th>}
-          <th>Transcript Created At</th>
-          {!summaryOnly && <th>File Last Modified</th>}
-          {!summaryOnly && <th>File Size</th>}
+          <th className={classes.desktopOnly}>Transcript Created At</th>
+          {!summaryOnly && <th className={classes.desktopOnly}>File Last Modified</th>}
+          {!summaryOnly && <th className={classes.desktopOnly}>File Size</th>}
           <th></th>
         </tr>
         {transcripts.map((transcript, index) => {
@@ -41,13 +41,13 @@ class TranscriptPicker extends Component {
               {!summaryOnly && <td>
                 {transcript.filename}
               </td>}
-              <td>
+              <td className={classes.desktopOnly}>
                 {transcript.displayCreatedAt()}
               </td>
-              {!summaryOnly && <td>
+              {!summaryOnly && <td className={classes.desktopOnly}>
                 {transcript.displayFileLastModified()}
               </td>}
-              {!summaryOnly && <td>
+              {!summaryOnly && <td className={classes.desktopOnly}>
                 {transcript.displayFileSize()}
               </td>}
               <td>
