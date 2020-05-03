@@ -53,7 +53,7 @@ class TranscribeRequestCard extends Component {
       <Card selected={selected} onClick={onClick} wrapperClass={wrapperClass} className={`${className} ${classes[status]} ${small ? classes.small : ""}`}>
         <CardHeader className={small ? classes.smallHeader : ""} title={transcribeRequest.filename} subtitle={subtitle || transcribeRequest.contentType} icon={"icon"} iconColor={"blue"}/>
 
-        <Flexbox>
+        <div className={classes.chartAndInfoContainer}>
           <Flexbox className={classes.progressCircleContainer}>
             <CircularProgressbar value={this.state.progressPercentage} text={`${this.state.progressPercentage.toFixed(1)}%`} />
           </Flexbox>
@@ -90,7 +90,7 @@ class TranscribeRequestCard extends Component {
               </div>
             })}
           </Flexbox>
-        </Flexbox>
+        </div>
 
         {transcribeRequest.canRetry() && (
           <Button 

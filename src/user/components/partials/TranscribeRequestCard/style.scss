@@ -54,6 +54,15 @@
   min-width: 100px;
   padding: 1rem;
 }
+.chartAndInfoContainer {
+  display: flex;
+  flex-wrap: wrap;
+
+  @include mq(m) {
+    flex-wrap: nowrap;
+  }
+
+}
 .infoContainer {
   width: 80%;
 }
