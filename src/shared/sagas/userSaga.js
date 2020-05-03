@@ -28,6 +28,8 @@ import { errorActions, alertActions } from 'shared/actions'
 import TranscribeRequest from 'models/TranscribeRequest'
 import { Link } from 'react-router-dom'
 
+// TODO move to a place where this can be managed better
+let userListeners = []
 
 function* signIn(action) {
   const payload = action.payload
@@ -173,6 +175,7 @@ function* fetchUser(action) {
   }
 }
 
+
 //should only be called on initial login, or retrieving from cookies, etc.
 function* fetchCurrentUser(action) {
   try {
@@ -202,15 +205,16 @@ function* fetchCurrentUser(action) {
     // const mappedTranscripts = transcriptsResult.docs.map(doc => doc.data())
 
     // setup listener so every change to transcripts in firestore is reflected
-    userTranscriptsRef.onSnapshot((snapshot) => { 
+    let userTranscriptsListener = userTranscriptsRef.onSnapshot((snapshot) => { 
       const mappedTranscripts = snapshot.docs.map(doc => doc.data())
       store.dispatch({type: FETCH_TRANSCRIPTS_SUCCESS, payload: mappedTranscripts})
     })
+    userListeners.push(userTranscriptsListener)
 
     const userTranscribeRequestsRef = userRef.collection("transcribeRequests").orderBy("updated_at", "desc")
 
     // setup listener so changes to uploads and transcriptions that are in process are always up to date
-    userTranscribeRequestsRef.onSnapshot((snapshot) => {
+    const userTranscribeRequestsListener = userTranscribeRequestsRef.onSnapshot((snapshot) => {
       const currentRecords = _.values(store.getState().transcribeRequests || [])
 
       const changes = snapshot.docChanges.map(change => {
@@ -248,6 +252,7 @@ function* fetchCurrentUser(action) {
 				}
       })
 
+      userListeners.push(userTranscribeRequestsListener)
       // update the store
       const mappedTranscriptRequests = snapshot.docs.map(doc => doc.data())
       store.dispatch({type: FETCH_TRANSCRIBE_REQUESTS_SUCCESS, payload: mappedTranscriptRequests})
@@ -276,12 +281,16 @@ function* signUserOut() {
     yield firebase.auth().signOut()
     //handle the successful signout
 
+    // stop listening to firestore listeners
+    userListeners.forEach(listener => {
+      listener()
+    })
+    userListeners = []
+
     yield put({type: SIGN_OUT_SUCCESS, payload: true})
     // token should already be obsolete, but remove it just in case
     axios.defaults.headers.common['Authorization'] = "";
 
-    // I think this should be unnecessary, might even break things
-    yield axios.get(`/api/users/signOut`)
 
   } catch (err) {
     console.error('There was an error in the signUserOut:', err.message)

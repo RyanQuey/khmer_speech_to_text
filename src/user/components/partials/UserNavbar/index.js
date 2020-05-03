@@ -71,7 +71,7 @@ UserNavbar.propTypes = {
 }
 
 const mapStateToProps = (state) => {
-  return { user: state.user }
+  return { user: state.user || null }
 }
 
 export default connect(mapStateToProps)(UserNavbar)
