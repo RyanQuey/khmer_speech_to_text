@@ -12,6 +12,6 @@
 .desktopOnly {
   display: none;
   @include mq(m) {
-    display: flex;
+    display: table-cell;
   }
 }
