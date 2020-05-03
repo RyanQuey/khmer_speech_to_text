@@ -49,7 +49,7 @@ class ShowTranscript extends Component {
 
     const matchingTranscripts = Helpers.matchingTranscripts(transcripts, encodedFileName, lastModified)
 
-    const transcript = matchingTranscripts.pop()
+    const transcript = matchingTranscripts.shift()
     return {matchingTranscripts, transcript}
   }
 
@@ -80,8 +80,7 @@ class ShowTranscript extends Component {
 
             <Flexbox direction="column" justify="center" className={classes.transcriptText}>
               <Flexbox direction="column">
-                {false && transcript.humanReadableTranscription()}
-                {transcript.utterances.map((utterance, i) => 
+                {transcript.utterances && transcript.utterances.map((utterance, i) => 
                   <div 
                     key={i} 
                     className={classes.utterance} 
