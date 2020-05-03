@@ -18,3 +18,10 @@
     display: none !important;
   }
 }
+.userButtonsWrapper {
+  display: flex;
+  align-items: center;
+}
+.hamburger {
+  padding: 5px 10px;
+}

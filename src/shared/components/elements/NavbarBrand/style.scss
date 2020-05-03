@@ -1,13 +1,16 @@
 @import 'theme/_helpers';
 
 .brand {
-  width: $sidebar-width; //should be as wide as the sidebar
+  width: 100px;
   height: 50px;
   z-index: 2;
   color: $white;
   padding: 10px;
   background-color: $header-bg; //unless it's overridden in the component
 
+  @include mq(m) {
+    width: $sidebar-width; //should be as wide as the sidebar
+  }
   
   img {
     height: 100%;

@@ -66,9 +66,9 @@ class UserNavbar extends Component {
           <Flexbox className={classes.rightNav} align="center" justify="space-between">
           
             {user ? (
-              <div>
+              <div className={classes.userButtonsWrapper}>
                 <AccountMenu />
-                <Icon name="bars" onClick={this.props.toggleSidebar}/> 
+                <Icon name="bars" onClick={this.props.toggleSidebar} className={classes.hamburger} size="2x"/> 
               </div>
             ) : (
               <a href="#" onClick={this.openLoginModal}>Login</a>
