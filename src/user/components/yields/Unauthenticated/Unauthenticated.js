@@ -27,8 +27,6 @@ class Unauthenticated extends Component {
             <UserNavbar />
       
             <Flexbox>
-              <UserSidebar />
-      
               <div className={classes.mainContainer}>
                 <h1>Login to get started!</h1>
               </div>
