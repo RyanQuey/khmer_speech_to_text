@@ -50,18 +50,19 @@ class UploadAudioForm extends Component {
       <div>
         <Flexbox className={classes.rightColumn} direction="column">
 
-          <div>WARNING: WAV, MP3s and MP4s might work, but probably not, especially MP4s. Long MP4s might not work because they need to be converted and so timeout</div>
-          <div>Currently, MP3s must have sample rate hertz of 16,000, and even then might not work. FLAC files are best. So just do FLAC files for now</div>
-          <div>Best audio types: No noise cancellation, highest quality</div>
+          <div><strong>WARNING:</strong> WAV, MP3s and MP4s might work, but probably not, especially MP4s</div>
+          <div>Currently, MP3s must have sample rate hertz of 16,000, and even then might not work. FLAC files are best</div>
+          <div><strong>Best audio types:</strong> No noise cancellation, highest quality</div>
           <DropAudio
             circle
             defaultImage="/public/images/profile/defaultBanner.jpg"
             label="Drop audio file here"
-            height="70vh"
-            width="100%"
+            height="150px"
+            width="150px"
             cb={this.cb}
             onFailure={this.onFailure}
             onStartUploading={this.onStartUploading}
+            className={classes.dropAudio}
           />
         </Flexbox>
       </div>

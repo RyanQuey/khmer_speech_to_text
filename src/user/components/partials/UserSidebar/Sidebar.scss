@@ -2,23 +2,23 @@
 
 .sidebar {
   min-height: calc(100vh - 50px);
-  min-width: 250px;
-  width: 250px;
+  min-width: $sidebar-width;
+  width: $sidebar-width;
   box-sizing: border-box;
   background: $sidebar;
   color: $white;
   padding: 40px 20px;
   display: none; // don't show until they click on something
-  position: absolute !important;
   flex-direction: column;
+  position: absolute;
 
   &.show {
     display: flex;
     z-index: 9999;
   }
   @include mq(m) {
+    position: relative;
     display: flex;
-    position: absolute !important;
   }
 }
 
@@ -83,11 +83,13 @@
   background: $black;
   opacity: .8;
   top: 0;
-  width: calc(100vw - 250px); // sidebar width TODO use var
-  left: 250px; // sidebar width
+  width: calc(100vw -  $sidebar-width); 
+  left: $sidebar-width; 
   height: 100vh;
   position: absolute;
-  &.show {
-    display: block;
+  display: none;
+
+  @include mq(m) {
+    display: none;
   }
 }
