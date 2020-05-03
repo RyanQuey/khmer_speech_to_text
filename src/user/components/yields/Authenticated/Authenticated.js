@@ -20,8 +20,10 @@ class Authenticated extends Component {
   }
 
 
-  toggleSidebar (show = !this.state.showSidebarInMobile) {
-    console.log("now toggling")
+  toggleSidebar (show, e) {
+    if (show === undefined) {
+      show = !this.state.showSidebarInMobile
+    }
     this.setState({showSidebarInMobile: show})
   }
 

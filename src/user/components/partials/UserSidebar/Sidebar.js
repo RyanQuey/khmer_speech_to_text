@@ -17,8 +17,6 @@ class Sidebar extends Component {
   }
 
   render() {
-    console.log("can show", this.props.show)
-
     return (
       <div className={`${classes.sidebar} ${this.props.show ? classes.show : ""}`}>
 
@@ -30,7 +28,7 @@ class Sidebar extends Component {
             <MenuItem link="/unfinished-transcripts" text="Unfinished Transcripts" nav={true} icon="cogs" onClick={this.props.toggleSidebar.bind(this, false)}/>
           </ul>
         </div>
-        <div className={`${classes.backdrop} ${this.props.show ? classes.show : ""}`} onClick={this.props.toggleSidebar}></div>
+        <div className={`${classes.backdrop} ${this.props.show ? classes.show : ""}`} onClick={this.props.toggleSidebar.bind(this, !this.props.show)}></div>
       </div>
     )
   }

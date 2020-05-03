@@ -68,7 +68,7 @@ class UserNavbar extends Component {
             {user ? (
               <div className={classes.userButtonsWrapper}>
                 <AccountMenu />
-                <Icon name="bars" onClick={this.props.toggleSidebar} className={classes.hamburger} size="2x"/> 
+                <Icon name="bars" onClick={this.props.toggleSidebar.bind(this, undefined)} className={classes.hamburger} size="2x"/> 
               </div>
             ) : (
               <a href="#" onClick={this.openLoginModal}>Login</a>
