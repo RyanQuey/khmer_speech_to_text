@@ -332,6 +332,9 @@ class TranscribeRequest {
         // request (rather than creating a new one)
         return "file-missing"
 
+      } else if (this.error && String(this.error).includes("400 WAV header indicates an unsupported format")) {
+        return "unsupported-format"
+
       } else if (this.error && String(this.error).includes("Presumably a client error")) {
         return "can-retry"
 
@@ -429,6 +432,7 @@ class TranscribeRequest {
       "can-retry-unknown-error": "Retry...but we're not sure why it failed the first time and it might fail again",
       "please-wait": "We are processing your file, please wait",
       "already-complete": "Finished transcribing, click here to view!",
+      "unsupported-format": "We are sorry, but we are not handling this audio file format yet, unable to retry"
     }
 
     return obj[message]

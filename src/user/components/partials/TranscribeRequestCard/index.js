@@ -76,7 +76,6 @@ class TranscribeRequestCard extends Component {
               let additionalClasses
 
               if (label != "Status") {
-                console.log("adding because label?", label)
                 additionalClasses = "desktopOnly"
               }
 
