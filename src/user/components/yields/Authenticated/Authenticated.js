@@ -36,7 +36,7 @@ class Authenticated extends Component {
         <UserNavbar toggleSidebar={this.toggleSidebar}/>
   
         <Flexbox>
-          <UserSidebar show={showSidebarInMobile}/>
+          <UserSidebar show={showSidebarInMobile} toggleSidebar={this.toggleSidebar}/>
   
           <UserContent />
         </Flexbox>

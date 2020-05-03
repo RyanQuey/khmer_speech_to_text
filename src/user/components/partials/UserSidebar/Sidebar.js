@@ -30,6 +30,7 @@ class Sidebar extends Component {
             <MenuItem link="/unfinished-transcripts" text="Unfinished Transcripts" nav={true} icon="cogs"/>
           </ul>
         </div>
+        <div className={`${classes.backdrop} ${this.props.show ? classes.show : ""}`} onClick={this.props.toggleSidebar}></div>
       </div>
     )
   }

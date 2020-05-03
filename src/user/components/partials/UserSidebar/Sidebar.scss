@@ -79,3 +79,15 @@
   }
 }
 
+.backdrop {
+  background: $black;
+  opacity: .8;
+  top: 0;
+  width: calc(100vw - 250px); // sidebar width TODO use var
+  left: 250px; // sidebar width
+  height: 100vh;
+  position: absolute;
+  &.show {
+    display: block;
+  }
+}

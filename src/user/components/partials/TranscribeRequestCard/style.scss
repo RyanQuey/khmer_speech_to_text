@@ -58,13 +58,27 @@
 }
 .request-card {
   padding: 2rem;
-  min-width: 350px;
+  min-width: 250px;
   max-width: 550px;
-  width: 550px;
+  width: 250px;
+
+  @include mq(m) {
+    min-width: 350px;
+    max-width: 550px;
+    width: 550px;
+  }
+
   &.error {
 
   }
   &.transcribing {
 
+  }
+}
+.desktopOnly {
+  display: none;
+  flex-direction: column; 
+  @include mq(m) {
+    display: flex;
   }
 }

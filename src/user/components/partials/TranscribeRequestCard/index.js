@@ -72,9 +72,15 @@ class TranscribeRequestCard extends Component {
 
               if (!value) {
                 return null
+              } 
+              let additionalClasses
+
+              if (label != "Status") {
+                console.log("adding because label?", label)
+                additionalClasses = "desktopOnly"
               }
 
-              return <Flexbox key={index} direction="column" className={classes.content}>
+              return <div key={index} className={`${classes.content} ${additionalClasses ? classes[additionalClasses] : ""}`}>
                 <div className={classes.contentSection}>
                   <span className={classes.cardLabel}>
                     {label}:
@@ -82,7 +88,7 @@ class TranscribeRequestCard extends Component {
                   &nbsp;
                   {value}
                 </div>
-              </Flexbox>
+              </div>
             })}
           </Flexbox>
         </Flexbox>
