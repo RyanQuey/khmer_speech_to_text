@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { StyleSheet, css } from 'aphrodite'
 import theme from 'theme'
 
-const Flexbox = ({ align, background, className, direction, justify, flexWrap, wrap, children, name, color, onClick }) => {
+const Flexbox = ({ id, align, background, className, direction, justify, flexWrap, wrap, children, name, color, onClick }) => {
   const styles = StyleSheet.create({
     flex: {
       backgroundColor: theme.color[background] || background,
@@ -16,7 +16,7 @@ const Flexbox = ({ align, background, className, direction, justify, flexWrap, w
     },
   })
   return (
-    <div id={name} name={name} className={`${css(styles.flex)} ${className || ''}`} onClick={onClick}>{children}</div>
+    <div id={id || name} name={name} className={`${css(styles.flex)} ${className || ''}`} onClick={onClick}>{children}</div>
   )
 }
 

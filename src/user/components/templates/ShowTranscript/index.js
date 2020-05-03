@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Flexbox, Button, Input, Checkbox, Icon, Spinner } from 'shared/components/elements'
 import {
 } from 'constants/actionTypes'
-import {formActions} from 'shared/actions'
+import {alertActions, formActions} from 'shared/actions'
 import classes from './style.scss'
 import {
   withRouter,
@@ -29,6 +29,31 @@ class ShowTranscript extends Component {
     this.hideTranscribeRequests()
   }
 
+  copy () {
+    /* Get the text field */
+    const text = document.getElementById("transcript-text").innerText;
+
+    const tempInput = document.createElement("textarea");
+    document.body.appendChild(tempInput);
+    tempInput.value = text;
+    tempInput.select();
+    /* Select the text field */
+    tempInput.setSelectionRange(0, 99999); /*For mobile devices*/
+
+    /* Copy the text inside the text field */
+    document.execCommand("copy");
+
+    // remove the temp element
+    document.body.removeChild(tempInput);
+
+    /* Alert the copied text */
+    alertActions.newAlert({
+      //title: response.data.transcription,
+      title: "Copied text to clipboard",
+      level: "SUCCESS",
+      options: {timer: true}
+    })
+  }
   hideTranscribeRequests () {
     const { transcript, matchingTranscripts } = this.findTranscript()
     // (async side effect)
@@ -45,7 +70,6 @@ class ShowTranscript extends Component {
     const { transcriptIdentifier } = params
 
     const {encodedFileName, lastModified} = Helpers.getTranscriptDataFromParam(transcriptIdentifier)
-    console.log("filename", encodedFileName, lastModified)
 
     const matchingTranscripts = Helpers.matchingTranscripts(transcripts, encodedFileName, lastModified)
 
@@ -60,7 +84,13 @@ class ShowTranscript extends Component {
       return <Spinner />
     }
 
-    console.log("transcript", transcript)
+    const copyButton = (
+      <div>
+        <Button onClick={this.copy} small={true}>
+          Copy Text
+        </Button>
+      </div>
+    )
 
     return (
       <Flexbox className={classes.main} direction="column" >
@@ -77,8 +107,10 @@ class ShowTranscript extends Component {
                 </Flexbox>
               </Flexbox>
             </Flexbox>
+            
+            {copyButton}
 
-            <Flexbox direction="column" justify="center" className={classes.transcriptText}>
+            <Flexbox id="transcript-text" direction="column" justify="center" className={classes.transcriptText}>
               <Flexbox direction="column">
                 {transcript.utterances && transcript.utterances.map((utterance, i) => 
                   <div 
@@ -93,6 +125,7 @@ class ShowTranscript extends Component {
               <hr />
             </Flexbox>
 
+            {copyButton}
           </div>
         </div>
 
