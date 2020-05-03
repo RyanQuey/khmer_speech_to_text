@@ -83,12 +83,16 @@
   background: $black;
   opacity: .8;
   top: 0;
-  width: calc(100vw -  $sidebar-width); 
+  width: calc(100vw -  #{$sidebar-width}); 
   left: $sidebar-width; 
   height: 100vh;
   position: absolute;
   display: none;
 
+
+  &.show {
+    display: block;
+  }
   @include mq(m) {
     display: none;
   }
