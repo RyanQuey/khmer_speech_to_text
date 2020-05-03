@@ -24,10 +24,10 @@ class Sidebar extends Component {
 
         <div className={classes.nav}>
           <ul className={classes.sidebarNav}>
-            <MenuItem link="/upload" text="Upload" nav={true} exact={true} icon="upload"/>
-            {false && <MenuItem link="/profile" text="Profile" nav={true} icon="bullhorn"/>}
-            <MenuItem link="/transcripts" text="Transcripts" nav={true} exact={true} icon="file-alt"/>
-            <MenuItem link="/unfinished-transcripts" text="Unfinished Transcripts" nav={true} icon="cogs"/>
+            <MenuItem link="/upload" text="Upload" nav={true} exact={true} icon="upload" onClick={this.props.toggleSidebar}/>
+            {false && <MenuItem link="/profile" text="Profile" nav={true} icon="bullhorn" onClick={this.props.toggleSidebar}/>}
+            <MenuItem link="/transcripts" text="Transcripts" nav={true} exact={true} icon="file" onClick={this.props.toggleSidebar}/>
+            <MenuItem link="/unfinished-transcripts" text="Unfinished Transcripts" nav={true} icon="cogs" onClick={this.props.toggleSidebar}/>
           </ul>
         </div>
         <div className={`${classes.backdrop} ${this.props.show ? classes.show : ""}`} onClick={this.props.toggleSidebar}></div>
