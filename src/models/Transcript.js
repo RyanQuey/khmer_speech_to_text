@@ -4,6 +4,18 @@ import TranscribeRequest from 'models/TranscribeRequest'
 // TODO create model class, with stuff for schema etc
 //class Transcript extends Model {
 // takes transcript from firestore record (uses underscored keys from the api) 
+const mapObj = {
+  "សញ្ញាខណ្ឌ":  "។",
+  "សញ្ញាសួរ":  "?",
+  "សញ្ញាឧទាន": "!",
+  "សញ្ញាបើកវង់ក្រចក": "\(",
+  "សញ្ញាបិតវង់ក្រចក":  ")",
+  "ចំណុចពីរគូស": "៖",
+  "ល៉ៈ ": "។ល។",
+}
+window.khmerPunctuationMapObj = mapObj
+console.log("Punctuation mapping", mapObj)
+
 class Transcript {
   constructor(transcriptData) {
     // super()
@@ -76,6 +88,15 @@ class Transcript {
 
     return match && new TranscribeRequest({transcribeRequestRecord: match})
   }
+
+  // maps certain spelled out words to their puncuation equivalent
+  static displayUtterance (utteranceTranscript) {
+    // TODO probably better to put in unicode bytes here instead for accuracy and ease of reading
+    const re = new RegExp(Object.keys(mapObj).join("|"),"gi");
+
+    return utteranceTranscript.replace(re, (matched) => mapObj[matched]);
+  }
+
 }
 
 export default Transcript
