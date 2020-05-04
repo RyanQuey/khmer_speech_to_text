@@ -4,18 +4,63 @@ import TranscribeRequest from 'models/TranscribeRequest'
 // TODO create model class, with stuff for schema etc
 //class Transcript extends Model {
 // takes transcript from firestore record (uses underscored keys from the api) 
-const mapObj = {
+window.khmerPunctuationMap = {
   "សញ្ញាខណ្ឌ":  "។",
   "សញ្ញាសួរ":  "?",
   "សញ្ញាឧទាន": "!",
   "សញ្ញាបើកវង់ក្រចក": " \(",
-  "សញ្ញាបិតវង់ក្រចក":  ") ",
+  "សញ្ញាបិតវង់ក្រចក":  "\) ",
   "ចំណុចពីរគូស": "៖",
   "ល៉ៈ ": "។ល។",
   "សញ្ញាខ័ណ្ឌ": "។",
 }
-window.khmerPunctuationMapObj = mapObj
-console.log("Punctuation mapping", mapObj)
+const punctuationRegex = new RegExp(Object.keys(khmerPunctuationMap).join("|"),"gi");
+// make sure numbers correspond to index in array
+window.khmerNumbersArr = [
+  // numbers
+  "សូន្យ",
+  "មួយ",
+  "ពីរ",
+  "បី",
+  "បួន",
+  "ប្រាំ",
+  "ប្រាំមួយ",
+  "ប្រាំពីរ",
+  "ប្រាំបី",
+  "ប្រាំបួន",
+]
+window.khmerNumeralArr = [
+  // numbers
+  "០",
+  "១",
+  "២",
+  "៣",
+  "៤",
+  "៥",
+  "៦",
+  "៧",
+  "៨",
+  "៩",
+]
+// hits anything with the khmer word for "number" before and then an Arabic numeral
+const khNumber = "លេខ"
+// keep khmer on separate line if possible, or else vim gets messed up
+const referencesRegex = /\s?ជំពូក\s?(\d+)\s?ខ\s?(\d+)/gi
+// if colon before or after, counting it as reference, so handling differently
+const khmerNumberRegex = new RegExp(`(${khNumber})?\\s?(\\d)`, "gi");
+// global regexs don't capture
+const nonGlobalRegex = (reg) => new RegExp(reg.source, "i");
+const convertToKhmerNumeral = (numStr) => {
+  let ret = ""
+  // make sure if multidigit string, converts all
+  for (let i = 0; i < numStr.length; i++) {
+    ret += khmerNumeralArr[numStr[i]]
+  }
+
+  return ret
+}
+
+console.log("Punctuation and number mapping", khmerPunctuationMap, khmerNumbersArr)
 
 class Transcript {
   constructor(transcriptData) {
@@ -93,9 +138,44 @@ class Transcript {
   // maps certain spelled out words to their puncuation equivalent
   static displayUtterance (utteranceTranscript) {
     // TODO probably better to put in unicode bytes here instead for accuracy and ease of reading
-    const re = new RegExp(Object.keys(mapObj).join("|"),"gi");
+    // want it to be like: 1 Clement" 1:19 " so spaces before and after. Will change to Khmer
+    // numbers in the punctuation regex
 
-    return utteranceTranscript.replace(re, (matched) => mapObj[matched]);
+    // TODO make sure references don't get switched over somehow...
+    const withFixedReferences = utteranceTranscript.replace(referencesRegex, (matched) => {
+      const match = matched.match(nonGlobalRegex(referencesRegex));
+      console.log("got a reference match", match, matched)
+      // don't wait to change to Khmer numerals later, since references don't follow the normal
+      // rule. Keep it separate, and save a lot of grief in regex wasteland
+        console.log("returning reference", ` ${khmerNumeralArr[match[1]]}:${khmerNumeralArr[match[2]]} `)
+      return ` ${convertToKhmerNumeral(match[1])}:${convertToKhmerNumeral(match[2])} `
+    })
+    // first, converting all numbers with លេខ in front to Khmer numerals
+    // I think it's better to only run one replace for both types of numbers rather than two
+    // replaces with separate logic, since it has to iterate over whole string. So regex needs to
+    // match both types, then decide which one to 
+    console.log("now checking with", khmerNumberRegex)
+    const withFixedNumberals = withFixedReferences.replace(khmerNumberRegex, (matched) => {
+      const match = matched.match(nonGlobalRegex(khmerNumberRegex));
+      console.log("got a match", match, matched)
+
+      // e.g., 1 or 5 etc
+      const theNumber = match[2]
+      // if they use the Khmer word for "number" before, or it's more than 9, use Khmer numeral
+      if (match[1] || theNumber.length > 1) {
+        console.log("returning what?", khmerNumeralArr[theNumber])
+        return convertToKhmerNumeral(theNumber)
+
+      } else {
+        // spell it out
+        console.log("returning what", khmerNumbersArr[theNumber])
+        return khmerNumbersArr[theNumber]
+      }
+    })
+
+    const processedUtterance = withFixedNumberals.replace(punctuationRegex, (match) => khmerPunctuationMap[match]);
+
+    return processedUtterance
   }
 
 }
