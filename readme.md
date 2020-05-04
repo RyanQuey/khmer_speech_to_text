@@ -33,3 +33,9 @@ For running cloud server locally as well, do `firebase serve --only functions --
 * upgrade to webpack 3
 * make sure that sass files can import from the theme folder
 
+# If need to update the preferred spellings doc: 
+  * download new .txt file from https://github.com/languagetool-org/languagetool/blob/master/languagetool-language-modules/km/src/main/resources/org/languagetool/rules/km/coherency.txt
+      (make sure to download, don't copy and paste since it might not copy correctly due to data encoding etc)
+  * remove any comments or whatever from the top (e.g., "#KhmerMultipleSpellings")
+  * convert to json using `node private/convert-preferred-spellings.js`
+

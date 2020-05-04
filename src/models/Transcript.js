@@ -1,9 +1,13 @@
 import { TRANSCRIPTION_STATUSES} from "constants/transcript"
 import TranscribeRequest from 'models/TranscribeRequest'
+import preferredSpellings from 'helpers/preferred-spellings.json'
 
+const preferredSpellingRegex = new RegExp(Object.keys(preferredSpellings).join("|"),"gi");
 // TODO create model class, with stuff for schema etc
 //class Transcript extends Model {
 // takes transcript from firestore record (uses underscored keys from the api) 
+
+// TODO move these to helpers
 window.khmerPunctuationMap = {
   "សញ្ញាខណ្ឌ":  "។",
   "សញ្ញាសួរ":  "?",
@@ -144,36 +148,32 @@ class Transcript {
     // TODO make sure references don't get switched over somehow...
     const withFixedReferences = utteranceTranscript.replace(referencesRegex, (matched) => {
       const match = matched.match(nonGlobalRegex(referencesRegex));
-      console.log("got a reference match", match, matched)
       // don't wait to change to Khmer numerals later, since references don't follow the normal
       // rule. Keep it separate, and save a lot of grief in regex wasteland
-        console.log("returning reference", ` ${khmerNumeralArr[match[1]]}:${khmerNumeralArr[match[2]]} `)
       return ` ${convertToKhmerNumeral(match[1])}:${convertToKhmerNumeral(match[2])} `
     })
     // first, converting all numbers with លេខ in front to Khmer numerals
     // I think it's better to only run one replace for both types of numbers rather than two
     // replaces with separate logic, since it has to iterate over whole string. So regex needs to
     // match both types, then decide which one to 
-    console.log("now checking with", khmerNumberRegex)
     const withFixedNumberals = withFixedReferences.replace(khmerNumberRegex, (matched) => {
       const match = matched.match(nonGlobalRegex(khmerNumberRegex));
-      console.log("got a match", match, matched)
 
       // e.g., 1 or 5 etc
       const theNumber = match[2]
       // if they use the Khmer word for "number" before, or it's more than 9, use Khmer numeral
       if (match[1] || theNumber.length > 1) {
-        console.log("returning what?", khmerNumeralArr[theNumber])
         return convertToKhmerNumeral(theNumber)
 
       } else {
         // spell it out
-        console.log("returning what", khmerNumbersArr[theNumber])
         return khmerNumbersArr[theNumber]
       }
     })
 
-    const processedUtterance = withFixedNumberals.replace(punctuationRegex, (match) => khmerPunctuationMap[match]);
+    // set words with alternate spellings
+    const withPreferredSpellings = withFixedNumberals.replace(preferredSpellingRegex, (match) => preferredSpellings[match])
+    const processedUtterance = withPreferredSpellings.replace(punctuationRegex, (match) => khmerPunctuationMap[match]);
 
     return processedUtterance
   }
