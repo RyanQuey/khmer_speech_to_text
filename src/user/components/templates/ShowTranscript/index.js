@@ -8,7 +8,7 @@ import classes from './style.scss'
 import {
   withRouter,
 } from "react-router-dom";
-import { TranscriptPicker } from 'user/components/partials'
+import { TranscriptPicker, Utterance } from 'user/components/partials'
 import Transcript from 'models/Transcript'
 
 //shows up as buttons in mobile, or sidebar in browser?
@@ -112,20 +112,9 @@ class ShowTranscript extends Component {
 
             <Flexbox id="transcript-text" direction="column" justify="center" className={classes.transcriptText}>
               <Flexbox direction="column">
-                {transcript.utterances && transcript.utterances.map((utterance, i) => {
-                  // I think it should be sorted by confidence already. If not...probably leave it,
-                  // Google messed up I think. Or sort it in API at most
-                  const bestAlt = utterance.alternatives[0]
-                  const bestText = Transcript.displayUtterance(bestAlt.transcript)
-
-                  return <div 
-                    key={i} 
-                    className={`${classes.utterance} ${bestAlt.confidence < 0.95 ? classes.lowConfidence : ""}`}
-                    title={utterance.alternatives.length > 1 ? `Alternatively, perhaps should be: ${utterance.alternatives.slice(1).map(a => a.transcript).join(" OR POSSIBLY ")}` : "No alternatives provided"}
-                  >
-                    {bestText}
-                  </div>
-                })}
+                {transcript.utterances && transcript.utterances.map((utterance, i) => 
+                  <Utterance key={i} utterance={utterance}/>
+                )}
               </Flexbox>
               <hr />
             </Flexbox>

@@ -1,71 +1,9 @@
 import { TRANSCRIPTION_STATUSES} from "constants/transcript"
 import TranscribeRequest from 'models/TranscribeRequest'
-import preferredSpellings from 'helpers/preferred-spellings.json'
 
-const preferredSpellingRegex = new RegExp(Object.keys(preferredSpellings).join("|"),"gi");
 // TODO create model class, with stuff for schema etc
 //class Transcript extends Model {
 // takes transcript from firestore record (uses underscored keys from the api) 
-
-// TODO move these to helpers
-window.khmerPunctuationMap = {
-  "សញ្ញាខណ្ឌ":  "។",
-  "សញ្ញាសួរ":  "?",
-  "សញ្ញាឧទាន": "!",
-  "សញ្ញាបើកវង់ក្រចក": " \(",
-  "សញ្ញាបិតវង់ក្រចក":  "\) ",
-  "ចំណុចពីរគូស": "៖",
-  "ល៉ៈ ": "។ល។",
-  "សញ្ញាខ័ណ្ឌ": "។",
-}
-const punctuationRegex = new RegExp(Object.keys(khmerPunctuationMap).join("|"),"gi");
-// make sure numbers correspond to index in array
-window.khmerNumbersArr = [
-  // numbers
-  "សូន្យ",
-  "មួយ",
-  "ពីរ",
-  "បី",
-  "បួន",
-  "ប្រាំ",
-  "ប្រាំមួយ",
-  "ប្រាំពីរ",
-  "ប្រាំបី",
-  "ប្រាំបួន",
-]
-window.khmerNumeralArr = [
-  // numbers
-  "០",
-  "១",
-  "២",
-  "៣",
-  "៤",
-  "៥",
-  "៦",
-  "៧",
-  "៨",
-  "៩",
-]
-// hits anything with the khmer word for "number" before and then an Arabic numeral
-const khNumber = "លេខ"
-// keep khmer on separate line if possible, or else vim gets messed up
-const referencesRegex = /\s?ជំពូក\s?(\d+)\s?ខ\s?(\d+)/gi
-// if colon before or after, counting it as reference, so handling differently
-const khmerNumberRegex = new RegExp(`(${khNumber})?\\s?(\\d)`, "gi");
-// global regexs don't capture
-const nonGlobalRegex = (reg) => new RegExp(reg.source, "i");
-const convertToKhmerNumeral = (numStr) => {
-  let ret = ""
-  // make sure if multidigit string, converts all
-  for (let i = 0; i < numStr.length; i++) {
-    ret += khmerNumeralArr[numStr[i]]
-  }
-
-  return ret
-}
-
-console.log("Punctuation and number mapping", khmerPunctuationMap, khmerNumbersArr)
-
 class Transcript {
   constructor(transcriptData) {
     // super()
@@ -146,34 +84,34 @@ class Transcript {
     // numbers in the punctuation regex
 
     // TODO make sure references don't get switched over somehow...
-    const withFixedReferences = utteranceTranscript.replace(referencesRegex, (matched) => {
-      const match = matched.match(nonGlobalRegex(referencesRegex));
+    const withFixedReferences = utteranceTranscript.replace(Helpers.referencesRegex, (matched) => {
+      const match = matched.match(Helpers.nonGlobalRegex(Helpers.referencesRegex));
       // don't wait to change to Khmer numerals later, since references don't follow the normal
       // rule. Keep it separate, and save a lot of grief in regex wasteland
-      return ` ${convertToKhmerNumeral(match[1])}:${convertToKhmerNumeral(match[2])} `
+      return ` ${Helpers.convertToKhmerNumeral(match[1])}:${Helpers.convertToKhmerNumeral(match[2])} `
     })
     // first, converting all numbers with លេខ in front to Khmer numerals
     // I think it's better to only run one replace for both types of numbers rather than two
     // replaces with separate logic, since it has to iterate over whole string. So regex needs to
     // match both types, then decide which one to 
-    const withFixedNumberals = withFixedReferences.replace(khmerNumberRegex, (matched) => {
-      const match = matched.match(nonGlobalRegex(khmerNumberRegex));
+    const withFixedNumberals = withFixedReferences.replace(Helpers.khmerNumberRegex, (matched) => {
+      const match = matched.match(Helpers.nonGlobalRegex(Helpers.khmerNumberRegex));
 
       // e.g., 1 or 5 etc
       const theNumber = match[2]
       // if they use the Khmer word for "number" before, or it's more than 9, use Khmer numeral
       if (match[1] || theNumber.length > 1) {
-        return convertToKhmerNumeral(theNumber)
+        return Helpers.convertToKhmerNumeral(theNumber)
 
       } else {
         // spell it out
-        return khmerNumbersArr[theNumber]
+        return Helpers.KHMER_NUMBERS[theNumber]
       }
     })
 
     // set words with alternate spellings
-    const withPreferredSpellings = withFixedNumberals.replace(preferredSpellingRegex, (match) => preferredSpellings[match])
-    const processedUtterance = withPreferredSpellings.replace(punctuationRegex, (match) => khmerPunctuationMap[match]);
+    const withPreferredSpellings = withFixedNumberals.replace(Helpers.preferredSpellingRegex, (match) => {console.log(match, Helpers.PREFERRED_SPELLINGS[match]); return Helpers.PREFERRED_SPELLINGS[match]})
+    const processedUtterance = withPreferredSpellings.replace(Helpers.punctuationRegex, (match) => Helpers.KHMER_PUNCTUATION[match]);
 
     return processedUtterance
   }

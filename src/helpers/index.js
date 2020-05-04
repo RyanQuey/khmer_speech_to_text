@@ -10,6 +10,7 @@ import {
 import {
   newAlert
 } from 'shared/actions/alerts'
+import khmerHelpers from './khmer-helpers'
 import Transcript from 'models/Transcript'
 
 // TODO import from a constants file shared with cloud functions folder for consistency (?)
@@ -145,9 +146,11 @@ let Helpers = {
   }, 
 
   timestamp: () => moment.utc().format("YYYYMMDDTHHmmss[Z]")
+
+
 }
 
 // for adding more helper files to this one
-Helpers = Object.assign(Helpers)
+Helpers = Object.assign(Helpers, khmerHelpers)
 
 export default Helpers
