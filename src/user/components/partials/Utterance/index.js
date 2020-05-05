@@ -109,15 +109,36 @@ class Utterance extends Component {
         isDefault = false
         // means the previous word was not the Khmer word for number, so hopefully speaker wants it
         // spelled out
+
+        // sometimes there are non-number parts included on the same word...shame on you Google! 
+        // For example, 2020_05_04_19_31_55.flac
+        // But need to keep that part separate
+        // find only the number, in case they mixed letters in the same word
+        let number = wordData.word.match(/^[^\d]*(\d+)[^\d]*$/)[1]
         if (wordData.word.length > 1) {
           // just use numeral anyways
-          word = Helpers.convertToKhmerNumeral(wordData.word)
+          word = Helpers.convertToKhmerNumeral(number)
+          tags.push("numeral")
 
         } else {
           // spell it out
-          word = Helpers.KHMER_NUMBERS[wordData.word] 
+          word = Helpers.KHMER_NUMBERS[number] 
+          tags.push("spelled-out-number")
         }
-        tags.push("spelled-out-number")
+
+        // add the rest back in
+        let nonNumbers = wordData.word.match(new RegExp(`^(.*)?${number}(.*)?$`))
+        if (nonNumbers[1] || nonNumbers[2]) {
+          tags.push("letters-and-numbers-in-one")
+
+          if (nonNumbers[1]) {
+            word = nonNumbers[1] + word
+          }
+          if (nonNumbers[2]) {
+            word = word + nonNumbers[2]
+          }
+        }
+
 
       } else if (Helpers.PREFERRED_SPELLINGS[wordData.word]) {
         isDefault = false
@@ -177,6 +198,7 @@ class Utterance extends Component {
           <Word 
             wordData={wordData} 
             nextWordData={words[index+1]} 
+            key={index}
           />
         ))}
       </div>
