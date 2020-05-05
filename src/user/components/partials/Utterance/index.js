@@ -31,15 +31,58 @@ class Utterance extends Component {
       // set some defaults. Will change many of them
       let word = wordData.word, originalWordData = wordData, confidence = wordData.confidence, endTime = wordData.endTime, startTime = wordData.startTime, tags = [], isDefault = true
 
-      if (wordData.word == Helpers.khChapter) {
+      if (Helpers.ALL_BOOKS_NO_NUM.includes(wordData.word)) {
+        let thirdWordData = words[i+2]
+        let fourthWordData = words[i+3]
+        console.log("got a book!", [wordData.word, secondWordData.word, thirdWordData.word, fourthWordData.word])
+        // is book of Bible, so watch out for funky handling by Google
+        // But not necessarily non-default
+
+        if (
+          Helpers.BOOKS_WITH_MANY_NO_NUM.includes(wordData.word) &&
+          Helpers.khPart == secondWordData.word &&
+          Helpers.isOrdinal(thirdWordData.word, fourthWordData.word)
+        ) {
+          isDefault = false
+          // if 3rd is an ordinal by itself, it means Google sent the ordinal bunched together as
+          // one "word", so the fourth is not included
+          let allInOne = Helpers.bonusOrdinals.includes(thirdWordData.word)
+          if (allInOne) {
+            let num = thirdWordData.word.replace(Helpers.khOrdinalIndicatorRegEx, "")
+            word = `${Helpers.convertToKhmerNumeral(num)}${wordData.word}`
+            confidence = [wordData, secondWordData, thirdWordData].reduce((acc, val) => (acc + val.confidence), 0) / 3
+            originalWordData = {wordData, secondWordData, thirdWordData} 
+            // leave the 4th one out of it
+            i += 2
+
+          } else {
+            word = `${Helpers.convertToKhmerNumeral(fourthWordData.word)}${wordData.word}`
+
+            // get the average and use as combined word confidence
+            // NOTE maybe we should be even more confident, since it fits this pattern?
+            confidence = [wordData, secondWordData, thirdWordData, fourthWordData].reduce((acc, val) => (acc + val.confidence), 0) / 4
+            originalWordData = {wordData, secondWordData, thirdWordData, fourthWordData} 
+            // skip next three words since we're combining them
+            i += 3
+          }
+
+          tags.push("combined")
+          tags.push("preceded-by-nbsp")
+          tags.push("followed-by-nbsp")
+          tags.push("book-name")
+        }
+
+      } else if (wordData.word.match(Helpers.khChapterRegex)) {
         // test if this is reference
+        // NOTE that we want to do this even if no book name is recognized, since often no book is
+        // recognized at all even if the end user said one
         let thirdWordData = words[i+2]
         let fourthWordData = words[i+3]
 
-        if (secondWordData.word.match(/\d/) && thirdWordData.word.match(Helpers.khVerse) && fourthWordData.word.match(/\d/)) {
+        if (Helpers.isNumber(secondWordData.word) && thirdWordData.word.match(Helpers.khVerse) && Helpers.isNumber(fourthWordData.word)) {
           // found a reference
           isDefault = false
-          word = `${secondWordData.word}:${fourthWordData.word}`
+          word = `${Helpers.convertToKhmerNumeral(secondWordData.word)}:${Helpers.convertToKhmerNumeral(fourthWordData.word)}`
 
           // get the average and use as combined word confidence
           // NOTE maybe we should be even more confident, since it fits this pattern?
@@ -84,19 +127,12 @@ class Utterance extends Component {
           tags.push("followed-by-nbsp")
         }
 
-      } else if (wordData.word == Helpers.khNumber && secondWordData && (
-        secondWordData.word.match(/\d/) || Helpers.KHMER_NUMBERS.includes(secondWordData.word)
-      )) {
+      } else if (wordData.word == Helpers.khNumber && secondWordData && Helpers.isNumber(secondWordData.word)) {
         // want to do this whether the 2nd word is spelled out Khmer number or Arabic numeral
         isDefault = false
 
         // if spelled out already, convert to numeral
-        const spelledOutIndex = Helpers.KHMER_NUMBERS.indexOf(secondWordData.word)
-        if (spelledOutIndex != -1) {
-          word = Helpers.KHMER_NUMERALS[spelledOutIndex]
-        } else {
-          word = Helpers.convertToKhmerNumeral(secondWordData.word)
-        }
+        word = Helpers.convertToKhmerNumeral(secondWordData.word)
 
         endTime = secondWordData.endTime
         confidence = [wordData, secondWordData].reduce((acc, val) => (acc + val.confidence), 0) / 2
@@ -109,9 +145,15 @@ class Utterance extends Component {
         // skip next word since we're combining them
         i += 1
 
+      } else if (Helpers.KHMER_NUMBERS.includes(wordData.word)) {
+        // sometimes they spell it for us. In which case, just add the right tag
+        isDefault = false
+        tags.push("spelled-out-number")
+
       } else if (wordData.word.match(/\d/)) {
         isDefault = false
-        // means the previous word was not the Khmer word for number, so hopefully speaker wants it
+        // means the previous word was not the Khmer word for number, since we already ruled this
+        // out, so hopefully speaker wants it
         // spelled out
 
         // sometimes there are non-number parts included on the same word...shame on you Google! 
