@@ -56,7 +56,7 @@ class UploadAudioForm extends Component {
           <DropAudio
             circle
             defaultImage="/public/images/profile/defaultBanner.jpg"
-            label="Drop audio or click here to upload"
+            label="Drop audio or click to upload"
             height="150px"
             width="150px"
             cb={this.cb}
