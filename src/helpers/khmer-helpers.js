@@ -34,7 +34,7 @@ window.KHMER_PUNCTUATION_NO_LEADER = {
   "ចំណុចពីរគូស": "៖",
   "ល៉ៈ ": "។ល។",
   "បើកវង់ក្រចក": " \(",
-  "បិតវង់ក្រចក":  "\) ",
+  "បិតវង់ក្រចក":  "\)",
 }
 // for performance want to only run once, not for every word in every transcript!
 window.KHMER_PUNCTUATION_NO_LEADER_KEYS = Object.keys(KHMER_PUNCTUATION_NO_LEADER)
