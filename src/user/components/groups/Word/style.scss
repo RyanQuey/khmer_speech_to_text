@@ -6,10 +6,19 @@
     background-color: $light-purple-gray;
   }
 }
+.warning {
+  background-color: #f5d46b;
+}
+.confident {
+  // nothing
+}
 .lowConfidence {
   background-color: #fff3cd;
 }
-.veryLowConfidence {
+.failing {
   background-color: red; //TODO change
+}
+.abysmal {
+  background-color: darkred; //TODO change
 }
 

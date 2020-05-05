@@ -29,7 +29,7 @@ class Utterance extends Component {
       let wordData = words[i]
       let secondWordData = words[i+1]
       // set some defaults. Will change many of them
-      let word = wordData.word, confidence = wordData.confidence, endTime = wordData.endTime, startTime = wordData.startTime, tags = [], isDefault = true
+      let word = wordData.word, originalWordData = wordData, confidence = wordData.confidence, endTime = wordData.endTime, startTime = wordData.startTime, tags = [], isDefault = true
 
       if (wordData.word == Helpers.khChapter) {
         // test if this is reference
@@ -45,6 +45,7 @@ class Utterance extends Component {
           // NOTE maybe we should be even more confident, since it fits this pattern?
           confidence = [wordData, secondWordData, thirdWordData, fourthWordData].reduce((acc, val) => (acc + val.confidence), 0) / 4
           endTime = fourthWordData.endTime
+          originalWordData = {wordData, secondWordData, thirdWordData, fourthWordData} 
           tags.push("combined")
           tags.push("preceded-by-nbsp")
           tags.push("followed-by-nbsp")
@@ -61,6 +62,8 @@ class Utterance extends Component {
         isDefault = false
         word = Helpers.KHMER_PUNCTUATION[secondWordData.word]
         endTime = secondWordData.endTime
+        originalWordData = {wordData, secondWordData} 
+        confidence = [wordData, secondWordData].reduce((acc, val) => (acc + val.confidence), 0) / 2
         tags.push("combined")
         tags.push("followed-by-nbsp")
         tags.push("punctuation")
@@ -96,7 +99,8 @@ class Utterance extends Component {
         }
 
         endTime = secondWordData.endTime
-        confidence = [wordData, secondWordData].reduce((acc, val) => (acc + val.confidence), 0) / 4
+        confidence = [wordData, secondWordData].reduce((acc, val) => (acc + val.confidence), 0) / 2
+        originalWordData = {wordData, secondWordData} 
         tags.push("combined")
         tags.push("preceded-by-nbsp")
         tags.push("followed-by-nbsp")
@@ -119,6 +123,8 @@ class Utterance extends Component {
           // just use numeral anyways
           word = Helpers.convertToKhmerNumeral(number)
           tags.push("numeral")
+          tags.push("preceded-by-nbsp")
+          tags.push("followed-by-nbsp")
 
         } else {
           // spell it out
@@ -162,7 +168,7 @@ class Utterance extends Component {
 
 
       let processedWordData = {
-        originalWordData: wordData,
+        originalWordData,
         word, 
         confidence, 
         endTime, 

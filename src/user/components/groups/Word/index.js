@@ -25,11 +25,28 @@ class Word extends Component {
 
     // I think it should be sorted by confidence already. If not...probably leave it,
     // Google messed up I think. Or sort it in API at most
+    let confidenceClass
+    if (tags.includes("letters-and-numbers-in-one")) {
+      confidenceClass = classes.warning
+
+    } else if (confidence > 0.95) {
+      confidenceClass = classes.confident
+
+    } else  if (confidence > 0.85) {
+      confidenceClass = classes.lowConfidence
+
+    } else  if (confidence > 0.65) {
+      confidenceClass = classes.failing
+
+    } else if (confidence < 0.65)  {
+      confidenceClass = classes.abysmal
+    }
+
 
     return (
       <span 
-        className={`word ${classes.word} ${confidence < 0.95 ? classes.lowConfidence : ""}`} 
-        title={`${parseFloat(confidence* 100, 2)}%`}
+        className={`word ${classes.word} ${confidenceClass}`} 
+        title={confidenceClass == classes.warning ? "Google returned a single word with letters and numbers: " + wordData.originalWordData.word : `Confidence Level: ${parseFloat(confidence* 100, 2)}%`}
       >
         {word}
         {nextWordData && (wordData.tags.includes("followed-by-nbsp") || nextWordData.tags.includes("preceded-by-nbsp") ? '\u00A0' : '\u200B')}
