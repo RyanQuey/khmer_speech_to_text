@@ -36,6 +36,7 @@ class Utterance extends Component {
         // test if this is reference
         let thirdWordData = words[i+2]
         let fourthWordData = words[i+3]
+
         if (secondWordData.word.match(/\d/) && thirdWordData.word.match(Helpers.khVerse) && fourthWordData.word.match(/\d/)) {
           // found a reference
           isDefault = false
@@ -47,29 +48,57 @@ class Utterance extends Component {
           startTime = wordData.startTime
           endTime = fourthWordData.endTime
           tags.push("combined")
-          tags.push("surround-by-nbsp")
+          tags.push("preceded-by-nbsp")
+          tags.push("followed-by-nbsp")
           tags.push("reference")
 
           // skip next three words since we're combining them
           i += 3
         }
 
-      } else if (wordData.word == Helpers.khNumber) {
-        // means if the following word is a number, they want the Khmer numeral. If not don't change
-        secondWordData = words[i+1]
+      } else if (wordData.word == Helpers.khPunctuationLeader && Helpers.KHMER_PUNCTUATION_KEYS.includes(secondWordData.word)) {
+        // don't just test all words and their following words, will slow things down
+        
+        // this is punctuation
+        isDefault = false
+        word = Helpers.KHMER_PUNCTUATION[secondWordData.word]
+        startTime = wordData.startTime
+        endTime = secondWordData.endTime
+        tags.push("combined")
+        tags.push("followed-by-nbsp")
+        tags.push("punctuation")
 
-        if (secondWordData.word.match(/\d/)) {
-          isDefault = false
-          word = Helpers.convertToKhmerNumeral(secondWordData.word)
-          startTime = wordData.startTime
-          endTime = secondWordData.endTime
-          tags.push("combined")
-          tags.push("surround-by-nbsp")
-          tags.push("numeral")
-          
-          // skip next word since we're combining them
-          i += 1
+        // skip next word since we're combining them
+        i += 1
+
+      } else if (Helpers.KHMER_PUNCTUATION_NO_LEADER_KEYS.includes(wordData.word)) {
+        // is no leader punctuation. Not combining
+        isDefault = false
+        word = Helpers.KHMER_PUNCTUATION_NO_LEADER[secondWordData.word]
+        startTime = wordData.startTime
+        endTime = wordData.endTime
+        tags.push("punctuation")
+
+        if (word == "\(") {
+          tags.push("preceded-by-nbsp")
+
+        } else {
+          tags.push("followed-by-nbsp")
         }
+
+      } else if (wordData.word == Helpers.khNumber && secondWordData.word.match(/\d/)) {
+        // means if the following word is a number, they want the Khmer numeral. If not don't change
+        isDefault = false
+        word = Helpers.convertToKhmerNumeral(secondWordData.word)
+        startTime = wordData.startTime
+        endTime = secondWordData.endTime
+        tags.push("combined")
+        tags.push("preceded-by-nbsp")
+        tags.push("followed-by-nbsp")
+        tags.push("numeral")
+        
+        // skip next word since we're combining them
+        i += 1
 
       } else if (wordData.word.match(/\d/)) {
         isDefault = false
@@ -94,7 +123,8 @@ class Utterance extends Component {
       } else if (Helpers.isEnglish(wordData)) {
         // English words should have spaces. Other than that can be default
         tags.push("English")
-        tags.push("surround-by-nbsp")
+        tags.push("preceded-by-nbsp")
+        tags.push("followed-by-nbsp")
       }
 
       if (isDefault) {

@@ -28,17 +28,28 @@ window.KHMER_NUMERALS = [
   "៨",
   "៩",
 ]
-window.KHMER_PUNCTUATION = {
-  "សញ្ញាខណ្ឌ":  "។",
-  "សញ្ញាសួរ":  "?",
-  "សញ្ញាឧទាន": "!",
-  "សញ្ញាបើកវង់ក្រចក": " \(",
-  "សញ្ញាបិតវង់ក្រចក":  "\) ",
+
+// none of these will require "sanna" (kh for "sign") before recognizing it
+window.KHMER_PUNCTUATION_NO_LEADER = {
   "ចំណុចពីរគូស": "៖",
   "ល៉ៈ ": "។ល។",
-  "សញ្ញាខ័ណ្ឌ": "។",
+  "បើកវង់ក្រចក": " \(",
+  "បិតវង់ក្រចក":  "\) ",
 }
+// for performance want to only run once, not for every word in every transcript!
+window.KHMER_PUNCTUATION_NO_LEADER_KEYS = Object.keys(KHMER_PUNCTUATION_NO_LEADER)
 
+// all of these will require "sanna" (kh for "sign") before recognizing it
+window.KHMER_PUNCTUATION = {
+  "ណ្ឌ":  "។",
+  "ខ័ណ្ឌ": "។",
+  "សួរ":  "?",
+  "ឧទាន": "!",
+}
+window.KHMER_PUNCTUATION_KEYS = Object.keys(KHMER_PUNCTUATION)
+window.ALL_KHMER_PUNCTUATION = Object.assign(KHMER_PUNCTUATION, KHMER_PUNCTUATION_NO_LEADER)
+
+const khPunctuationLeader = "សញ្ញា"
 // hits anything with the khmer word for "number" before and then an Arabic numeral
 const khNumber = "លេខ"
 // keep khmer writing on separate line if possible, or else vim gets messed up
@@ -63,11 +74,15 @@ export default {
 
     return ret
   },
-  punctuationRegex: new RegExp(Object.keys(KHMER_PUNCTUATION).join("|"),"gi"),
+  punctuationRegex: new RegExp(Object.keys(ALL_KHMER_PUNCTUATION).join("|"),"gi"),
   // NOTE don't use when looking at individual words
   preferredSpellingRegex: new RegExp(Object.keys(PREFERRED_SPELLINGS).join("|"),"gi"),
 
+  khPunctuationLeader,
   KHMER_PUNCTUATION, 
+  KHMER_PUNCTUATION_NO_LEADER, 
+  KHMER_PUNCTUATION_KEYS, 
+  KHMER_PUNCTUATION_NO_LEADER_KEYS, 
   KHMER_NUMERALS,
   KHMER_NUMBERS,
   PREFERRED_SPELLINGS, 

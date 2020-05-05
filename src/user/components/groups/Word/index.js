@@ -32,7 +32,7 @@ class Word extends Component {
         title={`${parseFloat(confidence* 100, 2)}%`}
       >
         {word}
-        {nextWordData && (wordData.tags.includes("surround-by-nbsp") || nextWordData.tags.includes("surround-by-nbsp") ? '\u00A0' : '\u200B')}
+        {nextWordData && (wordData.tags.includes("followed-by-nbsp") || nextWordData.tags.includes("preceded-by-nbsp") ? '\u00A0' : '\u200B')}
       </span>
     )
   }
