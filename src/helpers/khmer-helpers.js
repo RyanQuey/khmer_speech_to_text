@@ -41,7 +41,7 @@ window.KHMER_PUNCTUATION_NO_LEADER_KEYS = Object.keys(KHMER_PUNCTUATION_NO_LEADE
 
 // all of these will require "sanna" (kh for "sign") before recognizing it
 window.KHMER_PUNCTUATION = {
-  "ណ្ឌ":  "។",
+  "ខណ្ឌ":  "។",
   "ខ័ណ្ឌ": "។",
   "សួរ":  "?",
   "ឧទាន": "!",

@@ -27,10 +27,9 @@ class Utterance extends Component {
     const ret = []
     for (let i = 0; i < words.length; i++) {
       let wordData = words[i]
-      let word, confidence, endTime, startTime, tags = []
       let secondWordData = words[i+1]
-
-      let isDefault = true
+      // set some defaults. Will change many of them
+      let word = wordData.word, confidence = wordData.confidence, endTime = wordData.endTime, startTime = wordData.startTime, tags = [], isDefault = true
 
       if (wordData.word == Helpers.khChapter) {
         // test if this is reference
@@ -45,7 +44,6 @@ class Utterance extends Component {
           // get the average and use as combined word confidence
           // NOTE maybe we should be even more confident, since it fits this pattern?
           confidence = [wordData, secondWordData, thirdWordData, fourthWordData].reduce((acc, val) => (acc + val.confidence), 0) / 4
-          startTime = wordData.startTime
           endTime = fourthWordData.endTime
           tags.push("combined")
           tags.push("preceded-by-nbsp")
@@ -62,7 +60,6 @@ class Utterance extends Component {
         // this is punctuation
         isDefault = false
         word = Helpers.KHMER_PUNCTUATION[secondWordData.word]
-        startTime = wordData.startTime
         endTime = secondWordData.endTime
         tags.push("combined")
         tags.push("followed-by-nbsp")
@@ -75,8 +72,6 @@ class Utterance extends Component {
         // is no leader punctuation. Not combining
         isDefault = false
         word = Helpers.KHMER_PUNCTUATION_NO_LEADER[secondWordData.word]
-        startTime = wordData.startTime
-        endTime = wordData.endTime
         tags.push("punctuation")
 
         if (word == "\(") {
@@ -86,12 +81,22 @@ class Utterance extends Component {
           tags.push("followed-by-nbsp")
         }
 
-      } else if (wordData.word == Helpers.khNumber && secondWordData.word.match(/\d/)) {
-        // means if the following word is a number, they want the Khmer numeral. If not don't change
+      } else if (wordData.word == Helpers.khNumber && secondWordData && (
+        secondWordData.word.match(/\d/) || Helpers.KHMER_NUMBERS.includes(secondWordData.word)
+      )) {
+        // want to do this whether the 2nd word is spelled out Khmer number or Arabic numeral
         isDefault = false
-        word = Helpers.convertToKhmerNumeral(secondWordData.word)
-        startTime = wordData.startTime
+
+        // if spelled out already, convert to numeral
+        const spelledOutIndex = Helpers.KHMER_NUMBERS.indexOf(secondWordData.word)
+        if (spelledOutIndex != -1) {
+          word = Helpers.KHMER_NUMERALS[spelledOutIndex]
+        } else {
+          word = Helpers.convertToKhmerNumeral(secondWordData.word)
+        }
+
         endTime = secondWordData.endTime
+        confidence = [wordData, secondWordData].reduce((acc, val) => (acc + val.confidence), 0) / 4
         tags.push("combined")
         tags.push("preceded-by-nbsp")
         tags.push("followed-by-nbsp")
@@ -104,10 +109,14 @@ class Utterance extends Component {
         isDefault = false
         // means the previous word was not the Khmer word for number, so hopefully speaker wants it
         // spelled out
-        word = Helpers.KHMER_NUMBERS[wordData.word] 
-        startTime = wordData.startTime
-        endTime = wordData.endTime
-        confidence = wordData.confidence
+        if (wordData.word.length > 1) {
+          // just use numeral anyways
+          word = Helpers.convertToKhmerNumeral(wordData.word)
+
+        } else {
+          // spell it out
+          word = Helpers.KHMER_NUMBERS[wordData.word] 
+        }
         tags.push("spelled-out-number")
 
       } else if (Helpers.PREFERRED_SPELLINGS[wordData.word]) {
@@ -115,13 +124,11 @@ class Utterance extends Component {
         let preferredSpelling = Helpers.PREFERRED_SPELLINGS[wordData.word]
         console.log("found alt spelling", wordData, preferredSpelling) 
         word = preferredSpelling
-        startTime = wordData.startTime
-        endTime = wordData.endTime
-        confidence = wordData.confidence
         tags.push("corrected-spelling")
 
       } else if (Helpers.isEnglish(wordData)) {
-        // English words should have spaces. Other than that can be default
+        // English words should have spaces. 
+        // Other than that can be default
         tags.push("English")
         tags.push("preceded-by-nbsp")
         tags.push("followed-by-nbsp")
@@ -129,16 +136,12 @@ class Utterance extends Component {
 
       if (isDefault) {
         // word is ready to be used as is
-        word = wordData.word
-        startTime = wordData.startTime
-        endTime = wordData.endTime
-        confidence = wordData.confidence
-
         tags.push("default")
       }
 
 
       let processedWordData = {
+        originalWordData: wordData,
         word, 
         confidence, 
         endTime, 
@@ -151,7 +154,6 @@ class Utterance extends Component {
       ret.push(processedWordData)
     }
 
-    console.log("utterance words", ret)
     return ret
   }
 
