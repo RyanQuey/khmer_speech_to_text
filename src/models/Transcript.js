@@ -77,6 +77,7 @@ class Transcript {
     return match && new TranscribeRequest({transcribeRequestRecord: match})
   }
 
+  // used only if we're not breaking the words out into separate components
   // maps certain spelled out words to their puncuation equivalent
   static displayUtterance (utteranceTranscript) {
     // TODO probably better to put in unicode bytes here instead for accuracy and ease of reading
@@ -94,7 +95,7 @@ class Transcript {
     // I think it's better to only run one replace for both types of numbers rather than two
     // replaces with separate logic, since it has to iterate over whole string. So regex needs to
     // match both types, then decide which one to 
-    const withFixedNumberals = withFixedReferences.replace(Helpers.khmerNumberRegex, (matched) => {
+    const withFixedNumerals = withFixedReferences.replace(Helpers.khmerNumberRegex, (matched) => {
       const match = matched.match(Helpers.nonGlobalRegex(Helpers.khmerNumberRegex));
 
       // e.g., 1 or 5 etc
@@ -110,7 +111,7 @@ class Transcript {
     })
 
     // set words with alternate spellings
-    const withPreferredSpellings = withFixedNumberals.replace(Helpers.preferredSpellingRegex, (match) => {console.log(match, Helpers.PREFERRED_SPELLINGS[match]); return Helpers.PREFERRED_SPELLINGS[match]})
+    const withPreferredSpellings = withFixedNumerals.replace(Helpers.preferredSpellingRegex, (match) => {console.log(match, Helpers.PREFERRED_SPELLINGS[match]); return Helpers.PREFERRED_SPELLINGS[match]})
     const processedUtterance = withPreferredSpellings.replace(Helpers.punctuationRegex, (match) => Helpers.KHMER_PUNCTUATION[match]);
 
     return processedUtterance

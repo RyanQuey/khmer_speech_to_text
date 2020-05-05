@@ -29,15 +29,41 @@ class ShowTranscript extends Component {
     this.hideTranscribeRequests()
   }
 
-  copy () {
+  // TODO figure out why this is triggering a re-render and stop doing that (performance TODO)
+  copy (e) {
+    e.preventDefault()
     /* Get the text field */
-    const text = document.getElementById("transcript-text").innerText;
+    // TODO use refs instead
+    // NOTE not just using the store to get all the text for now, since we're changing the text
+    // within the react component. If in the future we decide to persist changes to the store, if
+    // not to firestore directly, then can use store 
+    const allTextArr = []
+    $(".utterance").each(function(index) {
+      // want one paragraph per utterance
+      let textArr = []
+      let uttNode = this
+      $(uttNode).children(".word").each(function(index) { 
+        let wordNode = this
+        let wordText = $(wordNode).text()
+        console.log("adding some word text to ", wordText)
+        textArr.push(wordText)
+      })
 
+      // can add nbsp here if don't add into the component itself
+      let uttText = textArr.join("")
+      console.log("adding some text to arr", uttText)
+      allTextArr.push(uttText)
+    })
+
+    const allText = allTextArr.join("\n")
+
+    // make a temp input so they can copy it
     const tempInput = document.createElement("textarea");
     document.body.appendChild(tempInput);
-    tempInput.value = text;
-    tempInput.select();
+    tempInput.value = allText;
+
     /* Select the text field */
+    tempInput.select();
     tempInput.setSelectionRange(0, 99999); /*For mobile devices*/
 
     /* Copy the text inside the text field */
@@ -79,10 +105,10 @@ class ShowTranscript extends Component {
 
   render() {
     const { transcript, matchingTranscripts} = this.findTranscript()
-    console.log("showing transcript: ", transcript, "but all matches include:", matchingTranscripts)
     if (!transcript) {
       return <Spinner />
     }
+    console.log("showing transcript: ", transcript, "but all matches include:", matchingTranscripts)
 
     const copyButton = (
       <div>

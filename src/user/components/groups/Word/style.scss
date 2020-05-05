@@ -1,11 +1,10 @@
 @import 'theme/_helpers';
 
-.utterance {
-  text-align: left;
-  padding: .5rem;
-  margin-bottom: 1rem;
-  display: flex;
-  flex-wrap: wrap;
+.word {
+
+  &:hover {
+    background-color: $light-purple-gray;
+  }
 }
 .lowConfidence {
   background-color: #fff3cd;

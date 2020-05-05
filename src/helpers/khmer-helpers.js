@@ -44,6 +44,9 @@ const khNumber = "លេខ"
 // keep khmer writing on separate line if possible, or else vim gets messed up
 
 export default {
+  khNumber, 
+  khChapter: "ជំពូក",
+  khVerse: "ខ",
   referencesRegex: /\s?ជំពូក\s?(\d+)\s?ខ\s?(\d+)/gi,
 // if colon before or after, counting it as reference, so handling differently
   khmerNumberRegex: new RegExp(`(${khNumber})?\\s?(\\d)`, "gi"),
@@ -61,10 +64,13 @@ export default {
     return ret
   },
   punctuationRegex: new RegExp(Object.keys(KHMER_PUNCTUATION).join("|"),"gi"),
+  // NOTE don't use when looking at individual words
   preferredSpellingRegex: new RegExp(Object.keys(PREFERRED_SPELLINGS).join("|"),"gi"),
 
   KHMER_PUNCTUATION, 
   KHMER_NUMERALS,
   KHMER_NUMBERS,
   PREFERRED_SPELLINGS, 
+  ZERO_WIDTH_SPACE: "/u200B",
+  isEnglish: (wordData) => wordData.word.match(/^[a-zA-Z]+$/),
 }
