@@ -187,8 +187,23 @@ class Utterance extends Component {
           }
         }
 
+      } else if (Helpers.multiwordPunctuationMatch(words, i)) {
+        // checks if matches punctuations where their commands are more than one word
+        // it's a little slower to have to call twice, but only runs twice if there's a match, which
+        // shouldn't be that often, and it makes for relatively clean code.
+        // Could probably improve this too though
+        isDefault = false
+        let match = Helpers.multiwordPunctuationMatch(words, i) 
+        word = match.punctuation
+
+        tags.push("multiword-punctuation")
+        tags.push("punctuation")
+        tags = tags.concat(MULTI_WORD_KHMER_PUNCTUATION_EXTRA_TAGS[match.punctuation]) 
+
+        i += match.multiwordLength
 
       } else if (Helpers.PREFERRED_SPELLINGS[wordData.word]) {
+        // NOTE this should always be second to last check. Otherwise we want to change the word to a punctuation/number
         isDefault = false
         let preferredSpelling = Helpers.PREFERRED_SPELLINGS[wordData.word]
         console.log("found alt spelling", wordData, preferredSpelling) 
@@ -196,6 +211,7 @@ class Utterance extends Component {
         tags.push("corrected-spelling")
 
       } else if (Helpers.isEnglish(wordData)) {
+        // NOTE this should always be last check. Otherwise we want to change the word to a punctuation/number
         // English words should have spaces. 
         // Other than that can be default
         tags.push("English")

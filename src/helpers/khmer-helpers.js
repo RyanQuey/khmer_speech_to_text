@@ -36,10 +36,7 @@ window.KHMER_NUMERALS = [
 
 // none of these will require "sanna" (kh for "sign") before recognizing it
 window.KHMER_PUNCTUATION_NO_LEADER = {
-  "ចំណុចពីរគូស": "៖",
   "ល៉ៈ ": "។ល។",
-  "បើកវង់ក្រចក": " \(",
-  "បិតវង់ក្រចក":  "\)",
 }
 // for performance want to only run once, not for every word in every transcript!
 window.KHMER_PUNCTUATION_NO_LEADER_KEYS = Object.keys(KHMER_PUNCTUATION_NO_LEADER)
@@ -53,6 +50,46 @@ window.KHMER_PUNCTUATION = {
   "។": "។",
   "សួរ":  "?",
   "ឧទាន": "!",
+}
+// These are different. Keys will be what we want, values a list of the words. 
+// Makes it easy to iterate over and check for matches
+// TODO for performance, don't iterate over same word "bauk" or "bit" every time!
+window.MULTI_WORD_KHMER_PUNCTUATION = {
+   // TODO test. Maybe google separates words differently for example
+  "\(": [["បើក", "វង់", "ក្រចក"]],
+  // TODO test. Maybe google separates words differently for example
+  "\)": [["បិត", "វង់", "ក្រចក"]],
+  "៖": [["ចំណុច", "ពីរ", "គូស"]],
+  "«": [
+    ["បើក", "សញ្ញា", "អញ្ញ", "ប្រកាស"],
+    // Google has read it this way before, so being flexible
+    ["បើក", "សញ្ញា", "អាច", "ប្រកាស"],
+    ["បើក", "សញ្ញា", "អញ្ញ"],
+    // Google has read it this way before, so being flexible
+    ["បើក", "សញ្ញា", "ៗ"],
+    ["សញ្ញា", "អញ្ញ", "បើក"],
+    // Google has read it this way before, so being flexible
+    ["សញ្ញា", "ៗ", "បើក" ],
+  ],
+  "»": [
+    // Google has read it this way before, so being flexible
+    ["បិទ", "សញ្ញា", "អអាច", "ប្រកាស"],
+    ["បិទ", "សញ្ញា", "អញ្ញ", "ប្រកាស"],
+    ["បិទ", "សញ្ញា", "អញ្ញ"],
+    // Google has read it this way before, so being flexible
+    ["បិទ", "សញ្ញា", "ៗ"],
+    ["សញ្ញា", "អញ្ញ", "បិទ"],
+    // Google has read it this way before, so being flexible
+    ["សញ្ញា", "ៗ", "បិទ"],
+  ],
+}
+window.MULTI_WORD_KHMER_PUNCTUATION_EXTRA_TAGS = {
+  "\(": ["preceded-by-nbsp", "parentheses"],
+  // TODO test. Maybe google separates words differently for example
+  "\)": ["followed-by-nbsp", "parentheses"],
+  "៖": ["followed-by-nbsp"],
+  "«": ["preceded-by-nbsp", "quotation-marks"],
+  "»": ["followed-by-nbsp", "quotation-marks"],
 }
 window.KHMER_PUNCTUATION_KEYS = Object.keys(KHMER_PUNCTUATION)
 window.ALL_KHMER_PUNCTUATION = Object.assign(KHMER_PUNCTUATION, KHMER_PUNCTUATION_NO_LEADER)
@@ -138,4 +175,33 @@ export default {
     // hacky, but necessary to get edge cases
     bonusOrdinals.includes(word1)
   ),
+  multiwordPunctuationMatch: (allWords, currentIndex) => {
+    let keys = Object.keys(MULTI_WORD_KHMER_PUNCTUATION);
+    // iterate over each punctuation to see if there's a match
+    let ret = false
+    // using some so stops when return true
+    keys.some(key => {
+      // each punctuation might have multiple possible matches. Iterate over each one
+      let possibilitySet = MULTI_WORD_KHMER_PUNCTUATION[key] 
+      // using some so stops when return true
+      // returning this, so stops enclosing some call also if this returns true
+      return possibilitySet.some(valArr => {
+        // iterate over each word in the multi-word command to see if all match 
+        // allWords[currentIndex] is the current word. i starts at 0, and sees if each word matches in
+        // succession
+        let match = valArr.every((wordToMatch, i) => {
+          return wordToMatch == allWords[currentIndex + i].word
+        });
+        if (match) {
+          ret = {
+            punctuation: key, // in this case, we're using the punctuation mark we want to return as key
+            multiwordLength: valArr.length,
+          }
+          return true
+        }
+      })
+    })
+
+    return ret
+  }
 }

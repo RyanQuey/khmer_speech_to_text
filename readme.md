@@ -6,14 +6,17 @@
 
 1. Clone the project
 2. Run `npm i`
-3. Then run `npm run local`
+3. Copy config template to set some env vars: `cp ./src/config/dev/firebase.example.js ./src/config/dev/firebase.js` 
+4. Set the firebase api key in that firebase.js file
+5. Setup firebase using the firebase CLI (at a minimum will have to do: `firebase use default`)
+6. Then run `npm run local`
 
-That's it! Now go party on `localhost:3000` !
+# Deploying
 
-For running cloud server locally as well, do `firebase serve --only functions --host 0.0.0.0`
+```sh
+npm run deploy
+```
 
-
-![](https://media.giphy.com/media/fsULJFFGv8X3G/giphy.gif)
 
 # Contribution Guidelines
 
@@ -23,21 +26,18 @@ For running cloud server locally as well, do `firebase serve --only functions --
 * Please send **PRs** rather than push directly to a branch
 * Most of our development work will be handled on the `development` branch
 
-# Using the boilerplate
+# Other notes
 
-* This is set up for when there is a user section and a separate admin section.
-* Replace "userResource" and "adminResource" with actual resources, in initializers and reducers
-* Admin initializers will only run in the admin view, end-user initializers will only run in the user view
-* refire is for keeping the redux store up-to-date when the database makes a change. Set up listeners in refire which will then call actions (ask Carson for details)
 * if you are using ssh to access your development environment, run the development environment using `npm run local`, and open up the at in the browser at www.local.dev:3000, to get around Webpack's host check
 
 #TODO:
 * upgrade to webpack 3
 * make sure that sass files can import from the theme folder
+* probably remove the cloud functions, since we stopped using them but never removed the directory
 
-# If need to update the preferred spellings doc: 
-  * download new .txt file from https://github.com/languagetool-org/languagetool/blob/master/languagetool-language-modules/km/src/main/resources/org/languagetool/rules/km/coherency.txt
-      (make sure to download, don't copy and paste since it might not copy correctly due to data encoding etc)
-  * remove any comments or whatever from the top (e.g., "#KhmerMultipleSpellings")
-  * convert to json using `node private/convert-preferred-spellings.js`
+
+* download new .txt file from https://github.com/languagetool-org/languagetool/blob/master/languagetool-language-modules/km/src/main/resources/org/languagetool/rules/km/coherency.txt
+    (make sure to download, don't copy and paste since it might not copy correctly due to data encoding etc)
+* remove any comments or whatever from the top (e.g., "#KhmerMultipleSpellings")
+* convert to json using `node private/convert-preferred-spellings.js`
 
