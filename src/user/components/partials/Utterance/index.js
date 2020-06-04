@@ -27,13 +27,13 @@ class Utterance extends Component {
     const ret = []
     for (let i = 0; i < words.length; i++) {
       let wordData = words[i]
-      let secondWordData = words[i+1]
+      let secondWordData = words[i+1] || {}
       // set some defaults. Will change many of them
       let word = wordData.word, originalWordData = wordData, confidence = wordData.confidence, endTime = wordData.endTime, startTime = wordData.startTime, tags = [], isDefault = true
 
       if (Helpers.ALL_BOOKS_NO_NUM.includes(wordData.word)) {
-        let thirdWordData = words[i+2]
-        let fourthWordData = words[i+3]
+        let thirdWordData = words[i+2] || {}
+        let fourthWordData = words[i+3] || {}
         console.log("got a book!", [wordData.word, secondWordData.word, thirdWordData.word, fourthWordData.word])
         // is book of Bible, so watch out for funky handling by Google
         // But not necessarily non-default
@@ -76,8 +76,8 @@ class Utterance extends Component {
         // test if this is reference
         // NOTE that we want to do this even if no book name is recognized, since often no book is
         // recognized at all even if the end user said one
-        let thirdWordData = words[i+2]
-        let fourthWordData = words[i+3]
+        let thirdWordData = words[i+2] || {}
+        let fourthWordData = words[i+3] || {}
 
         if (Helpers.isNumber(secondWordData.word) && thirdWordData.word.match(Helpers.khVerse) && Helpers.isNumber(fourthWordData.word)) {
           // found a reference
