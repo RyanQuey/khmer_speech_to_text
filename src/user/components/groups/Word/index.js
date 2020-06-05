@@ -20,6 +20,7 @@ class Word extends Component {
   }
 
   render () {
+    // NOTE nextWordData hasn't been combined or checked for whether it is punctuation, number, etc. or not
     const { wordData, prevWordData, nextWordData  } = this.props
     const { word, confidence, startTime, endTime, tags} = wordData
 
@@ -49,7 +50,7 @@ class Word extends Component {
         title={confidenceClass == classes.warning ? "Google returned a single word with letters and numbers: " + wordData.originalWordData.word : `Confidence Level: ${parseFloat(confidence* 100, 2)}%`}
       >
         {word}
-        {nextWordData && !nextWordData.tags.includes("punctuation") && (wordData.tags.includes("followed-by-nbsp") || nextWordData.tags.includes("preceded-by-nbsp") ? '\u00A0' : '\u200B')}
+        {nextWordData && (!nextWordData.tags.includes("punctuation") && (wordData.tags.includes("followed-by-nbsp")) || nextWordData.tags.includes("preceded-by-nbsp") ? '\u00A0' : '\u200B')}
       </span>
     )
   }
