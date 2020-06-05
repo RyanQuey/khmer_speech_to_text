@@ -217,7 +217,7 @@ function* fetchCurrentUser(action) {
     const userTranscribeRequestsListener = userTranscribeRequestsRef.onSnapshot((snapshot) => {
       const currentRecords = _.values(store.getState().transcribeRequests || [])
 
-      const changes = snapshot.docChanges.map(change => {
+      const changes = snapshot.docChanges().map(change => {
         const docData = change.doc.data()
         const transcribeRequest = new TranscribeRequest({transcribeRequestRecord: docData})
         // or better, oldRecord

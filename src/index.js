@@ -39,7 +39,7 @@ window.$ = jQuery
 // window.endpoint = window.location.hostname.includes("khmer-speech-to-text") ? "https://us-central1-khmer-speech-to-text.cloudfunctions.net" : `http://${window.location.hostname}:5000/khmer-speech-to-text/us-central1`
 // For when using python api
 window.ENVIRONMENT = ["khmer-speech-to-text.web.app", "khmer-speech-to-text.firebaseapp.com"].includes(window.location.hostname) ? "PRODUCTION" : "DEVELOPMENT"
-window.endpoint = ENVIRONMENT == "PRODUCTION" ? "https://khmer-speech-to-text-api.herokuapp.com/" : `http://${window.location.hostname}:5000`
+window.endpoint = true || ENVIRONMENT == "PRODUCTION" ? "https://khmer-speech-to-text-api.herokuapp.com/" : `http://${window.location.hostname}:5000`
 const axiosInstance = axios.create({
   baseURL: endpoint,
   //timeout: 10*1000, // 10 sec. for longer operations, poll it instead of leaving it open

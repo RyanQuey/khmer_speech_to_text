@@ -61,7 +61,7 @@
     "@webpack-blocks/dev-server2": "^0.4.0",
     "aphrodite": "^1.2.5",
     "axios": "^0.19.2",
-    "firebase": "^4.13.1",
+    "firebase": "^7.15.0",
     "generate-password": "^1.5.1",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.28",
