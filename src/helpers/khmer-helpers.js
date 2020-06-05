@@ -129,7 +129,7 @@ export default {
   khNumber, 
   khChapter: "ជំពូក",
   // including some misspellings
-  khChapterRegex: new RegExp("ជំពូក|ចំពោះ"),
+  khChapterRegex: new RegExp("ជំពូក|ចំពោះ|ជំពោះ"),
   khVerse: "ខ",
   // including some misspellings
   khVerseRegex: new RegExp("ខ|ខល"),
