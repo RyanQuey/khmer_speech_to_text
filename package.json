@@ -9,7 +9,6 @@
     "env:dev": "cross-env NODE_ENV=development",
     "dev": "npm run env:dev -- webpack-dev-server",
     "local": "npm run env:dev -- webpack-dev-server --public www.local.dev:3000 --host 0.0.0.0",
-    "storybook": "start-storybook -p 9001 -c private/storybook",
     "clean": "rimraf dist/*",
     "clean:happy": "rimraf .happypack/*",
     "copy": "copyfiles -f ./src/index.html ./src/favicon.ico ./dist",
@@ -27,7 +26,6 @@
     "node": "8"
   },
   "devDependencies": {
-    "@kadira/storybook": "^2.35.3",
     "@webpack-blocks/dev-server": "^0.4.0",
     "@webpack-blocks/extract-text2": "^0.4.0",
     "@webpack-blocks/webpack2": "^0.4.0",
@@ -58,7 +56,6 @@
     "html-webpack-plugin": "^2.28.0",
     "node-sass": "^4.13.1",
     "react-hot-loader": "3.0.0-beta.6",
-    "react-storybook-decorator-background": "^1.0.5",
     "redux-devtools-extension": "^2.13.8",
     "rimraf": "^2.7.1",
     "sass-lint": "^1.13.1",
