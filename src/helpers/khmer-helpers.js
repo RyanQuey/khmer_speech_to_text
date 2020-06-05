@@ -193,10 +193,33 @@ export default {
           return wordToMatch == allWords[currentIndex + i].word
         });
         if (match) {
+          let wordData = allWords[currentIndex]
+          let matchedWordsData = _.range(valArr.length).map(i => allWords[currentIndex + i])
+
           ret = {
             punctuation: key, // in this case, we're using the punctuation mark we want to return as key
-            multiwordLength: valArr.length,
+            multiwordLength: matchedWordsData.length,
+            originalWordData: {wordData},
+            averageConfidence: matchedWordsData.reduce((acc, val) => (acc + val.confidence), 0) / 2 
+            endTime: _.last(matchedWordsData).endTime
           }
+
+          // TODO for these use cases, rename key from secondWordData to "wordData2" so can easily
+          // set using originalWordData[`wordData${i}`]
+          if (valArr.length > 1) {
+            ret.originalWordData.secondWordData = matchedWordsData[1]
+          }
+          if (valArr.length > 2) {
+            ret.originalWordData.thirdWordData = matchedWordsData[2]
+          }
+          if (valArr.length > 3) {
+            ret.originalWordData.fourthWordData = matchedWordsData[3]
+          }
+          // shouldn't be more than 4, but to be safe
+          if (valArr.length > 4) {
+            ret.originalWordData.fourthWordData = matchedWordsData[4]
+          }
+
           return true
         }
       })

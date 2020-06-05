@@ -128,7 +128,10 @@ class Utterance extends Component {
         }
 
       } else if (wordData.word == Helpers.khNumber && secondWordData && Helpers.isNumber(secondWordData.word)) {
-        // want to do this whether the 2nd word is spelled out Khmer number or Arabic numeral
+        // TODO Handle for edge cases. Most of the time, Google returns even multidigit numbers as a
+        // single "word". But this is worth testing more.
+
+        // recognizing this as numeral this whether the 2nd word is spelled out Khmer number or Arabic numeral
         isDefault = false
 
         // if spelled out already, convert to numeral
@@ -199,6 +202,10 @@ class Utterance extends Component {
         tags.push("multiword-punctuation")
         tags.push("punctuation")
         tags = tags.concat(MULTI_WORD_KHMER_PUNCTUATION_EXTRA_TAGS[match.punctuation]) 
+
+        endTime = match.endTime
+        confidence = match.averageConfidence
+        originalWordData = match.originalWordData
 
         i += match.multiwordLength
 
