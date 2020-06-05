@@ -87,13 +87,17 @@ window.MULTI_WORD_KHMER_PUNCTUATION = {
     ["សញ្ញា", "ៗ", "បិទ"],
   ],
 }
-window.MULTI_WORD_KHMER_PUNCTUATION_EXTRA_TAGS = {
-  "\(": ["preceded-by-nbsp", "parentheses"],
+// extra tags to add for punctuations
+window.PUNCTUATION_EXTRA_TAGS = {
+  "\(": ["preceded-by-nbsp", "parentheses", "opening-punctuation"],
   // TODO test. Maybe google separates words differently for example
-  "\)": ["followed-by-nbsp", "parentheses"],
+  "\)": ["followed-by-nbsp", "parentheses", "closing-punctuation"],
   "៖": ["followed-by-nbsp"],
-  "«": ["preceded-by-nbsp", "quotation-marks"],
-  "»": ["followed-by-nbsp", "quotation-marks"],
+  "«": ["preceded-by-nbsp", "quotation-marks", "opening-punctuation"],
+  "»": ["followed-by-nbsp", "quotation-marks", "closing-punctuation"],
+  "។": ["followed-by-nbsp", "end-of-sentence"],
+  "?": ["followed-by-nbsp", "end-of-sentence"],
+  "!": ["followed-by-nbsp", "end-of-sentence"],
 }
 window.KHMER_PUNCTUATION_KEYS = Object.keys(KHMER_PUNCTUATION)
 window.ALL_KHMER_PUNCTUATION = Object.assign(KHMER_PUNCTUATION, KHMER_PUNCTUATION_NO_LEADER)

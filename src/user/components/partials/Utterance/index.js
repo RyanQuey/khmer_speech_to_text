@@ -108,7 +108,6 @@ class Utterance extends Component {
         originalWordData = {wordData, secondWordData} 
         confidence = [wordData, secondWordData].reduce((acc, val) => (acc + val.confidence), 0) / 2
         tags.push("combined")
-        tags.push("followed-by-nbsp")
         tags.push("punctuation")
 
         // skip next word since we're combining them
@@ -119,13 +118,6 @@ class Utterance extends Component {
         isDefault = false
         word = Helpers.KHMER_PUNCTUATION_NO_LEADER[secondWordData.word]
         tags.push("punctuation")
-
-        if (word == "\(") {
-          tags.push("preceded-by-nbsp")
-
-        } else {
-          tags.push("followed-by-nbsp")
-        }
 
       } else if (wordData.word == Helpers.khNumber && secondWordData && Helpers.isNumber(secondWordData.word)) {
         // TODO Handle for edge cases. Most of the time, Google returns even multidigit numbers as a
@@ -201,7 +193,6 @@ class Utterance extends Component {
 
         tags.push("multiword-punctuation")
         tags.push("punctuation")
-        tags = tags.concat(MULTI_WORD_KHMER_PUNCTUATION_EXTRA_TAGS[match.punctuation]) 
 
         endTime = match.endTime
         confidence = match.averageConfidence
@@ -229,6 +220,12 @@ class Utterance extends Component {
       if (isDefault) {
         // word is ready to be used as is
         tags.push("default")
+      }
+
+      if (tags.includes("punctuation")) {
+        if (PUNCTUATION_EXTRA_TAGS[word]) {
+          tags = tags.concat(PUNCTUATION_EXTRA_TAGS[word]) 
+        }
       }
 
 
