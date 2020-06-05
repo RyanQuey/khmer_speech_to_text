@@ -204,7 +204,7 @@ export default {
             punctuation: key, // in this case, we're using the punctuation mark we want to return as key
             multiwordLength: matchedWordsData.length,
             originalWordData: {wordData},
-            averageConfidence: matchedWordsData.reduce((acc, val) => (acc + val.confidence), 0) / 2 ,
+            averageConfidence: matchedWordsData.reduce((acc, val) => (acc + val.confidence), 0) / matchedWordsData.length,
             endTime: _.last(matchedWordsData).endTime
           }
 
