@@ -64,6 +64,7 @@ window.MULTI_WORD_KHMER_PUNCTUATION = {
     ["បើក", "សញ្ញា", "អញ្ញ", "ប្រកាស"],
     // Google has read it this way before, so being flexible
     ["បើក", "សញ្ញា", "អាច", "ប្រកាស"],
+    ["សញ្ញា", "បើក", "អាច", "ប្រកាស"],
     ["បើក", "សញ្ញា", "អញ្ញ"],
     // Google has read it this way before, so being flexible
     ["បើក", "សញ្ញា", "ៗ"],
@@ -75,6 +76,7 @@ window.MULTI_WORD_KHMER_PUNCTUATION = {
     // Google has read it this way before, so being flexible
     ["បិទ", "សញ្ញា", "អអាច", "ប្រកាស"],
     ["បិទ", "សញ្ញា", "អញ្ញ", "ប្រកាស"],
+    ["សញ្ញា", "បិទ", "អញ្ញ", "ប្រកាស"],
     ["បិទ", "សញ្ញា", "អញ្ញ"],
     // Google has read it this way before, so being flexible
     ["បិទ", "សញ្ញា", "ៗ"],
