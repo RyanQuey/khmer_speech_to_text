@@ -76,7 +76,7 @@ function* signIn(action) {
     let user = result
 
     if (user) {
-      yield put({type: FETCH_CURRENT_USER_REQUEST, payload: user, options: findOrCreate})
+      yield put({type: FETCH_CURRENT_USER_REQUEST, payload: user, options: {findOrCreate: true}})
       yield put({type: SIGN_IN_SUCCESS, payload: user})
       alertActions.newAlert({
         title: "Welcome!",
