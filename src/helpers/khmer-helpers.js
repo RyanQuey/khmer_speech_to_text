@@ -198,7 +198,7 @@ export default {
         // allWords[currentIndex] is the current word. i starts at 0, and sees if each word matches in
         // succession
         let match = valArr.every((wordToMatch, i) => {
-          return wordToMatch == allWords[currentIndex + i].word
+          return allWords[currentIndex + i] && wordToMatch == allWords[currentIndex + i].word
         });
         if (match) {
           let wordData = allWords[currentIndex]
