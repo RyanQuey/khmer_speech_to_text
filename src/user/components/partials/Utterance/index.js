@@ -79,7 +79,7 @@ class Utterance extends Component {
         let thirdWordData = words[i+2] || {}
         let fourthWordData = words[i+3] || {}
 
-        if (Helpers.isNumber(secondWordData.word) && thirdWordData.word.match(Helpers.khVerse) && Helpers.isNumber(fourthWordData.word)) {
+        if (Helpers.isNumber(secondWordData.word) && thirdWordData.word && thirdWordData.word.match(Helpers.khVerse) && Helpers.isNumber(fourthWordData.word)) {
           // found a reference
           isDefault = false
           word = `${Helpers.convertToKhmerNumeral(secondWordData.word)}:${Helpers.convertToKhmerNumeral(fourthWordData.word)}`
