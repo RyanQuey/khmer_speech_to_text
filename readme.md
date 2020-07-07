@@ -1,5 +1,17 @@
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/RyanQuey/khmer_speech_to_text)
 
+A Firebase app that connects to a [Django backend](https://github.com/RyanQuey/python-heroku-khmer-speech-to-text) for uploading audio files to transcribe from speech to text, particularly so users can record audio when internet is slow or down and still get transcripts.
+
+## Uploads and Transcription Dashboard
+We track and display progress as the file uploads to Google Storage, as it is transcribed to Google Speech API, and as it is returned and stored by Firebase.
+
+![Uploading audio](https://github.com/RyanQuey/python-heroku-khmer-speech-to-text/raw/master/screenshots/uploading-audio-file.png)
+
+## Transcript Results
+Transcript includes highlights based on accuracy percentage, and lists possible alternatives on hover. Metadata about the file and the transcription is persisted for future reference.
+
+![Transcript Result](https://github.com/RyanQuey/python-heroku-khmer-speech-to-text/raw/master/screenshots/transcript-result.png)
+
 # Installation Instructions
 
 > Make sure you have node 8.x installed
