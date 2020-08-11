@@ -10,7 +10,9 @@ public/admin/index.html
 .DS_Store
 .happypack
 src/config/dev/firebase.js
-dist/
+dist/*.js
+dist/*.js.map
+# allow pngs
 **.swp
 **.swo
 **.bak 

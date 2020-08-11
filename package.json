@@ -11,7 +11,7 @@
     "local": "npm run env:dev -- webpack-dev-server --public www.local.dev:3000 --host 0.0.0.0",
     "clean": "rimraf dist/*",
     "clean:happy": "rimraf .happypack/*",
-    "copy": "copyfiles -f ./src/index.html ./src/favicon.ico ./dist",
+    "copy": "copyfiles -f ./src/index.html ./src/favicon.ico ./public/* ./dist",
     "dist": "npm run copy & webpack --env=dist",
     "deploy": "npm run env:dev && npm run clean && npm run dist && firebase deploy",
     "deploy-no-functions": "npm run env:dev && npm run clean && npm run dist && firebase deploy --except functions",

@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <meta charset="utf-8">
+<<<<<<< HEAD
+  <title>Khmer Voice App - Speech Recognition and Transcript Generation for Khmer</title>
+=======
+  <title>Khmer Speech to Text</title>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-161510908-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-161510908-1');
+  </script>
+>>>>>>> 302cd323ac458a240922833fb54a3d018a967e12
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+</head>
+<body>
+  <style>
+    body {
+      background-color: white;
+    }
+    .loading-container{
+      margin-top: 30%;
+      text-align: center;
+      font-family: 'Raleway', Helvetica, sans-serif;
+    }
+    .loading{
+      color: #fff;
+    }
+    .loading-container .logo{
+      font-weight: 600;
+      font-size: 40px;
+      color: #333333;
+      display: inline-block;
+      margin-bottom: 9em;
+      top: -60px;
+      position: relative;
+    }
+
+    .loader {
+        border: 26px solid #f3f3f3; /* Light grey */
+        border-top: 26px solid rgb(23, 195, 169); /* Blue */
+        border-radius: 50%;
+        width: 220px;
+        height: 220px;
+        animation: spin 2s linear infinite;
+        left: 50%;
+        margin-left: -140px;
+        position: absolute;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+  </style>
+  <div id="app">
+    <div class="loading-container">
+      <div class="loader">
+      </div>
+      <div class="logo">Khmer Voice App</div>
+      <h2 class="loading">Loading...</h2>
+    </div>
+  </div>
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,400,600|Source+Sans+Pro:300" rel="stylesheet" />
+</body>
+  <!-- Don't want this blocking - it's too slow, and not super important for this app -->
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" />
+</html>
