@@ -1,6 +1,6 @@
 import { Component } from 'react';
-import logo from 'images/logo.png';
 import User from 'user/components'
+import { Logo } from 'shared/components/elements'
 import { connect } from 'react-redux'
 import classes from 'App.scss';
 import {
@@ -63,7 +63,7 @@ class App extends Component {
       <div className={`${classes.App} desktop`}>
         {this.props.preloadingStore ? ( //currently , not implemented...I might not ever
           <div>
-            <img src={logo} className="App-logo" alt="logo" />
+            <Logo />
             <div>loading...</div>
           </div>
         ) : (

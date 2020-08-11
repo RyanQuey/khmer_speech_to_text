@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 const NavbarBrand = ({ background }) => {
   return (
     <div className={classes.brand} >
-      <Link to="/">
+      <Link id="navbar-brand-link" to="/">
         <Logo />
       </Link>
     </div>

@@ -9,6 +9,8 @@
 3. Copy config template to set some env vars: `cp ./src/config/dev/firebase.example.js ./src/config/dev/firebase.js` 
 4. Set the firebase api key in that firebase.js file
 5. Setup firebase using the firebase CLI (at a minimum will have to do: `firebase use default`)
+
+## Running Locally
 6. Then run `npm run local`
 7. Make sure to also start the [Python API](https://github.com/RyanQuey/python-heroku-khmer-speech-to-text) locally, or else you can read transcripts, but not do any uploads. 
 8. In order to sign up, your email will have to be whitelisted in our firestore db. Or of course you could setup your own firestore db and run the whole thing on your own.

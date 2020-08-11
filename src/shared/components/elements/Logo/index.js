@@ -1,7 +1,8 @@
-import logo from 'images/plovpit-logo-2.1-normal.png'
+import React from 'react'
+import logo from 'images/sbbic-logo-text-high-km.png'
 
 const Logo = () => (
-  <img alt="logo" src={logo} />
+  <img id="navbar-brand" alt="logo" src={logo} />
 )
 
 export default Logo

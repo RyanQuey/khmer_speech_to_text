@@ -44,9 +44,11 @@ class UserNavbar extends Component {
 
         <div className={classes.mainNav}>
           <Flexbox className={classes.leftNav} align="center" justify="space-between">
-            <Link to="/transcripts">
-              Transcripts
-            </Link>
+            {user && (
+              <Link to="/transcripts">
+                Transcripts
+              </Link>
+            )}
           </Flexbox>
 
           <Flexbox className={classes.rightNav} align="center" justify="space-between">
