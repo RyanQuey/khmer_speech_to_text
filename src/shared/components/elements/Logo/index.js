@@ -1,4 +1,5 @@
 import React from 'react'
+//import logo from 'images/khmervoiceapp.png'
 import logo from 'images/sbbic-logo-text-high-km.png'
 
 const Logo = () => (

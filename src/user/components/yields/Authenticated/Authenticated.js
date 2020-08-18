@@ -24,6 +24,14 @@ class Authenticated extends Component {
     if (show === undefined) {
       show = !this.state.showSidebarInMobile
     }
+
+    // hide the scrollbar for when the sidebar is up in mobile, so just see the sidebar
+    if (show) {
+      document.querySelector("html").style.overflowY = "hidden"
+    } else {
+      document.querySelector("html").style.overflowY = "auto"
+    }
+
     this.setState({showSidebarInMobile: show})
   }
 

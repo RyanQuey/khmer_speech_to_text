@@ -20,6 +20,13 @@ const STYLES = {
       //border: `${theme.color.primary} solid 2px`,
     },
   },
+  dark: {
+    regular: {
+      background: theme.color.darkGray,
+      color: theme.color.primary,
+      //border: `${theme.color.primary} solid 2px`,
+    },
+  },
 }
 //takes the style prop and outputs preset popup types
 const styles = (style, disabled, selected) => {

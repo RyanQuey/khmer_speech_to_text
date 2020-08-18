@@ -34,7 +34,7 @@ class AccountMenu extends Component {
           src={user && user.photoURL || avatar}
         />
 
-        <Popup body="left" show={this.state.open} handleClickOutside={this.toggleMenu.bind(this, false)}>
+        <Popup body="left" style="dark" show={this.state.open} handleClickOutside={this.toggleMenu.bind(this, false)}>
           <ul className={`${classes.menuDropdown}`}>
             <MenuItem link="/settings" text="Settings" hoverType="textOnly" />
             <MenuItem link="/" onClick={signOut} text="Sign Out" hoverType="textOnly"/>

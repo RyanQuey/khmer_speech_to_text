@@ -67,6 +67,8 @@ refire()
 const url = location.href
 const root = document.getElementById('app')
 
+/*
+
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
@@ -74,3 +76,4 @@ ReactDOM.render(
     </BrowserRouter>
   </Provider>, root
 );
+*/

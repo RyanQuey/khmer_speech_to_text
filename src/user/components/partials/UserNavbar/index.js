@@ -8,6 +8,8 @@ import { viewSettingActions } from 'shared/actions'
 import { StyleSheet, css } from 'aphrodite'
 import theme from 'theme'
 import classes from './style.scss'
+import info from 'constants/info'
+const { supportEmail } = info
 
 const styles = StyleSheet.create({
   menu: {
@@ -45,9 +47,7 @@ class UserNavbar extends Component {
         <div className={classes.mainNav}>
           <Flexbox className={classes.leftNav} align="center" justify="space-between">
             {user && (
-              <Link to="/transcripts">
-                Transcripts
-              </Link>
+              <a href={`mailto:${supportEmail}`} target="_blank">Support</a>
             )}
           </Flexbox>
 
@@ -59,7 +59,10 @@ class UserNavbar extends Component {
                 <AccountMenu />
               </div>
             ) : (
-              <a href="#" onClick={this.openLoginModal}>Login</a>
+              <div>
+                <a href={`mailto:${supportEmail}`} target="_blank">Support</a>
+                <a href="#" onClick={this.openLoginModal}>Login</a>
+              </div>
             )}
           </Flexbox>
         </div>
@@ -67,6 +70,8 @@ class UserNavbar extends Component {
         <div className={classes.mobileNav}>
           <Flexbox className={classes.rightNav} align="center" justify="space-between">
           
+            <a href={`mailto:${supportEmail}`} target="_blank">Support</a>
+
             {user ? (
               <div className={classes.userButtonsWrapper}>
                 <AccountMenu />
