@@ -36,7 +36,8 @@ class TranscribeRequestCard extends Component {
       if (this.props.transcribeRequest.hasError() || this.props.transcribeRequest.transcriptionComplete()) {
         clearInterval(this.intervalID);
       }
-    }, 300);
+      // change this number to have a slower or faster time in between updating the percentage bar
+    }, 100);
     
   }
 
@@ -50,7 +51,7 @@ class TranscribeRequestCard extends Component {
     const status = transcribeRequest.hasError() ? "error" : "transcribing"
 
     return (
-      <Card selected={selected} onClick={onClick} wrapperClass={wrapperClass} className={`${className} ${classes[status]} ${small ? classes.small : ""}`}>
+      <Card selected={selected} onClick={onClick} wrapperClass={wrapperClass} className={`${className} ${classes[status]} ${small ? classes.small : ""}`} height="310px">
         <CardHeader className={small ? classes.smallHeader : ""} title={transcribeRequest.filename} subtitle={subtitle || transcribeRequest.contentType} icon={"icon"} iconColor={"blue"}/>
 
         <div className={classes.chartAndInfoContainer}>
@@ -92,29 +93,31 @@ class TranscribeRequestCard extends Component {
           </Flexbox>
         </div>
 
-        {transcribeRequest.canRetry() && (
-          <Button 
-            title={"Click to try again"} 
-            onClick={this.props.requestResume.bind(this, transcribeRequest)}
-          >
-            {transcribeRequest.displayCanRetryMessage()}
-          </Button>
-        )}
-        {transcribeRequest.transcriptionComplete() && (
-          <Link to={transcribeRequest.transcriptUrl()}>
+        <div className={classes.nextStepCtn}>
+          {transcribeRequest.canRetry() && (
             <Button 
-              title={transcribeRequest.displayNextStepMessage()} 
+              title={"Click to try again"} 
+              onClick={this.props.requestResume.bind(this, transcribeRequest)}
             >
-              {transcribeRequest.displayNextStepMessage()}
+              {transcribeRequest.displayCanRetryMessage()}
             </Button>
-          </Link>
-        )}
-        {!transcribeRequest.canRetry() && !transcribeRequest.transcriptionComplete() && (
-          <div>
-            <hr />
-            {transcribeRequest.displayCanRetryMessage()}
-          </div>
-        )}
+          )}
+          {transcribeRequest.transcriptionComplete() && (
+            <Link to={transcribeRequest.transcriptUrl()}>
+              <Button 
+                title={transcribeRequest.displayNextStepMessage()} 
+              >
+                {transcribeRequest.displayNextStepMessage()}
+              </Button>
+            </Link>
+          )}
+          {!transcribeRequest.canRetry() && !transcribeRequest.transcriptionComplete() && (
+            <div>
+              <hr />
+              {transcribeRequest.displayCanRetryMessage()}
+            </div>
+          )}
+        </div>
       </Card>
     )
   }
