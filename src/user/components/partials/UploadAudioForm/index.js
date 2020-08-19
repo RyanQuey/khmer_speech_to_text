@@ -5,8 +5,8 @@ import {
   Route,
   Switch,
 } from 'react-router-dom'
-import { Flexbox } from 'shared/components/elements'
-import { DropAudio } from 'shared/components/groups'
+import { Flexbox, Icon } from 'shared/components/elements'
+import { Popup, DropAudio } from 'shared/components/groups'
 import { Home, Profile, Search } from 'user/components/templates'
 import requireAuthenticated from 'utils/requireAuthenticated'
 import forbidAuthenticated from 'utils/forbidAuthenticated'
@@ -23,6 +23,11 @@ class UploadAudioForm extends Component {
     this.cb = this.cb.bind(this)
     this.onFailure = this.onFailure.bind(this)
     this.onStartUploading = this.onStartUploading.bind(this)
+    this.toggleViewingPopup = this.toggleViewingPopup.bind(this)
+
+    this.state = {
+      viewingPopup: false,
+    }
   }
 
   onFailure (err) {
@@ -43,16 +48,43 @@ class UploadAudioForm extends Component {
     this.props.history.push("/unfinished-transcripts")
   }
 
+	
+	toggleViewingPopup () {
+    this.setState({viewingPopup: !this.state.viewingPopup})
+  }
+
   render() {
     const modalOpen = this.props.currentModal
 
     return (
       <div>
-        <Flexbox className={classes.rightColumn} direction="column">
+        <Flexbox className={classes.wrapper} direction="column">
 
-          <div><strong>WARNING:</strong> WAV, MP3s and MP4s might work, but probably not, especially MP4s</div>
-          <div>Currently, MP3s must have sample rate hertz of 16,000, and even then might not work. FLAC files are best</div>
-          <div><strong>Best audio types:</strong> No noise cancellation, highest quality</div>
+					<div className={classes.needHelpContainer}>
+            <span>Upload your Khmer audio to generate a transcript.</span>
+            <div className={classes.popupWrapper}>
+              <Icon name="question-circle" className={classes.helpBtn} onClick={this.toggleViewingPopup.bind(this)}/>
+              <Popup
+                side="bottom"
+                float="center"
+                handleClickOutside={this.toggleViewingPopup.bind(this, false)}
+                show={this.state.viewingPopup}
+                containerClass={classes.popupContainer}
+              >
+                <div className={classes.helpBox}>
+                  <div className={classes.instructions}>
+                    <div>Upload an audio file to get started. FLAC files are best. WAV, MP3s and MP4s might work, but there is a good chance they won't, especially MP4s</div>
+                    <div>
+                      <strong>Best options to use when recording:</strong>
+                      <div> - No noise cancellation</div>
+                      <div> - High fidelity</div>
+                    </div>
+                  </div>
+                </div>
+              </Popup>
+            </div>
+					</div>
+
           <DropAudio
             circle
             defaultImage="/public/images/profile/defaultBanner.jpg"

@@ -1,7 +1,46 @@
 @import 'theme/_helpers';
 
+.wrapper {
+  text-align: center;
+}
 
 .dropAudio {
   margin: 2rem;
 
+}
+.needHelpContainer {
+  display: flex;
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+}
+.popupContainer {
+  width: 250px;
+}
+.popupWrapper {
+  position: relative;
+  width: 2rem;
+}
+.helpBtn {
+  cursor: pointer;
+}
+.helpBox {
+  margin: 5px;
+  .instructions {
+    @include rems(14)
+    line-height: 1rem;
+    text-align: left;
+    padding: 10px 10px 0 10px;
+    h5 {
+      font-size: 1rem;
+    }
+    div {
+      padding-bottom: 1rem;
+    }
+  }
+  button {
+    @include rems(14)
+    line-height: 1rem;
+    white-space: nowrap;
+  }
 }

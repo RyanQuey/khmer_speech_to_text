@@ -25,7 +25,7 @@ class UserContent extends Component {
           })}    
 
           <Switch>
-            <Route exact path="/" component={UploadAudio} />
+            <Route exact path="/" component={Home} />
             <Route path="/upload" component={requireAuthenticated(UploadAudio)} />
             <Route path="/profile" component={requireAuthenticated(Profile)} />
             <Route path="/transcripts/:transcriptIdentifier" component={requireAuthenticated(ShowTranscript)} />

@@ -17,7 +17,7 @@ class DropAudio extends Component {
     }
     this.styles = StyleSheet.create({
       dropzone: {
-        background: (props.audioUrl || props.defaultAudio) ? `url(${encodeURI(props.audioUrl) || props.defaultAudio}) no-repeat center center` : this.props.backgroundColor || theme.color.white,
+        background: theme.color.white,
         backgroundSize: "cover",
         height: props.height || "100%",
         width: props.width || "100%",
@@ -89,7 +89,7 @@ class DropAudio extends Component {
         >
           <Flexbox align="center" direction="column">
             <div>{this.props.label}</div>
-            {this.state.pending ? <Icon color="black" name="spinner" /> : <Icon color="black" name="picture-o" />}
+            {this.state.pending ? <Icon color="black" name="spinner" /> : <Icon color="black" name="file-audio-o" size="2x"/>}
           </Flexbox>
         </Dropzone>
       </Flexbox>
