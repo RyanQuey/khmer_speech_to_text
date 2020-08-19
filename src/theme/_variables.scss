@@ -43,6 +43,15 @@ $module_red-2: #c32525;
 $module_green: #42B655;
 $module_quote: #dedede;
 
+// GR colors
+//$primary: #4f4081;
+//$secondary: #95669c;
+$light-purple-gray: #ada4cd;
+$even-lighter-purple-gray: #ada4cd61;
+$dark-purple-gray: #7e7796;
+$light-purple-complement: #7e66cd;
+$dark-purple-complement: #30274e;
+
 $text: #333;
 $msg: #A3A3A3;
 $nav-bg: #595959;
@@ -65,18 +74,14 @@ $accent1: rgb(155, 155, 155);
 $accent2: rgb(250, 175, 0);
 $accent3: rgb(176, 69, 69);
 
-// GR colors
-//$primary: #4f4081;
-//$secondary: #95669c;
-$light-purple-gray: #ada4cd;
-$even-lighter-purple-gray: #ada4cd61;
-$dark-purple-gray: #7e7796;
-$light-purple-complement: #7e66cd;
-$dark-purple-complement: #30274e;
+// light bluish green color scheme
+$primary: #6acdd7; // color of logo Nathan gave
+$lighter-bluish-green: #a0e8ec; 
+$theme-dark-blue: $ghost-blue;
 
 //this is for nav buttons
-$nav-hover-bg: $light-purple-gray;
-$nav-hover-font: $white;
+$nav-hover-bg: $white;
+$nav-hover-font: $text;
 $alt-nav-hover-font: $ghost-blue;
 $active: $nav-hover-bg;
 $nav-hover: #626262; // might stop using, deprecated
@@ -87,8 +92,9 @@ $light-gray-bg: #FAFAFA;
 $user-content-bg: $module_gray-1;
 
 /*     Sidebar      */
-// GR color $sidebar: $white;
-$sidebar: $gray-bg;
+// $sidebar: $primary;
+$sidebar: $theme-dark-blue;
+// $sidebar: $gray-bg;
 $sidebar-width: 250px;
 
 // header and footer
