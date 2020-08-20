@@ -5,7 +5,7 @@
   z-index: 2;
   color: $white;
   padding: 10px;
-  background-color: $header-bg; //unless it's overridden in the component
+  background-color: $navbar-brand-bg; //unless it's overridden in the component
 
   @include mq(m) {
     width: $sidebar-width; //should be as wide as the sidebar
