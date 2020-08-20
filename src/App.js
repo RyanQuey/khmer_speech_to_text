@@ -32,7 +32,6 @@ class App extends Component {
 
       handleQuery(query, cb, {i18n: this.props.i18n});
     }
-      console.log("no query...?")
 
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
