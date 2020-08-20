@@ -1,31 +1,39 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function email() {
+      return request.auth.token.email;
+    }
+
+    function rq_variations() {
+      // for testing signup only. Don't use in prod
+      return email().matches('rlquey2.*@gmail[.]com') == true 
+    }
+
     // users can edit their own stuff
     match /users/{userId} {
-      // for testing signup only. Don't use in prod
-      function rq_variations() {
-        return email().matches('rlquey2.*@gmail[.]com') == true 
-      }
-
-      function email() {
-        return request.auth.token.email;
-      }
 
       // require users to have a record in whitelist (see firestore db) or variations on my own email to continue
       function isWhitelisted() {
         return exists(/databases/$(database)/documents/whitelistedUsers/$(email()));
       }
 
-      allow create: if request.auth != null && isWhitelisted();
+      allow create: if request.auth != null;
       allow read, update, delete: if request.auth != null && request.auth.uid == userId && isWhitelisted();
+    
+      // for nested subcollections, eg transcribe requests
+      // https://firebase.google.com/docs/firestore/security/rules-structure#recursive_wildcards
+      match /{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId && isWhitelisted();
+      }
     } 
 
     // propagates rules down all subcollections
     // only allow from console
     // we don't want to allow reading, because then some users could read e-mails of other users
-    match /whitelistedUsers/{document=**} {
-      allow read, write: if false
+    match /whitelistedUsers/{email} {
+      allow read: if request.auth != null && request.auth.token.email == email;
+      allow write: if false;
     }
   }
 }

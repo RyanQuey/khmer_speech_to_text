@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 import { errorActions, alertActions, formActions } from 'shared/actions'
 import { Button, Flexbox, Input, Checkbox } from 'shared/components/elements'
 import { SIGN_IN_REQUEST, UPDATE_USER_REQUEST, RESET_PASSWORD_REQUEST } from 'constants/actionTypes'
+import info from 'constants/info'
+const { supportEmail, instructionVideoEnglishUrl, instructionVideoKhmerUrl } = info
 
 import classes from './style.scss'
 
@@ -122,6 +124,9 @@ class UserCredentials extends Component {
               label="I have read and agree to the"
             />&nbsp;
             <a href="/legal/terms-of-service.pdf" target="_blank">Terms of Service</a>
+            <div>
+              Please make sure to request access for this email from {supportEmail}, if you have not already.
+            </div>
 
           </div>
         }

@@ -7,6 +7,10 @@ import { Navbar } from 'shared/components/groups'
 import { UserNavbar, UserSidebar } from 'user/components/partials'
 import classes from './Authenticated.scss'
 import { withRouter } from 'react-router-dom'
+import { withTranslation } from 'react-i18next';
+
+import info from 'constants/info'
+const { supportEmail, instructionVideoEnglishUrl, instructionVideoKhmerUrl } = info
 
 
 class Authenticated extends Component {
@@ -36,21 +40,31 @@ class Authenticated extends Component {
   }
 
   render() {
-    const { children } = this.props
+    const { children, user, t, i18n } = this.props
     const { showSidebarInMobile } = this.state
     const alerts = _.values(this.props.alerts)
     const modalOpen = this.props.currentModal
+    const isWhitelisted = user.isWhitelisted
     
     return (
-      <Flexbox direction="column">
-        <UserNavbar toggleSidebar={this.toggleSidebar}/>
-  
-        <Flexbox>
-          <UserSidebar show={showSidebarInMobile} toggleSidebar={this.toggleSidebar}/>
-  
-          <UserContent />
-        </Flexbox>
-      </Flexbox>
+      <div>
+        {isWhitelisted ? (
+          <Flexbox direction="column">
+            <UserNavbar toggleSidebar={this.toggleSidebar}/>
+      
+            <Flexbox>
+              <UserSidebar show={showSidebarInMobile} toggleSidebar={this.toggleSidebar}/>
+      
+              <UserContent />
+            </Flexbox>
+          </Flexbox>
+        ) : (
+          <div>
+            We're sorry, it looks like this email ({user.email}) has not yet been allowed to user the Khmer Voice App. To get permission, please send us an email at {supportEmail}.
+          </div>
+        )
+        }
+      </div>
     )
   }
 }
@@ -64,7 +78,8 @@ const mapStateToProps = (state) => {
   return { 
     alerts: state.alerts,
     currentModal: state.viewSettings.currentModal,
+    user: state.user,
   }
 }
 
-export default withRouter(connect(mapStateToProps)(Authenticated))
+export default withRouter(connect(mapStateToProps)(withTranslation()(Authenticated)))

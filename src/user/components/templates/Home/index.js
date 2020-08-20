@@ -51,8 +51,8 @@ class Home extends Component {
                   <Link to="/upload">
                     {t("Upload your Khmer audio to start creating a transcript")}
                   </Link>
-                <p>
                 </p>
+                <p>
                   {t("Questions or comments? Contact us at ")}
                   <a href={`mailto:${supportEmail}`} target="_blank">{supportEmail}</a>.
                 </p>

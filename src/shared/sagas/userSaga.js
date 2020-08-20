@@ -176,7 +176,8 @@ function* fetchUser(action) {
 }
 
 
-//should only be called on initial login, or retrieving from cookies, etc.
+// should only be called on initial login, or retrieving from cookies, etc.
+// ie, happens will happens once per user session
 function* fetchCurrentUser(action) {
   try {
     const userData = action.payload
@@ -186,7 +187,10 @@ function* fetchCurrentUser(action) {
     // get users and transcripts simultaneously TODO 
     let returnedUser
     const result = yield userRef.get()
+
+    // NOTE this will all fail if they're not whitelisted also
     if (result.exists) {
+      console.log("getting user...")
       returnedUser = result.data()
       console.log("the returned user", returnedUser)
     
@@ -197,9 +201,28 @@ function* fetchCurrentUser(action) {
       userRef.set(JSON.parse(JSON.stringify(userData)))
     }
 
+    // check if whitelisted
+    const userWhitelistRef = db.collection("whitelistedUsers").doc(userData.email)
+    try {
+      // this try block will fail if not whitelisted, due to firestore rules. We don't want anyone
+      // finding out other whitelisted records besides their own email
+      const whitelistedResult = yield userWhitelistRef.get()
+      /* 
+       * const whitelistedData = yield whitelistedResult.data()
+       * console.log("whitelistedData?", whitelistedData)
+       */
+      console.log("whitelisted?", whitelistedResult.exists)
+      returnedUser.isWhitelisted = whitelistedResult.exists
+
+    } catch (err) {
+      returnedUser.isWhitelisted = false
+      console.error(err)
+    }
+
     yield put({type: SET_CURRENT_USER, payload: returnedUser})
 
     // TODO move these hooks to hook saga (?), to keep things cleaner
+    console.log("getting transcripts")
     const userTranscriptsRef = userRef.collection("transcripts").orderBy("updated_at", "desc")
     // const transcriptsResult = yield userTranscriptsRef.get()
     // const mappedTranscripts = transcriptsResult.docs.map(doc => doc.data())
@@ -211,6 +234,7 @@ function* fetchCurrentUser(action) {
     })
     userListeners.push(userTranscriptsListener)
 
+    console.log("getting transcript requests")
     const userTranscribeRequestsRef = userRef.collection("transcribeRequests").orderBy("updated_at", "desc")
 
     // setup listener so changes to uploads and transcriptions that are in process are always up to date
