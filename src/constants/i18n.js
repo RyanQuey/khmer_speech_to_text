@@ -5,6 +5,8 @@ const { supportEmail, instructionVideoEnglishUrl } = info
 
 // the translations
 // (tip move them in a JSON file and import them)
+// TODO more translations
+// TODO move this and all toggling of languages into REDUX
 const resources = {
   kh: {
     translation: {

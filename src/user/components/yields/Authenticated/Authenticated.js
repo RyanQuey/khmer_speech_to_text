@@ -2,7 +2,7 @@ import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Home, Profile, SignUp, UserContent } from 'user/components/templates'
-import { Flexbox, Alert } from 'shared/components/elements'
+import { Flexbox } from 'shared/components/elements'
 import { Navbar } from 'shared/components/groups'
 import { UserNavbar, UserSidebar } from 'user/components/partials'
 import classes from './Authenticated.scss'
@@ -42,13 +42,10 @@ class Authenticated extends Component {
   render() {
     const { children, user, t, i18n } = this.props
     const { showSidebarInMobile } = this.state
-    const alerts = _.values(this.props.alerts)
     const modalOpen = this.props.currentModal
-    const isWhitelisted = user.isWhitelisted
     
     return (
-      <div>
-        {isWhitelisted ? (
+      // TODO instead of boring plaintext, 
           <Flexbox direction="column">
             <UserNavbar toggleSidebar={this.toggleSidebar}/>
       
@@ -58,13 +55,6 @@ class Authenticated extends Component {
               <UserContent />
             </Flexbox>
           </Flexbox>
-        ) : (
-          <div>
-            We're sorry, it looks like this email ({user.email}) has not yet been allowed to user the Khmer Voice App. To get permission, please send us an email at {supportEmail}.
-          </div>
-        )
-        }
-      </div>
     )
   }
 }
@@ -76,7 +66,6 @@ Authenticated.propTypes = {
 }
 const mapStateToProps = (state) => {
   return { 
-    alerts: state.alerts,
     currentModal: state.viewSettings.currentModal,
     user: state.user,
   }

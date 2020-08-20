@@ -25,6 +25,15 @@ class UserCredentials extends Component {
     this.handlePassword = this.handlePassword.bind(this)
     this.toggleTos = this.toggleTos.bind(this)
   }
+  componentDidMount() {
+    // check on initialization, since often credential managers will just have it set already
+    formActions.setParams("UserCredentials", "credentials", {password: this.props.password})
+    formActions.setParams("UserCredentials", "credentials", {email: this.props.email})
+    this.setState({
+      validEmail: (!this.props.loginErrors || this.props.loginErrors.length === 0),
+    })
+  }
+
   componentWillReceiveProps(props) {
     //(if logging in, and there's an error that's new, stop pending or else it might get stuck indeffinitely spinning)
     if (props.loginErrors && props.loginErrors !== this.props.loginErrors) {
@@ -36,7 +45,7 @@ class UserCredentials extends Component {
     formActions.setParams("UserCredentials", "credentials", {password: value})
   }
   handleEmail(value, e, errors) {
-
+    // check email
     formActions.setParams("UserCredentials", "credentials", {email: value})
     this.setState({
       validEmail: (!errors || errors.length === 0),
@@ -50,6 +59,7 @@ class UserCredentials extends Component {
   submit(e) {
     e.preventDefault()
     this.props.togglePending(true);
+    console.log("closing alerts")
     alertActions.closeAlerts()
 
     let password = this.props.password

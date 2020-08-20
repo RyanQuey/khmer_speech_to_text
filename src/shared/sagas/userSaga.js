@@ -24,13 +24,16 @@ import {
 import { USER_FIELDS_TO_PERSIST } from 'constants'
 import { TRANSCRIPTION_STATUSES} from "constants/transcript"
 //import { setupSession } from 'lib/socket' // Not using a socket
-import { errorActions, alertActions } from 'shared/actions'
+import { errorActions, alertActions, viewSettingActions } from 'shared/actions'
 import TranscribeRequest from 'models/TranscribeRequest'
 import { Link } from 'react-router-dom'
+import info from 'constants/info'
+const { supportEmail, instructionVideoEnglishUrl, instructionVideoKhmerUrl } = info
 
 // TODO move to a place where this can be managed better
 let userListeners = []
 
+// also is for signups
 function* signIn(action) {
   const payload = action.payload
   try {
@@ -45,25 +48,21 @@ function* signIn(action) {
       case 'SIGN_UP_WITH_EMAIL':
         result = yield firebase.auth()
           .createUserWithEmailAndPassword(credentials.email, credentials.password)
-          .then((user) => {
-            const userData = user
+          .then((signupResult) => {
+            const userData = signupResult.user
             userData.redirect = true
             return userData
           })
 
-        // result = yield axios.post("/api/users", {
-        //   email: credentials.email,
-        //   password: credentials.password
-        // })
-
         break
       case 'SIGN_IN_WITH_EMAIL':
         result = yield firebase.auth().signInWithEmailAndPassword(credentials.email, credentials.password)
-        // result = yield axios.post("/api/users/authenticate", {
-        //   email: credentials.email,
-        //   password: credentials.password,
-        //   token,
-        // })
+          .then((signinResult) => {
+            const userData = signinResult.user
+            userData.redirect = true
+            return userData
+          })
+
         break
       case 'SIGN_IN_WITH_TOKEN':
         // TODO not yet implemented with firebase
@@ -118,7 +117,7 @@ function* signIn(action) {
       //not in our api to be accepted
       alertActions.newAlert({
         title: "Your account has not been registered in our system: ",
-        message: "Please contact us at hello@growthramp.io to register and then try again.",
+        message: `Please contact us at ${supportEmail} to register and then try again.`,
         level: "DANGER",
         options: {timer: false},
       })
@@ -146,6 +145,9 @@ function* signIn(action) {
     }
     action.onFailure && action.onFailure(err)
 
+  } finally {
+    // login modal my only be visible in Unauthenticated view anyways. But just close it
+    viewSettingActions.closeModal()
   }
 }
 
@@ -185,9 +187,9 @@ function* fetchCurrentUser(action) {
     const userRef = db.collection("users").doc(userData.uid)
 
     // get users and transcripts simultaneously TODO 
-    let returnedUser
-    const result = yield userRef.get()
+    let returnedUser = {}
 
+    const result = yield userRef.get()
     // NOTE this will all fail if they're not whitelisted also
     if (result.exists) {
       console.log("getting user...")
@@ -201,9 +203,9 @@ function* fetchCurrentUser(action) {
       userRef.set(JSON.parse(JSON.stringify(userData)))
     }
 
-    // check if whitelisted
-    const userWhitelistRef = db.collection("whitelistedUsers").doc(userData.email)
     try {
+      // check if whitelisted
+      const userWhitelistRef = db.collection("whitelistedUsers").doc(userData.email)
       // this try block will fail if not whitelisted, due to firestore rules. We don't want anyone
       // finding out other whitelisted records besides their own email
       const whitelistedResult = yield userWhitelistRef.get()
@@ -211,14 +213,22 @@ function* fetchCurrentUser(action) {
        * const whitelistedData = yield whitelistedResult.data()
        * console.log("whitelistedData?", whitelistedData)
        */
+
       console.log("whitelisted?", whitelistedResult.exists)
-      returnedUser.isWhitelisted = whitelistedResult.exists
+      // we want this to be a negative, so that by default things show up, and then only do not show
+      // (might be unnecessary now)
+      // up when it is clear they are not whitelisted.
+      // Again, whitelisting emails really is not a strong security feature, just makes it inconvenient for random
+      // people to start using our app
+      returnedUser.isNotWhitelisted = !whitelistedResult.exists
 
     } catch (err) {
-      returnedUser.isWhitelisted = false
+      returnedUser.isNotWhitelisted = true
       console.error(err)
+      throw err
     }
 
+    // even if not whitelisted, just continue. Will block the user later on
     yield put({type: SET_CURRENT_USER, payload: returnedUser})
 
     // TODO move these hooks to hook saga (?), to keep things cleaner
@@ -287,6 +297,22 @@ function* fetchCurrentUser(action) {
     action.cb && action.cb(result.data)
 
   } catch (err) {
+    console.log(err)
+    if (err.message == "Missing or insufficient permissions.") {
+      console.log("whitelisting issue...hopefully")
+      console.log("new alert")
+      alertActions.newAlert({
+        title: "Your account has not been registered in our system: ",
+        message: `Please contact us at ${supportEmail} to register and then try again.`,
+        level: "DANGER",
+        options: {timer: false},
+      })
+      yield put({type: SIGN_OUT_REQUEST})
+
+      // make sure to logout this user
+    } else {
+      console.log(err.message)
+    }
     errorActions.handleErrors({
       templateName: "Login",
       templatePart: "fetch",
@@ -380,6 +406,7 @@ function* resetPassword(action) {
 export default function* userSaga() {
   yield takeLatest(FETCH_USER_REQUEST, fetchUser)
   yield takeLatest(FETCH_CURRENT_USER_REQUEST, fetchCurrentUser)
+  // also is for signups
   yield takeLatest(SIGN_IN_REQUEST, signIn)
   yield takeLatest(SIGN_OUT_REQUEST, signUserOut)
   yield takeLatest(UPDATE_USER_REQUEST, updateUser)

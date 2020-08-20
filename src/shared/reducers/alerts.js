@@ -11,8 +11,15 @@ export default (state = {}, action) => {
 
     case CLOSE_ALERTS:
 
-      //TODO: only close one/some alert(s) in action.payload if action.payload === string/integer
-      return {}
+      if (action.payload == "all") {
+        return {}
+      } else {
+        // only close the alert by the key passed in
+        let newState = Object.assign({}, state)
+        delete newState[action.payload]
+        return newState
+      }
+
 
     default:
       return state

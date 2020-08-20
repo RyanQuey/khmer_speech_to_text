@@ -13,9 +13,9 @@ import {
   BrowserRouter,
 } from 'react-router-dom'
 import { connect } from 'react-redux'
-import info from 'constants/info'
 import { withTranslation } from 'react-i18next';
 
+import info from 'constants/info'
 const { supportEmail, instructionVideoEnglishUrl, instructionVideoKhmerUrl } = info
 
 class Unauthenticated extends Component {
@@ -27,6 +27,9 @@ class Unauthenticated extends Component {
      
     return (
       <div>
+          {alerts && !modalOpen && alerts.map((alert, i) => {
+            return <Alert alert={alert} key={i} />
+          })}    
           <Flexbox direction="column">
             <UserNavbar unauthenticated={true} />
             <Flexbox className={classes.mainContainer}>
