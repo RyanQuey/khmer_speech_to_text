@@ -52,7 +52,7 @@ class UserNavbar extends Component {
   render() {
     const { user, t } = this.props
     const SupportLink = () => <a href={`mailto:${supportEmail}`} target="_blank">{t("Support")}</a>
-    const ToggleLangBtn = () => <Button onClick={this.toggleLanguage}>{t("ភាសា​ខ្មែរ")}</Button>
+    const ToggleLangBtn = () => <Button small={true} onClick={this.toggleLanguage}>{t("ភាសា​ខ្មែរ")}</Button>
 
     return (
       <Navbar>
