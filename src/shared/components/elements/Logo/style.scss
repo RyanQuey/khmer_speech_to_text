@@ -3,7 +3,10 @@
 .container {
   display: block;
   max-width: 60px;
-  padding-right: 10px;
+  @include mq(m) {
+    padding-right: 10px;
+  }
+  
 }
 .logo {
   position: relative;
