@@ -15,12 +15,13 @@ import {
 } from 'react-router-dom'
 import { connect } from 'react-redux'
 import info from 'constants/info'
+import { withTranslation } from 'react-i18next';
 const { supportEmail, instructionVideoKhmerUrl, instructionVideoEnglishUrl } = info
 
 class Home extends Component {
   
   render() {
-    const { children } = this.props
+    const { children, t, i18n } = this.props
     const alerts = _.values(this.props.alerts)
     const modalOpen = this.props.currentModal
      
@@ -29,22 +30,31 @@ class Home extends Component {
           <Flexbox direction="column">
             <Flexbox className={classes.mainContainer}>
               <div className={classes.content}>
-                <h1>Khmer Voice App</h1>
+                <h1>
+                  {t("Khmer Voice App")}
+                </h1>
                 <h2>
-                  Instructions
+                  {t("Instructions")}
                 </h2>
                 <div className={classes.iframeWrapper}>
-                  <iframe width="300" height="169" src={instructionVideoKhmerUrl} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                  {i18n.language == "en" ? (
+                    <iframe width="300" height="169" src={instructionVideoEnglishUrl} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                  ) : (
+                    <iframe width="300" height="169" src={instructionVideoKhmerUrl} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                  )}
                 </div>
                 <br />
                 <h2>
-                  Let's get started!
+                  {t("Let's get started!")}
                 </h2>
                 <p>
-                  <Link to="/upload">Upload your Khmer audio to start creating a transcript</Link>
+                  <Link to="/upload">
+                    {t("Upload your Khmer audio to start creating a transcript")}
+                  </Link>
                 <p>
                 </p>
-                  Questions or comments? Contact us at <a href={`mailto:${supportEmail}`} target="_blank">{supportEmail}</a>.
+                  {t("Questions or comments? Contact us at ")}
+                  <a href={`mailto:${supportEmail}`} target="_blank">{supportEmail}</a>.
                 </p>
               </div>
             </Flexbox>
@@ -62,4 +72,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps)(Home))
+export default withRouter(connect(mapStateToProps)(withTranslation()(Home)))

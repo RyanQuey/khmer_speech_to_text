@@ -6,6 +6,7 @@ import { Button, Flexbox, Input } from 'shared/components/elements'
 import {
   SIGN_IN_REQUEST,
 } from 'constants/actionTypes'
+import { withTranslation } from 'react-i18next';
 import { 
   //SocialLogin, 
   UserCredentials 
@@ -46,8 +47,8 @@ class Login extends Component {
     errors && errors.forEach((err) => {
       if (err.type === errorTypes.RECORD_ALREADY_EXISTS.type) {
         let toReturn = {
-          title: "Account already exists for this email",
-          message: "Please try logging in instead"
+          title: props.t("Account already exists for this email"),
+          message: props.t("Please try logging in instead")
         }
         errorActions(toReturn)
 
@@ -101,19 +102,20 @@ class Login extends Component {
   }
 
   render() {
+    const { t } = this.props
     const view = this.state.view
     let generalText
     switch (view) {
       case "SIGN_UP":
-        generalText = "Signup"
+        generalText = t("Signup")
         break
 
       case "LOGIN":
-        generalText = "Login"
+        generalText = t("Login")
         break
 
       case "RESETTING_PASSWORD":
-        generalText = "Reset Password"
+        generalText = t("Reset Password")
         break
     }
 
@@ -134,12 +136,13 @@ class Login extends Component {
           submit={this.submitCredentials}
         />
         {view === "LOGIN"  &&
-          <a href="#" onClick={this.toggleResetPassword}>{this.state.resettingPassword ? "Login or signup" : "Forget your password?"}</a>
+          <a href="#" onClick={this.toggleResetPassword}>{this.state.resettingPassword ? t("Login or signup") : t("Forget your password?")}</a>
         }
 
         <br/>
         {!credentialsOnly && !resettingPassword && view === "LOGIN" && <div>
-          <h3>{socialText} through one of your social networks:</h3>
+          <h3>{socialText} {t("through one of your social networks:")}
+          </h3>
           <SocialLogin
             pending={this.state.pending}
             togglePending={this.togglePending}
@@ -150,9 +153,9 @@ class Login extends Component {
           href="#"
         >
           {view === "LOGIN" ? (
-            "Don't have an account? Click here to sign up"
+            t("Don't have an account? Click here to sign up")
           ) : (
-            "Already have an account? Click here to login"
+            t("Already have an account? Click here to login")
           )}
         </a>
       </Flexbox>
@@ -184,4 +187,4 @@ const mapDispatchToProps = (dispatch) => {
     }),
   }
 }
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Login))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withTranslation()(Login)))

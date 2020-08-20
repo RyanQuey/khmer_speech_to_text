@@ -24,6 +24,8 @@ import 'prototypeHelpers'
 import store from 'shared/reducers'
 import 'theme/index.scss'
 import App from './App';
+import './constants/i18n';
+
 
 window.db = firebaseApp.firestore();
 window.Helpers = Helpers
