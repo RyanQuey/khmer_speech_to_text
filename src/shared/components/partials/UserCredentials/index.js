@@ -121,7 +121,7 @@ class UserCredentials extends Component {
               onChange={this.toggleTos}
               label="I have read and agree to the"
             />&nbsp;
-            <a href="/files/growth-ramp-terms-of-service.pdf" target="_blank">Terms of Service</a>
+            <a href="/legal/terms-of-service.pdf" target="_blank">Terms of Service</a>
 
           </div>
         }

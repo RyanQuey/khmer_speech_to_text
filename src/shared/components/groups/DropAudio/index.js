@@ -13,7 +13,7 @@ class DropAudio extends Component {
 
     this.state = {
       pending: false,
-      maxSize: 100*1000*1000, // 10 MB ish// TODO what is good max?
+      maxSize: 100*1000*1000, // 100 MB ish// TODO what is good max?
     }
     this.styles = StyleSheet.create({
       dropzone: {

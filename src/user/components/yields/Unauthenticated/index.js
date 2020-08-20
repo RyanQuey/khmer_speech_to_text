@@ -41,7 +41,7 @@ class Unauthenticated extends Component {
                   {i18n.language == "en" ? (
                     <iframe width="300" height="169" src={instructionVideoEnglishUrl} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                   ) : (
-                    <iframe width="300" height="169" src={i18n.getFixedT("kh", instructionVideoKhmerUrl)} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <iframe width="300" height="169" src={instructionVideoKhmerUrl} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                   )}
                 </div>
                 <br />
