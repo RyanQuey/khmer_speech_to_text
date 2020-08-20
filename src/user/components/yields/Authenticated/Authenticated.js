@@ -45,16 +45,15 @@ class Authenticated extends Component {
     const modalOpen = this.props.currentModal
     
     return (
-      // TODO instead of boring plaintext, 
-          <Flexbox direction="column">
-            <UserNavbar toggleSidebar={this.toggleSidebar}/>
-      
-            <Flexbox>
-              <UserSidebar show={showSidebarInMobile} toggleSidebar={this.toggleSidebar}/>
-      
-              <UserContent />
-            </Flexbox>
-          </Flexbox>
+      <Flexbox direction="column">
+        <UserNavbar toggleSidebar={this.toggleSidebar}/>
+  
+        <Flexbox>
+          <UserSidebar show={showSidebarInMobile} toggleSidebar={this.toggleSidebar}/>
+  
+          <UserContent />
+        </Flexbox>
+      </Flexbox>
     )
   }
 }

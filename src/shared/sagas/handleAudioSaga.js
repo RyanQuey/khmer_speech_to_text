@@ -151,7 +151,6 @@ function* requestResume(action) {
       message = "Resuming"
     }
 
-    console.log("closing alerts since we're done transcribing")
     alertActions.closeAlerts()
     alertActions.newAlert({
       //title: response.data.transcription,

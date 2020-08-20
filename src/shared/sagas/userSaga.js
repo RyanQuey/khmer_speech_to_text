@@ -215,15 +215,10 @@ function* fetchCurrentUser(action) {
        */
 
       console.log("whitelisted?", whitelistedResult.exists)
-      // we want this to be a negative, so that by default things show up, and then only do not show
-      // (might be unnecessary now)
-      // up when it is clear they are not whitelisted.
-      // Again, whitelisting emails really is not a strong security feature, just makes it inconvenient for random
-      // people to start using our app
-      returnedUser.isNotWhitelisted = !whitelistedResult.exists
+      returnedUser.isWhitelisted = whitelistedResult.exists
 
     } catch (err) {
-      returnedUser.isNotWhitelisted = true
+      returnedUser.isWhitelisted = false
       console.error(err)
       throw err
     }
@@ -292,15 +287,11 @@ function* fetchCurrentUser(action) {
       store.dispatch({type: FETCH_TRANSCRIBE_REQUESTS_SUCCESS, payload: mappedTranscriptRequests})
     })
 
-
     //no reason to restart the socket here; this event should only occur is already retrieving the user data from the cookie, which means that API token and headers already are set correctly.
     action.cb && action.cb(result.data)
 
   } catch (err) {
-    console.log(err)
     if (err.message == "Missing or insufficient permissions.") {
-      console.log("whitelisting issue...hopefully")
-      console.log("new alert")
       alertActions.newAlert({
         title: "Your account has not been registered in our system: ",
         message: `Please contact us at ${supportEmail} to register and then try again.`,
@@ -310,9 +301,8 @@ function* fetchCurrentUser(action) {
       yield put({type: SIGN_OUT_REQUEST})
 
       // make sure to logout this user
-    } else {
-      console.log(err.message)
     }
+
     errorActions.handleErrors({
       templateName: "Login",
       templatePart: "fetch",
