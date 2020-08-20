@@ -13,8 +13,9 @@
     "clean:happy": "rimraf .happypack/*",
     "copy": "copyfiles -u 1 public/* public/**/* dist",
     "dist": "npm run copy & webpack --env=dist",
-    "deploy": "npm run env:dev && npm run clean && npm run dist && firebase deploy",
-    "deploy-no-functions": "npm run env:dev && npm run clean && npm run dist && firebase deploy --except functions",
+    "deploy-with-functions": "npm run env:dev && npm run clean && npm run dist && firebase deploy",
+    "deploy": "npm run env:dev && npm run clean && npm run dist && firebase deploy --except functions",
+    "deploy-rules": "firebase deploy --only firestore:rules",
     "serve": "node server.js --env=dev",
     "serve:dist": "node server.js --env=dist"
   },

@@ -38,10 +38,11 @@ npm run deploy
 There's a lot of TODOs throughout the project, and we would love to have your help!
 
 * Please follow [elemental design patterns](https://github.com/embark-studio/elemental)
-* Make sure you have `Node 8.x` installed. Node 10.x would be in use if we are using cloud functions, but currently we are not (TODO move both to same Node version)
+* Make sure you have `Node 8.x` installed. Node 10.x would be in use if we are using cloud functions, but currently we are not (TODO move both to same Node version; upgrade to Node 12)
 * Use an editor that has **eslint** and **editorConfig** installed and adhere to error messages as they arise
 * Please send **PRs** rather than push directly to a branch
 * Most of our development work will be handled on the `development` branch (TODO make a development branch)
+* If you have an idea, we recommend that you let us know ahead of time before working on it. PRs for features that have not been preapproved might not get accepted.
 
 # Other notes
 ## Highlighting based on Accuracy Confidence

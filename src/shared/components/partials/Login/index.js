@@ -2,7 +2,7 @@ import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { userActions, errorActions } from 'shared/actions'
-import { Button, Flexbox, Input } from 'shared/components/elements'
+import { Button, Flexbox, Input, Checkbox } from 'shared/components/elements'
 import {
   SIGN_IN_REQUEST,
 } from 'constants/actionTypes'
@@ -21,7 +21,7 @@ class Login extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      view: props.initialView || 'LOGIN',
+      view: Helpers.safeDataPath(props, "viewSettings.Login.initialView", 'LOGIN'),
       pending: false,
     }
 
@@ -171,7 +171,7 @@ const mapStateToProps = (state) => {
   return {
     user: state.user,
     errors: state.errors,
-    viewSettings: state.viewSettings,
+    viewSettings: state.viewSettings || {},
     password: Helpers.safeDataPath(state, "forms.UserCredentials.credentials.params.password", ""),
     email: Helpers.safeDataPath(state, "forms.UserCredentials.credentials.params.email", ""),
   }

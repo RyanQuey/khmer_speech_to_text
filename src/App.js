@@ -7,6 +7,7 @@ import {
   withRouter,
 } from 'react-router-dom'
 import handleQuery from 'utils/handleQuery'
+import { withTranslation } from 'react-i18next';
 import { 
   FETCH_CURRENT_USER_REQUEST,
 } from 'constants/actionTypes'
@@ -19,6 +20,7 @@ class App extends Component {
     const query = this.props.location.search
     //right now, this is only returning user and provider
     if (query) {
+      console.log("query is", query)
       const cb = (options) => {
         if (options.sendHome) {
           this.props.history.push("/")
@@ -28,11 +30,10 @@ class App extends Component {
         }
       }
 
-      handleQuery(query, cb);
+      handleQuery(query, cb, {i18n: this.props.i18n});
     }
-  }
+      console.log("no query...?")
 
-  componentDidMount() {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         // when hit api, make sure to send bearer token
@@ -86,4 +87,4 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withTranslation()(App)))

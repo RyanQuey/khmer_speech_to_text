@@ -1,19 +1,31 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // propagates rules down all subcollections
-    match /{document=**} {
+    // users can edit their own stuff
+    match /users/{userId} {
+      // for testing signup only. Don't use in prod
+      function rq_variations() {
+        return email().matches('rlquey2.*@gmail[.]com') == true 
+      }
+
       function email() {
         return request.auth.token.email;
       }
 
       // require users to have a record in whitelist (see firestore db) or variations on my own email to continue
       function isWhitelisted() {
-        return email().matches('rlquey2.*@gmail[.]com') == true || exists(/databases/$(database)/documents/whitelistedUsers/$(email()));
+        return exists(/databases/$(database)/documents/whitelistedUsers/$(email()));
       }
 
-      allow read: if isWhitelisted();
-      allow write: if isWhitelisted();
+      allow create: if request.auth != null && isWhitelisted();
+      allow read, update, delete: if request.auth != null && request.auth.uid == userId && isWhitelisted();
     } 
+
+    // propagates rules down all subcollections
+    // only allow from console
+    // we don't want to allow reading, because then some users could read e-mails of other users
+    match /whitelistedUsers/{document=**} {
+      allow read, write: if false
+    }
   }
 }

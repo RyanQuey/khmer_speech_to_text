@@ -38,9 +38,9 @@ class Home extends Component {
                 </h2>
                 <div className={classes.iframeWrapper}>
                   {i18n.language == "en" ? (
-                    <iframe width="300" height="169" src={instructionVideoEnglishUrl} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <iframe width="300" height="169" src={instructionVideoEnglishUrl} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
                   ) : (
-                    <iframe width="300" height="169" src={instructionVideoKhmerUrl} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <iframe width="300" height="169" src={instructionVideoKhmerUrl} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
                   )}
                 </div>
                 <br />
