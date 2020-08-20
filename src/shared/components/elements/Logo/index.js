@@ -8,12 +8,14 @@ import classes from './style.scss'
 const both = false 
 const Logo = () => (
   both ? (
-    <div className="container">
+    <div className={classes.container}>
       <img id="navbar-brand-svg" className={classes.darkBg} alt="logo2" src={svglogo} />
-      <img id="navbar-brand" alt="logo" src={logo} />
+      <img id="navbar-brand" className={classes.logo} alt="logo" src={logo} />
     </div>
   ) : (
-    <img id="navbar-brand" alt="logo" src={logo} />
+    <div className={classes.container}>
+      <img id="navbar-brand" className={classes.logo} alt="logo" src={svglogo} />
+    </div>
   )
 )
 

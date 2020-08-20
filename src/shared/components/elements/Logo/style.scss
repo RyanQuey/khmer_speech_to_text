@@ -1,7 +1,11 @@
 @import 'theme/_helpers';
 
 .container {
+  display: block;
+  max-width: 60px;
+  padding-right: 10px;
 }
-#navbar-brand-svg, .darkBg {
-  background-color: $gray-bg;
+.logo {
+  position: relative;
+  top: 5px;
 }

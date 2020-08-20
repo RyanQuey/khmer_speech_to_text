@@ -60,7 +60,9 @@ $play-bg: #A79032;
 
 $primary: #cf4c28; // mildly dark red
 $active: rgb(23, 195, 169);
-$secondary: rgb(0, 125, 125);
+$secondary: rgb(0, 125, 125); // darkish green. Not sure what we were using that for
+// TODO probably should be our primary or secondary...
+$logo-color: #66CDD8;
 $accent1: rgb(155, 155, 155);
 $accent2: rgb(250, 175, 0);
 $accent3: rgb(176, 69, 69);
@@ -93,7 +95,7 @@ $sidebar-width: 250px;
 
 // header and footer
 $header-bg: $white;
-$navbar-brand-bg: $white;
+$navbar-brand-bg: $logo-color;
 $header-height: 50px;
 $footer: $navy;
 

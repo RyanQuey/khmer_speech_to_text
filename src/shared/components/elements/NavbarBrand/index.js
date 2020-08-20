@@ -7,8 +7,9 @@ import { Link } from 'react-router-dom'
 const NavbarBrand = ({ background }) => {
   return (
     <div className={classes.brand} >
-      <Link id="navbar-brand-link" to="/">
+      <Link id="navbar-brand-link" className={classes.navBrandLink} to="/">
         <Logo />
+        <div className={classes.brandName}>Khmer Voice App</div>
       </Link>
     </div>
   )
