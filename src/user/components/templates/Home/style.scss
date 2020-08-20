@@ -1,8 +1,6 @@
 @import 'theme/_helpers';
 
 .mainContainer {
-  min-width: calc(100% - 250px);
-  min-height: calc(100vh - 50px);
   background: $light-gray-bg;
   text-align: center;
   justify-content: center;
@@ -10,7 +8,6 @@
 .content {
   background: $light-gray-bg;
   max-width: 600px;
-  padding: 0 0 2rem 0;
 }
 
 .iframeWrapper {
