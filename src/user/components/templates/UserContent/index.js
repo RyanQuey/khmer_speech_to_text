@@ -6,6 +6,7 @@ import {
   Switch,
 } from 'react-router-dom'
 import { Alert, Flexbox } from 'shared/components/elements'
+import { UserSettings } from 'shared/components/templates'
 import { Home, Profile, Search, Transcripts, UploadAudio, ShowTranscript, TranscribeRequestsIndex } from 'user/components/templates'
 import requireAuthenticated from 'utils/requireAuthenticated'
 import forbidAuthenticated from 'utils/forbidAuthenticated'
@@ -27,7 +28,8 @@ class UserContent extends Component {
           <Switch>
             <Route exact path="/" component={Home} />
             <Route path="/upload" component={requireAuthenticated(UploadAudio)} />
-            <Route path="/profile" component={requireAuthenticated(Profile)} />
+            {false && <Route path="/profile" component={requireAuthenticated(Profile)} />}
+            <Route path="/settings" component={requireAuthenticated(UserSettings)} />
             <Route path="/transcripts/:transcriptIdentifier" component={requireAuthenticated(ShowTranscript)} />
             <Route path="/transcripts" component={requireAuthenticated(Transcripts)} />
             <Route path="/unfinished-transcripts" component={requireAuthenticated(TranscribeRequestsIndex)} />

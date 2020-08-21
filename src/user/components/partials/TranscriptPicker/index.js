@@ -7,6 +7,7 @@ import { Button, Flexbox, Input } from 'shared/components/elements'
 import { SET_CURRENT_TRANSCRIPT } from 'constants/actionTypes'
 import Transcript from 'models/Transcript'
 import classes from './style.scss'
+import { withTranslation } from "react-i18next";
 
 // TODO migrate over to cards, so is more mobile friendly by default and it's still easy to show lots of different kinds of information without being too crowded
 class TranscriptPicker extends Component {
@@ -22,17 +23,17 @@ class TranscriptPicker extends Component {
   }
 
   render() {
-    const { pickable, transcripts, summaryOnly } = this.props
+    const { pickable, transcripts, summaryOnly, t } = this.props
 
     //TODO: set the title using props into the modal container
     return (
       <table >
         <tbody>
         <tr>
-          {!summaryOnly && <th>Filename</th>}
-          <th className={classes.desktopOnly}>Transcript Created At</th>
-          {!summaryOnly && <th className={classes.desktopOnly}>File Last Modified</th>}
-          {!summaryOnly && <th className={classes.desktopOnly}>File Size</th>}
+          {!summaryOnly && <th>{t("Filename")}</th>}
+          <th className={classes.desktopOnly}>{t("Transcript Created At")}</th>
+          {!summaryOnly && <th className={classes.desktopOnly}>{t("File Last Modified")}</th>}
+          {!summaryOnly && <th className={classes.desktopOnly}>{t("File Size")}</th>}
           <th></th>
         </tr>
         {transcripts.map((transcript, index) => {
@@ -51,7 +52,7 @@ class TranscriptPicker extends Component {
                 {transcript.displayFileSize()}
               </td>}
               <td>
-                {pickable && <button onClick={this.viewTranscript.bind(this, transcript)}>View</button>}
+                {pickable && <button onClick={this.viewTranscript.bind(this, transcript)}>{t("View")}</button>}
               </td>
             </tr>
           )
@@ -74,4 +75,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TranscriptPicker))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withTranslation()(TranscriptPicker)))

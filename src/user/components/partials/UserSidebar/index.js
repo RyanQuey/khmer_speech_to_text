@@ -6,6 +6,7 @@ import { MenuItem } from 'shared/components/groups'
 import { Select } from 'shared/components/groups'
 import { withRouter } from 'react-router-dom'
 import sbbicLogo from 'images/sbbic-member-small-web.png'
+import { withTranslation } from 'react-i18next';
 
 import classes from './Sidebar.scss'
 
@@ -18,15 +19,17 @@ class Sidebar extends Component {
   }
 
   render() {
+    const {t} = this.props
+
     return (
       <div className={`${classes.sidebar} ${this.props.show ? classes.show : ""}`}>
 
         <div className={classes.nav}>
           <ul className={classes.sidebarNav}>
-            <MenuItem link="/upload" text="Upload" nav={true} exact={true} icon="upload" onClick={this.props.toggleSidebar.bind(this, false)}/>
-            {false && <MenuItem link="/profile" text="Profile" nav={true} icon="bullhorn" onClick={this.props.toggleSidebar.bind(this, false)}/>}
-            <MenuItem link="/transcripts" text="Transcripts" nav={true} exact={true} icon="file" onClick={this.props.toggleSidebar.bind(this, false)}/>
-            <MenuItem link="/unfinished-transcripts" text="Unfinished Transcripts" nav={true} icon="cogs" onClick={this.props.toggleSidebar.bind(this, false)}/>
+            <MenuItem link="/upload" text={t("Upload")} nav={true} exact={true} icon="upload" onClick={this.props.toggleSidebar.bind(this, false)}/>
+            {false && <MenuItem link="/profile" text={t("Profile")} nav={true} icon="bullhorn" onClick={this.props.toggleSidebar.bind(this, false)}/>}
+            <MenuItem link="/transcripts" text={t("Transcripts")} nav={true} exact={true} icon="file" onClick={this.props.toggleSidebar.bind(this, false)}/>
+            <MenuItem link="/unfinished-transcripts" text={t("Unfinished Transcripts")} nav={true} icon="cogs" onClick={this.props.toggleSidebar.bind(this, false)}/>
           </ul>
         </div>
         <div className={`${classes.backdrop} ${this.props.show ? classes.show : ""}`} onClick={this.props.toggleSidebar.bind(this, !this.props.show)}></div>
@@ -50,4 +53,4 @@ const mapStateToProps = (state) => {
     user: state.user }
 }
 
-export default withRouter(connect(mapStateToProps)(Sidebar))
+export default withRouter(connect(mapStateToProps)(withTranslation()(Sidebar)))

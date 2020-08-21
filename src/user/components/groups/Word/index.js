@@ -10,6 +10,7 @@ import { Flexbox } from 'shared/components/elements'
 import { RESUME_TRANSCRIBING_REQUEST } from 'constants/actionTypes'
 import Transcript from 'models/Transcript'
 import classes from './style.scss'
+import { withTranslation } from "react-i18next";
 
 class Word extends Component {
   constructor(props) {
@@ -21,7 +22,7 @@ class Word extends Component {
 
   render () {
     // NOTE nextWordData hasn't been combined or checked for whether it is punctuation, number, etc. or not
-    const { wordData, prevWordData, nextWordData  } = this.props
+    const { wordData, prevWordData, nextWordData, t  } = this.props
     const { word, confidence, startTime, endTime, tags} = wordData
 
     // I think it should be sorted by confidence already. If not...probably leave it,
@@ -47,7 +48,7 @@ class Word extends Component {
     return (
       <span 
         className={`word ${classes.word} ${confidenceClass}`} 
-        title={confidenceClass == classes.warning ? "Google returned a single word with letters and numbers: " + wordData.originalWordData.word : `Confidence Level: ${parseFloat(confidence* 100, 2)}%`}
+        title={confidenceClass == classes.warning ? t("Google returned a single word with letters and numbers: ") + wordData.originalWordData.word : `${t("Confidence Level")}: ${parseFloat(confidence* 100, 2)}%`}
       >
         {word}
         {nextWordData && (!nextWordData.tags.includes("end-of-sentence") && !nextWordData.tags.includes("closing-punctuation") && (wordData.tags.includes("followed-by-nbsp")) || nextWordData.tags.includes("preceded-by-nbsp") ? '\u00A0' : '\u200B')}
@@ -57,4 +58,4 @@ class Word extends Component {
 }
 
 
-export default Word
+export default withTranslation()(Word)

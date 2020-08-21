@@ -6,15 +6,16 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { TranscriptPicker } from 'user/components/partials'
 import Transcript from 'models/Transcript'
+import { withTranslation } from "react-i18next";
 
 class Transcripts extends Component {
   render() {
-    const { user, transcripts } = this.props
+    const { user, transcripts, t } = this.props
     const transcriptsToShow = _.uniqBy(transcripts, (t) => t.fileIdentifier())
     return (
       <div id="Transcript-ctn">
         <div className="menu-ctn">
-          <h1>Transcripts</h1>
+          <h1>{t("Transcripts")}</h1>
         </div>
         <TranscriptPicker 
           transcripts={transcriptsToShow}
@@ -37,4 +38,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps)(Transcripts))
+export default withRouter(connect(mapStateToProps)(withTranslation()(Transcripts)))

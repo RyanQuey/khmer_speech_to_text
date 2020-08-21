@@ -15,6 +15,8 @@ import classes from './style.scss'
 import { formActions } from 'shared/actions'
 import Transcript from 'models/Transcript'
 import TranscribeRequest from 'models/TranscribeRequest'
+import { withTranslation } from "react-i18next";
+
 
 class UploadAudioForm extends Component {
   constructor(props) {
@@ -55,13 +57,14 @@ class UploadAudioForm extends Component {
 
   render() {
     const modalOpen = this.props.currentModal
+    const { t } = this.props
 
     return (
       <div>
         <Flexbox className={classes.wrapper} direction="column">
 
 					<div className={classes.needHelpContainer}>
-            <span>Upload your Khmer audio to generate a transcript.</span>
+            <span>{t("Upload your Khmer audio to generate a transcript.")}</span>
             <div className={classes.popupWrapper}>
               <Icon name="question-circle" className={classes.helpBtn} onClick={this.toggleViewingPopup.bind(this)}/>
               <Popup
@@ -73,11 +76,11 @@ class UploadAudioForm extends Component {
               >
                 <div className={classes.helpBox}>
                   <div className={classes.instructions}>
-                    <div>Upload an audio file to get started. FLAC files are best. WAV, MP3s and MP4s might work, but there is a good chance they won't, especially MP4s</div>
+                    <div>{t("Upload an audio file to get started. FLAC files are best. WAV, MP3s and MP4s might work, but there is a good chance they won't, especially MP4s")}</div>
                     <div>
-                      <strong>Best options to use when recording:</strong>
-                      <div> - No noise cancellation</div>
-                      <div> - High fidelity</div>
+                      <strong>{t("Best options to use when recording:")}</strong>
+                      <div> - {t("No noise cancellation")}</div>
+                      <div> - {t("High fidelity")}</div>
                     </div>
                   </div>
                 </div>
@@ -88,7 +91,7 @@ class UploadAudioForm extends Component {
           <DropAudio
             circle
             defaultImage="/public/images/profile/defaultBanner.jpg"
-            label="Drop audio or click to upload"
+            label={t("Drop audio or click to upload")}
             height="150px"
             width="150px"
             cb={this.cb}
@@ -111,5 +114,5 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps)(UploadAudioForm))
+export default withRouter(connect(mapStateToProps)(withTranslation()(UploadAudioForm)))
 

@@ -8,15 +8,16 @@ import { TranscribeRequestPicker } from 'user/components/partials'
 import Transcript from 'models/Transcript'
 import TranscribeRequest from 'models/TranscribeRequest'
 import { TRANSCRIPTION_STATUSES} from "constants/transcript"
+import { withTranslation } from "react-i18next";
 
 // AKA untranscribed uploads
 class TranscribeRequestsIndex extends Component {
   render() {
-    const { user, transcribeRequests } = this.props
+    const { user, transcribeRequests, t } = this.props
     return (
       <div id="unfinished-transcript-ctn">
         <div className="menu-ctn">
-          <h1>Transcript Request History</h1>
+          <h1>{t("Transcript Request History")}</h1>
         </div>
         <TranscribeRequestPicker 
           transcribeRequests={transcribeRequests}
@@ -41,4 +42,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps)(TranscribeRequestsIndex))
+export default withRouter(connect(mapStateToProps)(withTranslation()(TranscribeRequestsIndex)))

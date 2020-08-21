@@ -8,6 +8,7 @@ import {  } from 'constants/actionTypes'
 import theme from 'theme'
 import { formActions } from 'shared/actions'
 import classes from './style.scss'
+import { withTranslation } from "react-i18next";
 
 const sections = {
   websites: { //key should be url param
@@ -38,13 +39,17 @@ class UserSettings extends Component {
 
  componentDidMount() {
     //set current campaign based on the url params, no matter what it was before
+   /*
     const campaignId = this.props.match.params.campaignId
     this._checkUrl(this.props)
     window.onbeforeunload = this.handleUnload//TODO maybe use window.addEventListener("beforeunload") instead. Make sure to do for plans and campaign
+    */
   }
 
   componentWillUnmount () {
+    /*
     window.onbeforeunload = null
+    */
   }
 
   handleUnload(e) {
@@ -81,15 +86,24 @@ class UserSettings extends Component {
   }
 
   render() {
-    const c = this;
+    // TODO remove this when we change what's below here
+    const { t } = this.props
+    return (
+      <div>
+        <h1>{t("Settings")}</h1>
+        <div>{t("Coming soon...")}</div>
+      </div>
+    )
+    
     const currentSection = this.props.match.params.view
     const Tag = (sections[currentSection] && sections[currentSection].component) || ConfigureWebsites
 
-//TODO can borrow code from the content audit tabs
+
+    //TODO can borrow code from the content audit tabs
     return (
       <main className={classes.userSettings}>
-        <Prompt when={this.props.dirty} message={(location) => 'Form not saved; Are you sure you want to leave?'}/>
-        <h1>Settings</h1>
+        <Prompt when={this.props.dirty} message={(location) => "Form not saved; Are you sure you want to leave?"}/>
+        <h1>{t("Settings")}</h1>
         <Navbar className="" justifyTabs="flex-start" background={theme.color.moduleGrayOne} color={theme.color.text} tabs={true}>
           <ul>
             {Object.keys(sections).map((section) => {
@@ -135,6 +149,6 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(UserSettings))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withTranslation()(UserSettings)))
 
 

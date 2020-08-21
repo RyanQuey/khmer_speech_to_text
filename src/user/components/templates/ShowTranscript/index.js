@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import { TranscriptPicker, Utterance } from 'user/components/partials'
 import Transcript from 'models/Transcript'
+import { withTranslation } from "react-i18next";
 
 //shows up as buttons in mobile, or sidebar in browser?
 //used in channels and send
@@ -105,6 +106,8 @@ class ShowTranscript extends Component {
 
   render() {
     const { transcript, matchingTranscripts} = this.findTranscript()
+    const { t } = this.props
+
     if (!transcript) {
       return <Spinner />
     }
@@ -113,7 +116,7 @@ class ShowTranscript extends Component {
     const copyButton = (
       <div>
         <Button onClick={this.copy} small={true} style="inverted">
-          Copy Text
+          {t("Copy Text")}
         </Button>
       </div>
     )
@@ -126,10 +129,10 @@ class ShowTranscript extends Component {
             <Flexbox justify="flex-start" className={classes.fileData}>
               <Flexbox className={classes.fileDataItems} align="center" justify="flex-start">
                 <Flexbox className={classes.fileDataItem}>
-                  <div className={classes.label}>Created At:</div> {transcript.displayCreatedAt()}
+                  <div className={classes.label}>{t("Created At:")}</div> {transcript.displayCreatedAt()}
                 </Flexbox>
                 <Flexbox className={classes.fileDataItem}>
-                  <div className={classes.label}>Size:</div>{transcript.displayFileSize()}
+                  <div className={classes.label}>{t("Size:")}</div>{transcript.displayFileSize()}
                 </Flexbox>
               </Flexbox>
             </Flexbox>
@@ -175,6 +178,6 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-const ConnectedShowTranscript = withRouter(connect(mapStateToProps, mapDispatchToProps)(ShowTranscript))
+const ConnectedShowTranscript = withRouter(connect(mapStateToProps, mapDispatchToProps)(withTranslation()(ShowTranscript)))
 export default ConnectedShowTranscript
 

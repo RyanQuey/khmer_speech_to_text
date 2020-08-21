@@ -9,8 +9,8 @@ import { StyleSheet, css } from 'aphrodite'
 import theme from 'theme'
 import classes from './style.scss'
 import info from 'constants/info'
-import { withTranslation } from 'react-i18next';
 const { supportEmail } = info
+import { withTranslation } from 'react-i18next';
 
 const styles = StyleSheet.create({
   menu: {

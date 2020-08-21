@@ -11,6 +11,7 @@ import { SET_CURRENT_TRANSCRIPT, RESUME_TRANSCRIBING_REQUEST } from 'constants/a
 import classes from './style.scss'
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import { withTranslation } from "react-i18next";
 
 class TranscribeRequestCard extends Component {
   constructor(props) {
@@ -46,7 +47,7 @@ class TranscribeRequestCard extends Component {
   }
 
   render () {
-    const { transcribeRequest, selected, onClick, className = classes["request-card"], subtitle, small, wrapperClass, smallIcon} = this.props
+    const { transcribeRequest, selected, onClick, className = classes["request-card"], subtitle, small, wrapperClass, smallIcon, t} = this.props
 
     const status = transcribeRequest.hasError() ? "error" : "transcribing"
 
@@ -61,13 +62,19 @@ class TranscribeRequestCard extends Component {
 
           <Flexbox className={classes.infoContainer} direction="column">
             {[
-              [transcribeRequest.displayFileLastModified(), "File Last Modified"],
-              [transcribeRequest.displayLastUpdated(), "Last Updated"],
-              [transcribeRequest.displayFileSize(), "File Size"],
-              ["status", "Status"],
-              [_.truncate(transcribeRequest.error, {length: 33}), "Last Error"],
+              [transcribeRequest.displayFileLastModified(), t("File Last Modified")],
+              [transcribeRequest.displayLastUpdated(), t("Last Updated")],
+              [transcribeRequest.displayFileSize(), t("File Size")],
+              ["status", t("Status")],
+              [_.truncate(transcribeRequest.error, {length: 33}), t("Last Error")],
             ].map((set, index) => {
+              // above is array, 
+              // - first item is either a key for the transcribeRequest object or just a string to
+              // put there 
+              // - second item is label
+
               let label = set[1]
+
               // defaults to a key, if not, just display the string
               let value = transcribeRequest[set[0]] || set[0]
 
@@ -96,7 +103,7 @@ class TranscribeRequestCard extends Component {
         <div className={classes.nextStepCtn}>
           {transcribeRequest.canRetry() && (
             <Button 
-              title={"Click to try again"} 
+              title={t("Click to try again")} 
               onClick={this.props.requestResume.bind(this, transcribeRequest)}
             >
               {transcribeRequest.displayCanRetryMessage()}
@@ -133,4 +140,4 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TranscribeRequestCard))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withTranslation()(TranscribeRequestCard)))

@@ -9,6 +9,7 @@ import theme from 'theme'
 import avatar from 'images/avatar.png'
 import classes from './style.scss'
 import { userActions } from 'shared/actions'
+import { withTranslation } from 'react-i18next';
 
 class AccountMenu extends Component {
   constructor(props) {
@@ -22,7 +23,7 @@ class AccountMenu extends Component {
     this.setState({ open: newState })
   }
   render() {
-    const { user, signOut } = this.props
+    const { user, signOut, t } = this.props
 
     return (
       <div className={classes.menuCtn}>
@@ -36,8 +37,8 @@ class AccountMenu extends Component {
 
         <Popup body="left" style="dark" show={this.state.open} handleClickOutside={this.toggleMenu.bind(this, false)}>
           <ul className={`${classes.menuDropdown}`}>
-            <MenuItem link="/settings" text="Settings" hoverType="textOnly" />
-            <MenuItem link="/" onClick={signOut} text="Sign Out" hoverType="textOnly"/>
+            <MenuItem link="/settings" text={t("Settings")} hoverType="textOnly" />
+            <MenuItem link="/" onClick={signOut} text={t("Sign Out")} hoverType="textOnly"/>
           </ul>
         </Popup>
       </div>
@@ -59,5 +60,5 @@ const mapStateToProps = (state) => {
   return { user: state.user }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AccountMenu)
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(AccountMenu))
 
