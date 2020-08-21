@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "version": "0.0.1",
+  "description": "Ryan's Project",
+  "name": "",
+  "main": "",
+  "scripts": {
+    "start": "node prepare-text-for-translation.js"
+  },
+  "repository": "",
+  "author": "Ryan Quey",
+  "engines": {
+    "node": "8"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "csv": "^5.3.2"
+  }
+}
