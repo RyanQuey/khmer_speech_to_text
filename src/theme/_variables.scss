@@ -80,7 +80,9 @@ $dark-purple-complement: #30274e;
 $nav-hover-bg: $logo-color;
 $nav-hover-font: $white;
 $alt-nav-hover-font: $ghost-blue;
+// for when it is the nav-button that was last clicked on
 $active: $nav-hover-bg;
+$active-font: $text;
 $nav-hover: #626262; // might stop using, deprecated
 $nav-border: #474747; // might stop using, deprecated
 

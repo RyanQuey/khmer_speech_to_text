@@ -20,7 +20,7 @@
   //for any active nav, w/ or w/o link
   & > a.navActive, .navActive.noLink {
     background: $nav-hover-bg;
-    color: $nav-hover-font;
+    color: $active-font;
     &:hover {
       color: $nav-hover-font;
     }
