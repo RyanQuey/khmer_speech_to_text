@@ -29,19 +29,20 @@
       background-color: #f4f4f4;
     }
     .loading-container{
-      margin-top: 30%;
+      margin-top: 50%;
       text-align: center;
       font-family: 'Raleway', Helvetica, sans-serif;
     }
     .loading{
-      color: #fff;
+      color: #333333;
+      position: relative;
+      top: -55px;
     }
     .loading-container .logo{
       font-weight: 600;
       font-size: 40px;
       color: #333333;
       display: inline-block;
-      margin-bottom: 9em;
       top: -50px;
       position: relative;
     }
@@ -54,9 +55,23 @@
         height: 220px;
         animation: spin 2s linear infinite;
         left: 50%;
-        margin-left: -130px;
-        margin-top: 30px;
+        margin-left: -110px;
+        margin-top: -110px;
         position: absolute;
+    }
+
+    /* larger screens */
+    @media screen and (min-width: 640px) {
+      .loading-container{
+        margin-top: 30%;
+      }
+      .loading-container .logo{
+        top: -50px;
+      }
+
+      .loader {
+        margin-top: -130px;
+      }
     }
 
     @keyframes spin {
