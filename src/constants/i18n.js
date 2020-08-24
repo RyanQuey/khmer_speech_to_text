@@ -47,6 +47,7 @@ const resources = {
       "Profile": "ប្រវត្តិ​រូប",
       "Transcripts": "អត្ថ​បទ",
       "Unfinished Transcripts": "អត្ថ​បទ​មិន​ទាន់​ហើយ",
+      "Upload": "ផ្ទុក​ឡើង",
 
       ///////////////////////////
       // upload
