@@ -19,7 +19,7 @@ const resources = {
       // navbar
       // this one should be the only one reversed, since English page shows Khmer and vice versa
       "ភាសា​ខ្មែរ" : "English",
-      "Support": "សូម​ជំនួយ",
+      "Support": "ជំនួយ",
 
       /////////////////////
       // home
