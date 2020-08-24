@@ -93,7 +93,7 @@ class UploadAudioForm extends Component {
             defaultImage="/public/images/profile/defaultBanner.jpg"
             label={t("Drop audio or click to upload")}
             height="150px"
-            width="150px"
+            width="250px"
             cb={this.cb}
             onFailure={this.onFailure}
             onStartUploading={this.onStartUploading}
