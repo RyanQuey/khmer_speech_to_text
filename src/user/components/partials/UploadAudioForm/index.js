@@ -17,6 +17,10 @@ import Transcript from 'models/Transcript'
 import TranscribeRequest from 'models/TranscribeRequest'
 import { withTranslation } from "react-i18next";
 
+// what our app allows for audio uploads. Note that the real, actually secure validation happens in the backend, but
+// putting some validation here as well for better user experience and to keep stuff out of google
+// storage that won't work anyways too!
+const defaultMaxSizeMB = 50
 
 class UploadAudioForm extends Component {
   constructor(props) {
@@ -58,6 +62,8 @@ class UploadAudioForm extends Component {
   render() {
     const modalOpen = this.props.currentModal
     const { t } = this.props
+    // either custom quota set in the db or default
+    const maxSizeMB = this.props.user.customQuotas["audioFileSizeMB"] || defaultMaxSizeMB
 
     return (
       <div>
@@ -96,6 +102,7 @@ class UploadAudioForm extends Component {
             width="250px"
             cb={this.cb}
             onFailure={this.onFailure}
+            maxSizeMB={maxSizeMB} 
             onStartUploading={this.onStartUploading}
             className={classes.dropAudio}
           />
@@ -111,6 +118,7 @@ UploadAudioForm.propTypes = {
 const mapStateToProps = (state) => {
   return { 
     currentModal: state.viewSettings.currentModal,
+    user: state.user,
   }
 }
 

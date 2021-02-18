@@ -30,8 +30,16 @@ service cloud.firestore {
 
     // propagates rules down all subcollections
     // only allow from console
-    // we don't want to allow reading, because then some users could read e-mails of other users
+    // we also don't want to allow reading, because then some users could read e-mails of other users
     match /whitelistedUsers/{email} {
+      allow read: if request.auth != null && request.auth.token.email == email;
+      allow write: if false;
+    }
+
+    // only allow from console
+    // propagates rules down all subcollections
+    // we also don't want to allow reading, because then some users could read e-mails of other users
+    match /customQuotas/{email} {
       allow read: if request.auth != null && request.auth.token.email == email;
       allow write: if false;
     }

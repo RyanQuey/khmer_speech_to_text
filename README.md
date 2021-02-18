@@ -20,7 +20,7 @@ Transcript includes highlights based on accuracy percentage, and lists possible 
 2. Make sure you are using the right node version. Can use `nvm use` if you have nvm.
 3. Run `npm i`
 4. Copy config template to set some env vars: `cp ./src/config/dev/firebase.example.js ./src/config/dev/firebase.js` 
-5. Set the firebase api key in that firebase.js file
+5. Set the firebase api key in that firebase.js file `vim ./src/config/dev/firebase.js`
 6. Setup firebase using the firebase CLI (at a minimum will have to do: `firebase use default`)
 
 ## Running Locally
@@ -100,6 +100,13 @@ Scripture references are reformatted so that they are displayed in a more reader
 We also accomodate for certain mistakes that Google makes, under the assumption that if enough words match, it is probably meant to be a reference. For example, "ខ្សែ​ទាមួយ" is accepted as "ខ្សែ​ទីមួយ" (we accept "ទៀត" in the same way). Sometimes "ទាមួយ" is even returned as a single word. "ចំពោះ" is often returned instead of "ជំពូក", and so we adjusted for that as well. "ខល" is often returned instead of "ខ".
 
 More testing needs to be done with this. For example, books of the Bible where Google returns their name as two words rather than one word will probably not get recognized, but this is something we want to support.
+
+## Filesize limits
+
+- Because we are using Google storage, there is [about a 480 minute limitation on their end](https://cloud.google.com/speech-to-text/quotas#content)
+- However, we are setting a default of 50MB limit for files. 
+    * This can be overridden by manually adding values in firestore console (customQuotas > audioFileSizeMB). There is currently no UI for changing these values, it has to be done in google firestore console.
+    * We set this in backend in file: "transcription/transcribe_class.py" and in frontend in file: "src/user/components/partials/UploadAudioForm/index.js" which reads fields set when retrieving user (see "src/shared/sagas/userSaga.js")
 
 ## What's going on with `npm run local`?
 

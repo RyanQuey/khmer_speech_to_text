@@ -217,6 +217,16 @@ function* fetchCurrentUser(action) {
       console.log("whitelisted?", whitelistedResult.exists)
       returnedUser.isWhitelisted = whitelistedResult.exists
 
+      // check if user has custom quotas set (e.g., a higher file size in MB)
+      const userCustomQuotasRef = db.collection("customQuotas").doc(userData.email)
+      // this try block will fail if not whitelisted, due to firestore rules. We don't want anyone
+      // finding out other whitelisted records besides their own email
+      const customQuotasResult = yield userCustomQuotasRef.get()
+      const customQuotasData = yield customQuotasResult.data()
+      console.log("customQuotasData?", customQuotasData)
+
+      returnedUser.customQuotas = customQuotasData.exists ? customQuotasData : {}
+
     } catch (err) {
       returnedUser.isWhitelisted = false
       console.error(err)

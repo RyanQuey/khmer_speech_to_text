@@ -7,13 +7,15 @@ import classes from './style.scss'
 import theme from 'theme'
 import { StyleSheet, css } from 'aphrodite'
 
+const defaultMaxSize = 100*1000*1000 // 100 MB ish// TODO what is good max?
+
 class DropAudio extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
       pending: false,
-      maxSize: 100*1000*1000, // 100 MB ish// TODO what is good max?
+      
     }
     this.styles = StyleSheet.create({
       dropzone: {
@@ -72,7 +74,10 @@ class DropAudio extends Component {
 
   render() {
     // NOTE currently mp4 doesn't work. when it does, can do 
-    // 
+
+    // max file size in bytes for this audio file
+    const maxSizeBytes = this.props.maxSizeBytes || this.props.maxSizeMB * 1000 * 1000 || defaultMaxSize
+
     return (
       <Flexbox align="center" direction="column" justify="center" className={this.props.className || ""}>
         <Dropzone
@@ -83,7 +88,7 @@ class DropAudio extends Component {
           onDrop={this.onDrop}
           style={this.props.style}
           accept="audio/*, video/mp4"
-          maxSize={this.state.maxSize} 
+          maxSize={maxSizeBytes} 
           onDragOver={this.onDragOver}
           preventDropOnDocument={true}
         >
