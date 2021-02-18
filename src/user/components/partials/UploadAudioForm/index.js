@@ -70,7 +70,7 @@ class UploadAudioForm extends Component {
         <Flexbox className={classes.wrapper} direction="column">
 
 					<div className={classes.needHelpContainer}>
-            <span>{t("Upload your Khmer audio to generate a transcript.")}</span>
+            <span>{t("Upload your Khmer audio to generate a transcript")}</span>
             <div className={classes.popupWrapper}>
               <Icon name="question-circle" className={classes.helpBtn} onClick={this.toggleViewingPopup.bind(this)}/>
               <Popup
@@ -84,7 +84,7 @@ class UploadAudioForm extends Component {
                   <div className={classes.instructions}>
                     <div>{t("Upload an audio file to get started. FLAC files are best. WAV, MP3s and MP4s might work, but there is a good chance they won't, especially MP4s")}</div>
                     <div>
-                      <strong>{t("Best options to use when recording:")}</strong>
+                      <div>{t("Best options to use when recording:")}</div>
                       <div> - {t("No noise cancellation")}</div>
                       <div> - {t("High fidelity")}</div>
                     </div>
@@ -93,6 +93,8 @@ class UploadAudioForm extends Component {
               </Popup>
             </div>
 					</div>
+
+          <div>(Maximum file size: {maxSizeMB} MB)</div>
 
           <DropAudio
             circle

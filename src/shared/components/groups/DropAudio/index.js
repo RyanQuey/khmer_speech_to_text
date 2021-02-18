@@ -26,10 +26,15 @@ class DropAudio extends Component {
       },
     })
     this.onDrop = this.onDrop.bind(this)
+    this.getMaxFileSize = this.getMaxFileSize.bind(this)
   }
 
   handleError(e, a) {
     console.error(e, a);
+  }
+
+  getMaxFileSize() {
+    return this.props.maxSizeBytes || this.props.maxSizeMB * 1000 * 1000 || defaultMaxSize
   }
 
   // setup for sending to google apis
@@ -37,12 +42,17 @@ class DropAudio extends Component {
     const acceptedFile = acceptedFiles[0]
     const rejectedFile = rejectedFiles[0]
 
+    const maxSizeBytes = this.getMaxFileSize()
+
     if (rejectedFile) {
       console.error("rejected file", rejectedFile)
       
       let message
-      if (rejectedFile.size > this.state.maxSize) { 
-        message = "Maximum file size is 100MB"
+      if (rejectedFile.size > maxSizeBytes) { 
+        const maxMB = maxSizeBytes/1000/1000
+        const rejectedMB = rejectedFile.size/1000/1000
+
+        message = `Maximum file size is ${maxMB.toFixed(2)} MB, but this file is ${rejectedMB.toFixed(2)} MB`
       } else if (!rejectedFile.type.includes("audio/")) {
         message = "File must be an audio"
       } else {
@@ -76,7 +86,7 @@ class DropAudio extends Component {
     // NOTE currently mp4 doesn't work. when it does, can do 
 
     // max file size in bytes for this audio file
-    const maxSizeBytes = this.props.maxSizeBytes || this.props.maxSizeMB * 1000 * 1000 || defaultMaxSize
+    const maxSizeBytes = this.getMaxFileSize()
 
     return (
       <Flexbox align="center" direction="column" justify="center" className={this.props.className || ""}>

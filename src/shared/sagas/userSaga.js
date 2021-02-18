@@ -229,10 +229,8 @@ function* fetchCurrentUser(action) {
       // this try block will fail if not whitelisted, due to firestore rules. We don't want anyone
       // finding out other whitelisted records besides their own email
       const customQuotasResult = yield userCustomQuotasRef.get()
-      const customQuotasData = yield customQuotasResult.data()
-      console.log("customQuotasData?", customQuotasData)
 
-      returnedUser.customQuotas = customQuotasData.exists ? customQuotasData : {}
+      returnedUser.customQuotas = customQuotasResult.exists ? yield customQuotasResult.data() : {}
 
     } catch (err) {
       returnedUser.isWhitelisted = false
