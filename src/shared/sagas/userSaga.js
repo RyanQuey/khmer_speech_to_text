@@ -184,6 +184,7 @@ function* fetchCurrentUser(action) {
   try {
     const userData = action.payload
     const options = action.options || {}
+      console.log("getting ref for user...", userData.uid)
     const userRef = db.collection("users").doc(userData.uid)
 
     // get users and transcripts simultaneously TODO 
@@ -204,6 +205,9 @@ function* fetchCurrentUser(action) {
     }
 
     try {
+      console.log("check if whitelisted?")
+      yield put({type: "FETCH_WHITELISTED_STATUS"})
+
       // check if whitelisted
       const userWhitelistRef = db.collection("whitelistedUsers").doc(userData.email)
       // this try block will fail if not whitelisted, due to firestore rules. We don't want anyone
@@ -216,6 +220,9 @@ function* fetchCurrentUser(action) {
 
       console.log("whitelisted?", whitelistedResult.exists)
       returnedUser.isWhitelisted = whitelistedResult.exists
+
+      // hacky way to send a redux message
+      yield put({type: "FETCH_CUSTOM_QUOTAS_FOR_USER"})
 
       // check if user has custom quotas set (e.g., a higher file size in MB)
       const userCustomQuotasRef = db.collection("customQuotas").doc(userData.email)
@@ -302,6 +309,8 @@ function* fetchCurrentUser(action) {
 
   } catch (err) {
     if (err.message == "Missing or insufficient permissions.") {
+      console.log("guessing they aren't registered in our system...though it could be some other permissions issue too actually")
+
       alertActions.newAlert({
         title: "Your account has not been registered in our system: ",
         message: `Please contact us at ${supportEmail} to register and then try again.`,
