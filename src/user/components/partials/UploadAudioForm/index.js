@@ -63,7 +63,9 @@ class UploadAudioForm extends Component {
     const modalOpen = this.props.currentModal
     const { t } = this.props
     // either custom quota set in the db or default
-    const maxSizeMB = this.props.user.customQuotas["audioFileSizeMB"] || defaultMaxSizeMB
+    // customQuotas should be set for all users once it all loads (should be a matter of seconds), but if they click too fast don't
+    // want this to error
+    const maxSizeMB = Helpers.safeDataPath(this.props.user, "customQuotas.audioFileSizeMB", defaultMaxSizeMB)
 
     return (
       <div>

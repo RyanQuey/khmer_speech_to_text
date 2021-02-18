@@ -110,7 +110,7 @@ More testing needs to be done with this. For example, books of the Bible where G
 
 ## What's going on with `npm run local`?
 
-* if you are using ssh to access your development environment, run the development environment using `npm run local`, and open up the at in the browser at www.local.dev:3000, to get around Webpack's host check
+* if you are using ssh to access your development environment, run the development environment using `npm run local`, and open up the at in the browser at www.local.test:3000, to get around Webpack's host check
 * I am always SSHing into my localserver, and don't always want to bother using SSH tunneling, so that's why it's there.
 
 ## TODOs:

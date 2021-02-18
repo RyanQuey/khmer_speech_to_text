@@ -8,7 +8,7 @@
     "start": "npm run dev",
     "env:dev": "cross-env NODE_ENV=development",
     "dev": "npm run env:dev -- webpack-dev-server",
-    "local": "npm run env:dev -- webpack-dev-server --public www.local.dev:3000 --host 0.0.0.0",
+    "local": "npm run env:dev -- webpack-dev-server --public www.local.test:3000 --host 0.0.0.0",
     "clean": "rimraf dist/*",
     "clean:happy": "rimraf .happypack/*",
     "copy": "copyfiles -u 1 public/* public/**/* dist",

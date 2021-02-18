@@ -62,11 +62,11 @@ class TranscribeRequestCard extends Component {
 
           <Flexbox className={classes.infoContainer} direction="column">
             {[
-              [transcribeRequest.displayFileLastModified(), t("File Last Modified")],
-              [transcribeRequest.displayLastUpdated(), t("Last Updated")],
-              [transcribeRequest.displayFileSize(), t("File Size")],
+              [transcribeRequest.displayFileLastModified(), t("File Last Modified"), "Date and time the file that was uploaded was last updated"],
+              [transcribeRequest.displayLastUpdated(), t("Last Updated"), "Date and time transcript was last updated"],
+              [transcribeRequest.displayFileSize(), t("File Size"), "File size in MB"],
               ["status", t("Status")],
-              [_.truncate(transcribeRequest.error, {length: 33}), t("Last Error")],
+              [_.truncate(transcribeRequest.error, {length: 33}), t("Last Error"), `Full error message: ${transcribeRequest.error}`],
             ].map((set, index) => {
               // above is array, 
               // - first item is either a key for the transcribeRequest object or just a string to
@@ -74,6 +74,7 @@ class TranscribeRequestCard extends Component {
               // - second item is label
 
               let label = set[1]
+              const title = set[2] || ""
 
               // defaults to a key, if not, just display the string
               let value = transcribeRequest[set[0]] || set[0]
@@ -87,7 +88,7 @@ class TranscribeRequestCard extends Component {
                 additionalClasses = "desktopOnly"
               }
 
-              return <div key={index} className={`${classes.content} ${additionalClasses ? classes[additionalClasses] : ""}`}>
+              return <div key={index} className={`${classes.content} ${additionalClasses ? classes[additionalClasses] : ""}`} title={title}>
                 <div className={classes.contentSection}>
                   <span className={classes.cardLabel}>
                     {label}:

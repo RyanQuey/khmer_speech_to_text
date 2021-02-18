@@ -22,7 +22,6 @@ import TranscribeRequest from 'models/TranscribeRequest'
 function* uploadAudio(action) {
 
   let transcribeRequest, fileMetadata
-console.log("hello")
 
   try {
     const file = action.payload
