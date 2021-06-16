@@ -19,7 +19,6 @@ class Utterance extends Component {
 
 
   render () {
-console.log(KhmerHelpers)
     const { utterance } = this.props
 
     // I think it should be sorted by confidence already. If not...probably leave it,

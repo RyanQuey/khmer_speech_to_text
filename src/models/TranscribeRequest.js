@@ -499,6 +499,8 @@ class TranscribeRequest {
   }
   
   // track progress
+  // This keeps running and listening to file storage until complete
+  //
   // https://firebase.google.com/docs/storage/web/upload-files#monitor_upload_progress
   // NOTE could just await the `put()` call, but then can't track progress
   _sendAndTrackFile (file, metadata) {
