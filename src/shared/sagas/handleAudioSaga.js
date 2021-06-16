@@ -210,7 +210,7 @@ function* checkStatus(action) {
       console.log("not finished so try again")
       // try again
       setTimeout(function(){ 
-        console.log("trying again NOW")
+        // console.log("trying again NOW")
         store.dispatch({type: CHECK_TRANSCRIBING_PROGRESS_REQUEST, payload: action.payload})
       }, 750);
 

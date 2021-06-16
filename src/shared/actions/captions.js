@@ -28,21 +28,23 @@ import KhmerHelpers from 'helpers/khmer-helpers'
  *      ...
  *     ]
  *   }
- * @return string to add to srt file
+ * @return obj with data to add to srt file
  */ 
 function convertGSTPhraseToSRT(phrase) {
   let resultForPhrase = ""
   const firstWord = phrase.words[0]
   const startTime = convertSecondStringToTime(firstWord.startTime);
-  resultForPhrase += formatTime(startTime) + ' --> '
 
   const lastWord = phrase.words[phrase.words.length - 1]
   const endTime = convertSecondStringToTime(lastWord.endTime);
 
-  resultForPhrase += formatTime(endTime) + '\n'
-  resultForPhrase += phrase.transcript + '\n\n'
+  const timeStrForEntry = `${formatTime(startTime)} --> ${formatTime(endTime)}`
 
-  return resultForPhrase;
+
+  return {
+    timeStrForEntry, 
+    transcriptText: phrase.transcript,
+  };
 }
 
 function addPhraseToCaptions (phrase, captionsStr) {
@@ -59,21 +61,22 @@ function formatTime(time) {
 function convertSecondStringToTime(string) {
   // cut off the final "s" from the google transcript timestamp
   // e.g., "177.100s" > "177.100"
-  var seconds = string.substring(0, string.length - 1);
+  const secondsMatch = string.match(/^(\d+)\.?(\d+)?s$/) //substring(0, string.length - 1);
+  const totalSeconds = secondsMatch[1]
 
   // get the milliseconds separately
-  // e.g., "177.100" > "100"
-  var milliseconds = seconds.match(/\d+$/)
+  // e.g., "177.100s" > "100", or "40s" > "000"
+  const milliseconds = secondsMatch[2] || "000"
 
   // get hours
   // e.g., 177.100/3600
-  var hours = Math.floor(seconds / 3600);
+  const hours = Math.floor(totalSeconds / 3600);
 
   // get just the remainder of the hours
-  var minutes = Math.floor(seconds % 3600 / 60);
+  const minutes = Math.floor(totalSeconds % 3600 / 60);
 
   // get just the remainder of the minutes
-  seconds = Math.floor(seconds % 3600 % 60);
+  const seconds = Math.floor(totalSeconds % 3600 % 60);
 
   return {
     hours, minutes, seconds, milliseconds
@@ -83,9 +86,9 @@ function convertSecondStringToTime(string) {
 
 /*
  * - splits by spaces (but not zero width spaces), punctuation
- *
+ * - if there is a maximumWordsPerPhrase set, also splits by that number
  */
-const splitUtteranceByBreaks = (bestAlt) => {
+const splitUtteranceByBreaks = (bestAlt, maximumWordsPerPhrase = false) => {
   const phrases = []
   const emptyPhrase = {transcript: "", words: []}
 
@@ -107,10 +110,13 @@ const splitUtteranceByBreaks = (bestAlt) => {
 
     const hasWordAfter = i < wordCount -1 
 
-    // if has space, make start a new phrase
+    const hitMax = maximumWordsPerPhrase && currentPhrase.words.length == maximumWordsPerPhrase
+
+    // if has space after it OR if we are at the maximum words set and there is at least one following word, make start a new phrase
     // NOTE don't want to find zero width spaces, just normal spaces, so NOT using \s to find spaces
       // Make sure this is done at end, since Google is adding spaces at end of words, not beginning
-    if (KhmerHelpers.wordIsFollowedBySpace(wordData, nextWordData)) { 
+    if (hitMax && nextWordData || KhmerHelpers.wordIsFollowedBySpace(wordData, nextWordData)) { 
+      // split off to new phrase
       currentPhrase = _.cloneDeep(emptyPhrase)
       phrases.push(currentPhrase)
     }
@@ -119,19 +125,17 @@ const splitUtteranceByBreaks = (bestAlt) => {
   return phrases
 }
 
-// converts a transcript instance to srt
-export const convertToSRT = (transcript) => {
-  if (!transcript.utterances) {
-    return
-  } 
+function convertTranscriptToPhrases (transcript) {
+  let phrases = []
 
-  // what will be exported to file
-  var result = ''
   // const splitBy = "utterance"
   const splitBy = "space"
-  let entryIndex = 1
+  // only when splitBy is "space"
+  const maximumWordsPerPhrase = 10
 
+  // basically a reduce job, convert utterances into one or more phrases
   transcript.utterances.forEach((utterance) => {
+
     // "phrase" is an array of arbitrary number of words to be displayed in a single caption
 
     let entryForUtterance
@@ -147,33 +151,41 @@ export const convertToSRT = (transcript) => {
     bestAlt.transcript = formattedWords.map(w => w.word)
 
     if (splitBy == "utterance") {
-      const phrase = bestAlt
-      // convert to srt format string
-      entryForUtterance = convertGSTPhraseToSRT(phrase)
-
-      // add to result
-      result += entryIndex
-      result += '\n'
-      result += entryForUtterance
-      entryIndex ++
+      phrases.push(bestAlt)
 
     } else if (splitBy == "space") {
       // splits by normal space (ie NOT zero width space)
-      const phrases = splitUtteranceByBreaks(bestAlt)
-      phrases.forEach((phrase) => {
-        // convert to srt format string
-        entryForUtterance = convertGSTPhraseToSRT(phrase)
+      const phrasesFromUtterance = splitUtteranceByBreaks(bestAlt, maximumWordsPerPhrase)
+      phrases = phrases.concat(phrasesFromUtterance)
 
-        // add to result
-        result += entryIndex
-        result += '\n'
-        result += entryForUtterance
-
-        entryIndex ++
-      })
     }
-
   })
 
-  return result
+  return phrases
+}
+
+// converts a transcript instance to srt
+export const convertToSRT = (transcript) => {
+  if (!transcript.utterances) {
+    // probably just throw an error...?
+    return
+  } 
+
+  const phrases = convertTranscriptToPhrases(transcript)
+
+
+
+  const result = phrases.map((phrase, i) => {
+    // convert to srt format string
+    const { transcriptText, timeStrForEntry } = convertGSTPhraseToSRT(phrase)
+
+    return `${i + 1}
+${timeStrForEntry}
+${transcriptText}
+
+`
+  })
+
+  // what will be exported to file
+  return result.join("")
 }

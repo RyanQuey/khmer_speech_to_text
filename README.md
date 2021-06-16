@@ -19,6 +19,8 @@ Easily copy to clipboard by clicking on the "Copy Text" button
 ## Generate Captions for Video
 You can also generate an ["srt" file](https://blog.hubspot.com/marketing/srt-file) which can be [uploaded to Youtube directly and edited within Youtube](https://support.google.com/youtube/answer/2734796?hl=en), or uploaded to several other video editing programs, such as [Adobe Premiere](https://www.rev.com/blog/how-to-upload-captions-and-subtitles-in-adobe-premiere-pro-and-amazon-direct), [Filmora](https://www.rev.com/blog/resources/how-to-add-captions-and-subtitles-in-filmora9), [Davinci](https://www.rev.com/blog/how-to-add-captions-and-subtitles-to-davinci-resolve-studio).
 
+Just click the "Generate Captions" button and it will download a file for you. This will split words up whenever this is a space between words, and provide timestamps for each phrase. 
+
 # Installation Instructions
 
 > Make sure you have node 8.x installed

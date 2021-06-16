@@ -38,7 +38,8 @@ class TranscribeRequestCard extends Component {
         clearInterval(this.intervalID);
       }
       // change this number to have a slower or faster time in between updating the percentage bar
-    }, 100);
+      // lower number means faster ticks!
+    }, 50);
     
   }
 

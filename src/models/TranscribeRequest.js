@@ -226,7 +226,7 @@ class TranscribeRequest {
       // TODO filetype mp3s will have smaller files but longer transcribing
       // also slower in prod since it's a hobby one
       {
-        estimatedTime: this.isMP3() ? 20 + this.sizeInMB()*32 : 20 + this.sizeInMB()*8,
+        estimatedTime: this.isMP3() ? 20 + this.sizeInMB()* 175 : 20 + this.sizeInMB()*10,
       },
         // processing transcript. Should be very fast
         // one 315 KB file took one second
