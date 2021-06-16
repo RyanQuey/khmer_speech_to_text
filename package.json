@@ -61,7 +61,7 @@
     "@google-cloud/speech": "^3.6.0",
     "@webpack-blocks/dev-server2": "^0.4.0",
     "aphrodite": "^1.2.5",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "firebase": "^7.15.0",
     "generate-password": "^1.5.1",
     "i18next": "^19.9.2",
