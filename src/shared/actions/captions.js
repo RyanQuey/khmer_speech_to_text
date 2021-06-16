@@ -33,13 +33,11 @@ import KhmerHelpers from 'helpers/khmer-helpers'
 function convertGSTPhraseToSRT(phrase) {
   let resultForPhrase = ""
   const firstWord = phrase.words[0]
-  console.log("firstWord", firstWord)
   const startTime = convertSecondStringToTime(firstWord.startTime);
   resultForPhrase += formatTime(startTime) + ' --> '
 
   const lastWord = phrase.words[phrase.words.length - 1]
   const endTime = convertSecondStringToTime(lastWord.endTime);
-  console.log("lastWord", lastWord)
 
   resultForPhrase += formatTime(endTime) + '\n'
   resultForPhrase += phrase.transcript + '\n\n'
@@ -162,7 +160,6 @@ export const convertToSRT = (transcript) => {
     } else if (splitBy == "space") {
       // splits by normal space (ie NOT zero width space)
       const phrases = splitUtteranceByBreaks(bestAlt)
-      console.log("phrases", phrases)
       phrases.forEach((phrase) => {
         // convert to srt format string
         entryForUtterance = convertGSTPhraseToSRT(phrase)
@@ -178,6 +175,5 @@ export const convertToSRT = (transcript) => {
 
   })
 
-  console.log(result)
   return result
 }
