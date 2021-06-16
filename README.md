@@ -29,6 +29,7 @@ Transcript includes highlights based on accuracy percentage, and lists possible 
 - Your python api in development is expected to be running at localhost. 
 
     `"PRODUCTION" ? "https://khmer-speech-to-text-api.herokuapp.com/" : http://${window.location.hostname}:5000`
+- To run local frontend against prod backend: in `src/index.js` change to `true || "PRODUCTION" ? "https://khmer-speech-to-text-api.herokuapp.com/" : http://${window.location.hostname}:5000`
 
 ### Creating a user
 - In order to sign up a user, your email will have to be whitelisted in our firestore db. 
