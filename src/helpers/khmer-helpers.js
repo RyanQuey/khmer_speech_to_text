@@ -257,7 +257,11 @@ function combineKeywords (words) {
       // For example, 2020_05_04_19_31_55.flac
       // But need to keep that part separate
       // find only the number, in case they mixed letters in the same word
-      let number = wordData.word.match(/^[^\d]*(\d+)[^\d]*$/)[1]
+      let numberMatch = wordData.word.match(/^[^\d]*(\d+)[^\d]*$/)
+      // make sure numberMatch is not null
+      // TODO test this more to make sure there aren't cases to make sure we cover here
+      let number = numberMatch ? numberMatch[1] : wordData.word.match(/\d/)
+
       if (wordData.word.length > 1) {
         // just use numeral anyways
         word = Helpers.convertToKhmerNumeral(number)
