@@ -12,6 +12,13 @@ Transcript includes highlights based on accuracy percentage, and lists possible 
 
 ![Transcript Result](https://github.com/RyanQuey/python-heroku-khmer-speech-to-text/raw/master/screenshots/transcript-result.png)
 
+## Using the Transcript
+### Copy To clipboard 
+Easily copy to clipboard by clicking on the "Copy Text" button
+
+## Generate Captions for Video
+You can also generate an ["srt" file](https://blog.hubspot.com/marketing/srt-file) which can be [uploaded to Youtube directly and edited within Youtube](https://support.google.com/youtube/answer/2734796?hl=en), or uploaded to several other video editing programs, such as [Adobe Premiere](https://www.rev.com/blog/how-to-upload-captions-and-subtitles-in-adobe-premiere-pro-and-amazon-direct), [Filmora](https://www.rev.com/blog/resources/how-to-add-captions-and-subtitles-in-filmora9), [Davinci](https://www.rev.com/blog/how-to-add-captions-and-subtitles-to-davinci-resolve-studio).
+
 # Installation Instructions
 
 > Make sure you have node 8.x installed
@@ -123,7 +130,7 @@ More testing needs to be done with this. For example, books of the Bible where G
 ## TODOs:
 There's several TODO tags throughout the project. But apart from that:
 
-* upgrade to webpack 3
+* upgrade to webpack 3...or at this point, webpack 5
 * make sure that sass files can import from the theme folder
 * probably remove the cloud functions, since we stopped using them but never removed the directory
 
