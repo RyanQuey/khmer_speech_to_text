@@ -26,7 +26,13 @@ Transcript includes highlights based on accuracy percentage, and lists possible 
 ## Running Locally
 6. Then run `npm run local`
 7. Make sure to also start the [Python API](https://github.com/RyanQuey/python-heroku-khmer-speech-to-text) locally, or else you can read transcripts, but not do any uploads. 
-8. In order to sign up, your email will have to be whitelisted in our firestore db. Or of course you could setup your own firestore db and run the whole thing on your own.
+- Your python api in development is expected to be running at localhost. 
+
+    `"PRODUCTION" ? "https://khmer-speech-to-text-api.herokuapp.com/" : http://${window.location.hostname}:5000`
+
+### Creating a user
+- In order to sign up a user, your email will have to be whitelisted in our firestore db. 
+- Or of course you could setup your own firestore db and run the whole thing on your own.
 
 # Deploying
 
