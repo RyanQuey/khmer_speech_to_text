@@ -220,6 +220,7 @@ class TranscribeRequest {
         // transcribing
         // one 315KB (flac?) file took 6 seconds
       // one 25 MB flac file took 3m:43s (163 s) 
+      // one 15 MB mp3 file (my heb lecture #5 part 2), 30 minutes long, took 3m:43s (163 s) 
         // 
         // Includes server > client (respond to original request) > server again (client begins
         // polling) > Google > server

@@ -21,6 +21,8 @@ You can also generate an ["srt" file](https://blog.hubspot.com/marketing/srt-fil
 
 Just click the "Generate Captions" button and it will download a file for you. This will split words up whenever this is a space between words, and provide timestamps for each phrase. 
 
+You can also set the maximum words per caption, which will keep a single caption entry from getting too long.
+
 # Installation Instructions
 
 > Make sure you have node 8.x installed
