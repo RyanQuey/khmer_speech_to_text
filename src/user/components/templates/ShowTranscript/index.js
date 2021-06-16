@@ -3,7 +3,11 @@ import { connect } from 'react-redux'
 import { Flexbox, Button, Input, Checkbox, Icon, Spinner } from 'shared/components/elements'
 import {
 } from 'constants/actionTypes'
-import {alertActions, formActions} from 'shared/actions'
+import {
+  alertActions, 
+  formActions,
+  captionsActions,
+} from 'shared/actions'
 import classes from './style.scss'
 import {
   withRouter,
@@ -19,6 +23,7 @@ class ShowTranscript extends Component {
     super(props)
 
     this.findTranscript = this.findTranscript.bind(this)
+    this.generateCaptionsSRT = this.generateCaptionsSRT.bind(this)
     this.hideTranscribeRequests = this.hideTranscribeRequests.bind(this)
   }
 
@@ -30,6 +35,30 @@ class ShowTranscript extends Component {
     this.hideTranscribeRequests()
   }
 
+  /*
+   * - assumes the first transcript, does not yet consider the alternatives returned by Google
+   *
+   */ 
+  generateCaptionsSRT () {
+    const { transcript, matchingTranscripts} = this.findTranscript()
+    const srtString = captionsActions.convertToSRT(transcript)
+
+    console.log(srtString)
+
+    // console.log(transcriptJSON)
+    // content, filename, format
+    let filename = "captions." + transcript.filename.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "").replace(/\s/g, "-") + ".srt"
+
+		const type = 'application/octet-stream';
+    const a = document.createElement('a');
+    const blob = new Blob([ srtString ], { type: type });
+
+    a.href = window.URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+
+  // copies text to clipboard
   // TODO figure out why this is triggering a re-render and stop doing that (performance TODO)
   copy (e) {
     e.preventDefault()
@@ -121,6 +150,14 @@ class ShowTranscript extends Component {
       </div>
     )
 
+    const downloadCaptionButton = (
+      <div>
+        <Button onClick={this.generateCaptionsSRT} small={true} style="inverted">
+          {t("Generate Captions")}
+        </Button>
+      </div>
+    )
+
     return (
       <Flexbox className={classes.main} direction="column" >
         <h2>{transcript.filename}</h2>
@@ -138,6 +175,7 @@ class ShowTranscript extends Component {
             </Flexbox>
             
             {copyButton}
+            {downloadCaptionButton}
 
             <Flexbox id="transcript-text" direction="column" justify="center" className={classes.transcriptText}>
               <Flexbox direction="column">

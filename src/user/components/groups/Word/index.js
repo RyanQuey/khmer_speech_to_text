@@ -1,7 +1,5 @@
 import { Component } from 'react';
 import { connect } from 'react-redux'
-import { PROVIDERS } from 'constants/providers'
-import { FAKE } from 'constants/actionTypes'
 import {
   withRouter,
   Link
@@ -11,6 +9,7 @@ import { RESUME_TRANSCRIBING_REQUEST } from 'constants/actionTypes'
 import Transcript from 'models/Transcript'
 import classes from './style.scss'
 import { withTranslation } from "react-i18next";
+import KhmerHelpers from 'helpers/khmer-helpers'
 
 class Word extends Component {
   constructor(props) {
@@ -51,7 +50,7 @@ class Word extends Component {
         title={confidenceClass == classes.warning ? t("Google returned a single word with letters and numbers: ") + wordData.originalWordData.word : `${t("Confidence Level")}: ${parseFloat(confidence* 100, 2)}%`}
       >
         {word}
-        {nextWordData && (!nextWordData.tags.includes("end-of-sentence") && !nextWordData.tags.includes("closing-punctuation") && (wordData.tags.includes("followed-by-nbsp")) || nextWordData.tags.includes("preceded-by-nbsp") ? '\u00A0' : '\u200B')}
+        {KhmerHelpers.wordIsFollowedBySpace(wordData, nextWordData) ? '\u00A0' : '\u200B'}
       </span>
     )
   }
