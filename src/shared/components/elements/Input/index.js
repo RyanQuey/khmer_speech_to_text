@@ -187,6 +187,8 @@ class Input extends Component {
           type={this.props.type}
           value={this.props.value}
           maxLength={this.props.maxLength ? this.props.maxLength.toString() : undefined}
+          max={this.props.max ? this.props.max : undefined}
+          min={this.props.min ? this.props.min : undefined}
         />
         {this.props.labelAfter && label}
         <div className={classes.errorMessages}>

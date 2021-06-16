@@ -25,6 +25,11 @@ class ShowTranscript extends Component {
     this.findTranscript = this.findTranscript.bind(this)
     this.generateCaptionsSRT = this.generateCaptionsSRT.bind(this)
     this.hideTranscribeRequests = this.hideTranscribeRequests.bind(this)
+    this.setMaxWordPerEntry = this.setMaxWordPerEntry.bind(this) 
+
+    this.state = {
+      maxWordPerEntry: 10,
+    }
   }
 
   componentDidMount() {
@@ -35,13 +40,17 @@ class ShowTranscript extends Component {
     this.hideTranscribeRequests()
   }
 
+  setMaxWordPerEntry (val) {
+    this.setState({maxWordPerEntry: val})
+  }
   /*
    * - assumes the first transcript, does not yet consider the alternatives returned by Google
    *
    */ 
   generateCaptionsSRT () {
     const { transcript, matchingTranscripts} = this.findTranscript()
-    const srtString = captionsActions.convertToSRT(transcript)
+
+    const srtString = captionsActions.convertToSRT(transcript, this.state.maxWordPerEntry)
 
     console.log(srtString)
 
@@ -150,14 +159,6 @@ class ShowTranscript extends Component {
       </div>
     )
 
-    const downloadCaptionButton = (
-      <div>
-        <Button onClick={this.generateCaptionsSRT} small={true} style="inverted">
-          {t("Generate Captions")}
-        </Button>
-      </div>
-    )
-
     return (
       <Flexbox className={classes.main} direction="column" >
         <h2>{transcript.filename}</h2>
@@ -174,8 +175,22 @@ class ShowTranscript extends Component {
               </Flexbox>
             </Flexbox>
             
-            {copyButton}
-            {downloadCaptionButton}
+            <Flexbox align="flex-start" justify="flex-start" direction="column">
+              <Flexbox justify="flex-start">
+                <Button onClick={this.generateCaptionsSRT} small={true} style="inverted">
+                  {t("Generate Captions")}
+                </Button>
+                <Input 
+                  label="Maximum Words per Caption Line"
+                  onChange={this.setMaxWordPerEntry}
+                  value={this.state.maxWordPerEntry}
+                  type="number"
+                  min="1"
+                  max="50"
+                />
+              </Flexbox>
+              {copyButton}
+            </Flexbox>
 
             <Flexbox id="transcript-text" direction="column" justify="center" className={classes.transcriptText}>
               <Flexbox direction="column">

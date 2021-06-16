@@ -86,9 +86,9 @@ function convertSecondStringToTime(string) {
 
 /*
  * - splits by spaces (but not zero width spaces), punctuation
- * - if there is a maximumWordsPerPhrase set, also splits by that number
+ * - if there is a maxWordPerEntry set, also splits by that number
  */
-const splitUtteranceByBreaks = (bestAlt, maximumWordsPerPhrase = false) => {
+const splitUtteranceByBreaks = (bestAlt, maxWordPerEntry = false) => {
   const phrases = []
   const emptyPhrase = {transcript: "", words: []}
 
@@ -110,7 +110,7 @@ const splitUtteranceByBreaks = (bestAlt, maximumWordsPerPhrase = false) => {
 
     const hasWordAfter = i < wordCount -1 
 
-    const hitMax = maximumWordsPerPhrase && currentPhrase.words.length == maximumWordsPerPhrase
+    const hitMax = maxWordPerEntry && currentPhrase.words.length == maxWordPerEntry
 
     // if has space after it OR if we are at the maximum words set and there is at least one following word, make start a new phrase
     // NOTE don't want to find zero width spaces, just normal spaces, so NOT using \s to find spaces
@@ -125,13 +125,11 @@ const splitUtteranceByBreaks = (bestAlt, maximumWordsPerPhrase = false) => {
   return phrases
 }
 
-function convertTranscriptToPhrases (transcript) {
+function convertTranscriptToPhrases (transcript, maxWordPerEntry = 10) {
   let phrases = []
 
   // const splitBy = "utterance"
   const splitBy = "space"
-  // only when splitBy is "space"
-  const maximumWordsPerPhrase = 10
 
   // basically a reduce job, convert utterances into one or more phrases
   transcript.utterances.forEach((utterance) => {
@@ -155,7 +153,7 @@ function convertTranscriptToPhrases (transcript) {
 
     } else if (splitBy == "space") {
       // splits by normal space (ie NOT zero width space)
-      const phrasesFromUtterance = splitUtteranceByBreaks(bestAlt, maximumWordsPerPhrase)
+      const phrasesFromUtterance = splitUtteranceByBreaks(bestAlt, maxWordPerEntry)
       phrases = phrases.concat(phrasesFromUtterance)
 
     }
@@ -164,14 +162,20 @@ function convertTranscriptToPhrases (transcript) {
   return phrases
 }
 
-// converts a transcript instance to srt
-export const convertToSRT = (transcript) => {
+/* 
+ * converts a transcript instance to srt string that can be written to file
+ *
+ * @param transcript an instance of Transcript model 
+ * @param maxWordPerEntry only applies when splitBy = "space"
+ */
+export const convertToSRT = (transcript, maxWordPerEntry) => {
   if (!transcript.utterances) {
     // probably just throw an error...?
     return
   } 
 
-  const phrases = convertTranscriptToPhrases(transcript)
+  // split into phrases, whether one phrase per utterance or multiple phrases per utterance
+  const phrases = convertTranscriptToPhrases(transcript, maxWordPerEntry)
 
 
 
@@ -179,11 +183,7 @@ export const convertToSRT = (transcript) => {
     // convert to srt format string
     const { transcriptText, timeStrForEntry } = convertGSTPhraseToSRT(phrase)
 
-    return `${i + 1}
-${timeStrForEntry}
-${transcriptText}
-
-`
+    return `${i + 1}\n${timeStrForEntry}\n${transcriptText}\n\n`
   })
 
   // what will be exported to file
