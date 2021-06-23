@@ -215,10 +215,20 @@ function combineKeywords (words) {
       // skip next word since we're combining them
       i += 1
 
+    } else if (Helpers.KHMER_PUNCTUATION_KEYS.includes(wordData.word)) {
+      // this is for when GOogle just returns the punctuation sign on their own. We did not say the khPunctuationLeader, but they returned it. 
+      // Mostly only happens with ។, I think
+      // this is punctuation
+
+      isDefault = false
+      tags.push("punctuation")
+      tags.push("google-returned-as-punctuation")
+
     } else if (Helpers.KHMER_PUNCTUATION_NO_LEADER_KEYS.includes(wordData.word)) {
       // is no leader punctuation. Not combining
       isDefault = false
-      word = Helpers.KHMER_PUNCTUATION_NO_LEADER[secondWordData.word]
+      // 6/23/21 I don't know if we've tried this one before yet, but I believe the following line of code is wrong, we're not combining, we're not even looking at the second word. 
+      //word = Helpers.KHMER_PUNCTUATION_NO_LEADER[secondWordData.word]
       tags.push("punctuation")
 
     } else if (wordData.word == Helpers.khNumber && secondWordData && Helpers.isNumber(secondWordData.word)) {
@@ -431,6 +441,9 @@ export default {
     return isFollowedBySpace
   },
 
+  /* 
+   * find sentences that are for punctuation, but are multiple words, e.g., for parenthesse and quotes. 
+   */
   multiwordPunctuationMatch: (allWords, currentIndex) => {
     let keys = Object.keys(MULTI_WORD_KHMER_PUNCTUATION);
     // iterate over each punctuation to see if there's a match
