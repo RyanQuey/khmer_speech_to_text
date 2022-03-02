@@ -126,6 +126,44 @@ More testing needs to be done with this. For example, books of the Bible where G
     * This can be overridden by manually adding values in firestore console (customQuotas > audioFileSizeMB). There is currently no UI for changing these values, it has to be done in google firestore console.
     * We set this in backend in file: "transcription/transcribe_class.py" and in frontend in file: "src/user/components/partials/UploadAudioForm/index.js" which reads fields set when retrieving user (see "src/shared/sagas/userSaga.js")
 
+## Converting MP3s to Flac
+MP3s might work ok for you as in within this app. However, sometime we found that flac worked better even when converting from mp3 > flac.
+
+We might have the app do this for you in the future, but it seems like it's more of a hack than a solution - ideally Google just figures out how to do mp3s for us :) In the meantime, here's [a script you can use](https://github.com/RyanQuey/python-heroku-khmer-speech-to-text/blob/master/scripts/convert-mp3-to-flac.sh).
+
+## Duplicate results
+Sometimes flac files will return duplicate results. The reason is that if a flac file has 2 channels (i.e., is stereo) then we are making an assumption that this is on purpose, and that each channel is a different speaker (or something along those lines). Accordingly, either change your flac to single channel (mono) or expect to get double the transcript generated. 
+
+Note that this will mean twice the cost on our end for transcription costs from Google. 
+
+This behavior could be changed on our end in the future.
+
+## Punctuation in filesize
+Please be reasonable with your punctuation. Don't put `#` signs in your audiofile filenames (e.g., `#fun-tags.flac`). Just take those out before uploading (e.g., to `fun-tags.flac`). 
+
+(TODO add better error handling, currently we just show a spinner indefinitely). 
+
+#### Punctuation Signs that are definitely ok: 
+```
+-
+«
+»
+៖
+_
+.
+    (i.e., spaces)
+  
+```
+And probably some more. 
+
+#### Punctuation Signs that will break the app currently:
+
+```
+#
+
+```
+And probably some more. 
+
 ## What's going on with `npm run local`?
 
 * if you are using ssh to access your development environment, run the development environment using `npm run local`, and open up the at in the browser at www.local.test:3000, to get around Webpack's host check
