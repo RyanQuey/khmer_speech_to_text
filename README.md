@@ -138,6 +138,17 @@ Note that this will mean twice the cost on our end for transcription costs from 
 
 This behavior could be changed on our end in the future.
 
+**Side Note**: You can check channels using the following script
+```
+ffprobe -i ./<filename>.flac  -show_streams -select_streams a:0 | grep channel
+```
+
+Output will include something like this, which tells you what it is: 
+
+> channels=2
+
+> channel_layout=stereo
+
 ## Punctuation in filesize
 Please be reasonable with your punctuation. Don't put `#` signs in your audiofile filenames (e.g., `#fun-tags.flac`). Just take those out before uploading (e.g., to `fun-tags.flac`). 
 
