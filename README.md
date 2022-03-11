@@ -126,8 +126,16 @@ More testing needs to be done with this. For example, books of the Bible where G
     * This can be overridden by manually adding values in firestore console (customQuotas > audioFileSizeMB). There is currently no UI for changing these values, it has to be done in google firestore console.
     * We set this in backend in file: "transcription/transcribe_class.py" and in frontend in file: "src/user/components/partials/UploadAudioForm/index.js" which reads fields set when retrieving user (see "src/shared/sagas/userSaga.js")
 
+## WAV 
+- It is possible to get WAV working, but we would have to do more testing to get it working, especially it seems like making the right audio file and right settings (particularly, Sample rate hertz and number of channels. Maybe bit rate). 
+
+#### Technical details about what we might try to fix this: 
+Might try dynamically changing settings based on what is in the file (which you can test using `python-heroku-khmer-speech-to-text/scripts/check-audio-file.sh`). Would require downloading the file in the python server and doing some checking and conversion. 
+
+Or might try requiring users to use a certain setting (would have to find a good format for us). 
+
 ## Converting MP3s to Flac
-MP3s might work ok for you as in within this app. However, sometime we found that flac worked better even when converting from mp3 > flac.
+MP3s might work ok for you as in within this app. However, sometime we found that flac worked better even when converting from mp3 > flac. On the other hand, it is worth noting that sometimes MP3 worked better...or even, sometimes it would be some words are better for flac, some better in mp3. So...it's a toss up. Might not be worth the hassle to convert at all. But if you want to: 
 
 We might have the app do this for you in the future, but it seems like it's more of a hack than a solution - ideally Google just figures out how to do mp3s for us :) In the meantime, here's [a script you can use](https://github.com/RyanQuey/python-heroku-khmer-speech-to-text/blob/master/scripts/convert-mp3-to-flac.sh).
 
