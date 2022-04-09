@@ -65,7 +65,7 @@
     "firebase": "^7.15.0",
     "generate-password": "^1.5.1",
     "i18next": "^19.9.2",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "moment-timezone": "^0.5.28",
     "prop-types": "^15.5.10",
     "querystring": "^0.2.0",
