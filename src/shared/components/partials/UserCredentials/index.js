@@ -69,11 +69,12 @@ class UserCredentials extends Component {
 
     if (this.props.view === "SET_CREDENTIALS") {
       let params = {}
-      cb = () => {
+      cb = (email) => {
         alertActions.newAlert({
           title: "Credentials successfully updated",
           level: "SUCCESS",
         })
+        // send back to login view
       }
       if (password) {params.password = password}
       if (email) {params.email = email}
@@ -81,12 +82,11 @@ class UserCredentials extends Component {
       this.props.updateUser(params, cb)
 
     } else if (this.props.view === "RESETTING_PASSWORD") {
-      cb = () => {
-        this.props.togglePending(false)
-        this.setState({
-          //change view to login
-        })
+      cb = (email) => {
+        this.props.handleSuccesfulResetPassword()
       }
+
+      // send message in redux and get it started
       this.props.resetPasswordRequest(email, cb)
 
     } else {

@@ -361,6 +361,11 @@ function* signUserOut() {
   }
 }
 
+/**
+ * July 2022 update:
+ * I'm guessing this is leftover code from growthramp. We don't use an api that persists to db right
+ * now, so need to convert this code to use firebase instead. 
+ */ 
 function* updateUser(action) {
   try {
     const userData = action.payload
@@ -386,21 +391,41 @@ function* updateUser(action) {
   }
 }
 
+/**
+ *
+ * note that we're using WebVersion 8 right now
+ * https://firebase.google.com/docs/auth/web/manage-users#web-version-8_9
+ */ 
 function* resetPassword(action) {
   try {
+    console.log("reseting with", action)
     const email = action.payload
-    const res = yield axios.post(`/api/users/resetPassword`, {email})
-    yield put({type: RESET_PASSWORD_SUCCESS, payload: email})
+    //yield firebase.auth().sendPasswordResetEmail(email)
+    // yield put({type: RESET_PASSWORD_SUCCESS, payload: email})
+    // seems to be failing silently, try the promise way
+    firebase.auth().sendPasswordResetEmail(email).then(() => {
+      // not y
+      put({type: RESET_PASSWORD_SUCCESS, payload: email})
 
-    alertActions.newAlert({
-      title: "Successfully reset password:",
-      message: "Please check your e-mail for instructions to set your new password",
-      level: "SUCCESS",
-      options: {timer: false},
+      console.log("send alert", action)
+      window.alertActions = alertActions
+      alertActions.newAlert({
+        title: `Successfully reset password for ${email}`,
+        message: "Please check your e-mail for instructions to set your new password",
+        level: "SUCCESS",
+        options: {timer: false},
+      })
+
+      console.log("callback", action.cb)
+      action.cb && action.cb(email)
+
+    }).catch((error) => {
+      console.error(error)
+      throw error
     })
-    action.cb && action.cb(res.user)
 
   } catch (err) {
+    console.log(err)
     errorActions.handleErrors({
       templateName: "User",
       templatePart: "update",

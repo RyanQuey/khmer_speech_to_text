@@ -29,6 +29,7 @@ class Login extends Component {
     this.togglePending = this.togglePending.bind(this)
     this.toggleResetPassword = this.toggleResetPassword.bind(this)
     this.submitCredentials = this.submitCredentials.bind(this)
+    this.handleSuccesfulResetPassword = this.handleSuccesfulResetPassword.bind(this)
   }
 
   componentWillReceiveProps (props) {
@@ -40,6 +41,7 @@ class Login extends Component {
     }
 
     if (user && Object.keys(user).length > 0) {
+      // closes modal etc, if in modal
       this.props.onSuccess();
     }
 
@@ -60,11 +62,25 @@ class Login extends Component {
     this.setState({pending: value})
   }
 
+  handleSuccesfulResetPassword(e) {
+    e && e.preventDefault()
+
+    this.togglePending()
+    // change back to login view
+    this.toggleResetPassword()
+
+    // does some stuff, including close modal if in modal
+    this.props.onSuccess()
+  }
+
   toggleResetPassword(e) {
-    e.preventDefault()
-    this.setState({
-      view: "RESETTING_PASSWORD",
-    })
+    e && e.preventDefault()
+
+    if (this.state.view === "LOGIN") {
+      this.setState({view: "RESETTING_PASSWORD"})
+    } else {
+      this.setState({view: "LOGIN"})
+    }
   }
   toggleView(e) {
     e.preventDefault()
@@ -132,6 +148,7 @@ class Login extends Component {
           buttonText={generalText}
           pending={this.state.pending}
           token={this.props.viewSettings.modalToken}
+          handleSuccesfulResetPassword={this.handleSuccesfulResetPassword} 
           togglePending={this.togglePending}
           submit={this.submitCredentials}
         />
