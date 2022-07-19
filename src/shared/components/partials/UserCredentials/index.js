@@ -82,6 +82,11 @@ class UserCredentials extends Component {
       this.props.updateUser(params, cb)
 
     } else if (this.props.view === "RESETTING_PASSWORD") {
+      // July 2022 update: Gave this a college try, but email wasn't sending, and also if it sends
+      // then it just sends the user back to us so they can reset the password anyways, so yeah. Not
+      // doing that! Just ask them to contact admin and we will send them a password for now. 
+      // below UI looks nice though
+      //
       cb = (email) => {
         this.props.handleSuccesfulResetPassword()
       }

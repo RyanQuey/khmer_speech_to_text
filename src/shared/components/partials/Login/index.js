@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { userActions, errorActions } from 'shared/actions'
+import { alertActions, userActions, errorActions } from 'shared/actions'
 import { Button, Flexbox, Input, Checkbox } from 'shared/components/elements'
 import {
   SIGN_IN_REQUEST,
@@ -77,7 +77,17 @@ class Login extends Component {
     e && e.preventDefault()
 
     if (this.state.view === "LOGIN") {
-      this.setState({view: "RESETTING_PASSWORD"})
+      // July 2022 update: Gave this a college try, but email wasn't sending, and also if it sends
+      // then it just sends the user back to us so they can reset the password anyways, so yeah. Not
+      // doing that! 
+      //this.setState({view: "RESETTING_PASSWORD"})
+      alertActions.newAlert({
+        title: "Please contact admin at voice@sbbic.org for help resetting your password",
+        level: "WARNING",
+      })
+      // close modal
+      this.props.onSuccess()
+
     } else {
       this.setState({view: "LOGIN"})
     }
