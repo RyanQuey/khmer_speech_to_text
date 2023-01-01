@@ -139,8 +139,17 @@ Or might try requiring users to use a certain setting (would have to find a good
 
 ## Converting FLAC to WAV
 This works great from my Sony recorder: 
+
+Two channel: (stereo)
+- Also specifies 44100 Hz (which is correct but should be kept by default)
+- Also specifies s16 (which is correct but should be kept by default)
 ```
 ffmpeg -i 221231_2149.wav -af aformat=s16:44100 out.flac
+```
+
+Single channel: (mono). This will save money by merging the two channels into one and then sending that one, but you lose the advantage of getting both channels...mostly that's not a huge advantage 
+```
+ffmpeg -i 221231_2140.wav -af aformat=channel_layouts=mono 221231_2140.mono.flac
 ```
 
 ## Converting MP3s to Flac
