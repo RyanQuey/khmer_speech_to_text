@@ -217,7 +217,6 @@ There's several TODO tags throughout the project. But apart from that:
 
 * upgrade to webpack 3...or at this point, webpack 5
 * make sure that sass files can import from the theme folder
-* probably remove the cloud functions, since we stopped using them but never removed the directory
 
 
 * download new .txt file from https://github.com/languagetool-org/languagetool/blob/master/languagetool-language-modules/km/src/main/resources/org/languagetool/rules/km/coherency.txt
