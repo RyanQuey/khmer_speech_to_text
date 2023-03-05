@@ -25,7 +25,7 @@ You can also set the maximum words per caption, which will keep a single caption
 
 # Installation Instructions
 
-> Make sure you have node 8.x installed
+> Make sure you have node 16.x installed
 
 1. Clone the project
 2. Make sure you are using the right node version. Can use `nvm use` if you have nvm.
