@@ -371,19 +371,24 @@ export default {
   khOrdinalRegEx: new RegExp(`(${khOrdinalIndicatorArr.join("|")})(\d|${KHMER_NUMBERS.join("|")})`), 
   khNumber, 
   khChapter: "ជំពូក",
+
   // including some misspellings
   khChapterRegex: new RegExp("ជំពូក|ចំពោះ|ជំពោះ"),
   khVerse: "ខ",
+
   // including some misspellings
   khVerseRegex: new RegExp("ខ|ខល"),
   referencesRegex: /\s?ជំពូក\s?(\d+)\s?ខ\s?(\d+)/gi,
+
 // if colon before or after, counting it as reference, so handling differently
   khmerNumberRegex: new RegExp(`(${khNumber})?\\s?(\\d)`, "gi"),
   // global regexs don't capture
   nonGlobalRegex: (reg) => new RegExp(reg.source, "i"),
+
   // TODO I'm sure there's a more performant way to do this, but unless it's a math transcript we
   // shouldn't call this too often anyways
-  isNumber: (str) => str.match(/\d/) || KHMER_NUMBERS.includes(str),
+  isNumber: (str) => str && (str.match(/\d/) || KHMER_NUMBERS.includes(str)),
+
   convertToKhmerNumeral: (numStr) => {
     const spelledOutIndex = KHMER_NUMBERS.indexOf(numStr)
     let ret
@@ -400,6 +405,7 @@ export default {
     return ret
   },
   punctuationRegex: new RegExp(Object.keys(ALL_KHMER_PUNCTUATION).join("|"),"gi"),
+
   // NOTE don't use when looking at individual words
   preferredSpellingRegex: new RegExp(Object.keys(PREFERRED_SPELLINGS).join("|"),"gi"),
 
